@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cook International Limited | Corporate Headquarters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Cook International Limited is an international holding company headquartered in Nassau, New Providence, The Bahamas, overseeing global entertainment, technology, and digital media businesses."
+  />
+  <style>
+    :root {
+      --bg-deep: #020617;
+      --bg-panel: #020617;
+      --accent-gold: #facc15;
+      --accent-orange: #f97316;
+      --accent-emerald: #10b981;
+      --accent-cyan: #06b6d4;
+      --muted: #9ca3af;
+      --text-main: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+    }
+
+    a {
+      color: #a5b4fc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #cook-corporate-site {
+      padding: 32px 16px 64px;
+    }
+
+    .cis-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* NAV */
+    .cis-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .cis-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cis-brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(248, 250, 252, 0.6);
+      box-shadow:
+        0 0 20px rgba(248, 250, 252, 0.45),
+        0 0 40px rgba(34, 211, 238, 0.35);
+      background:
+        radial-gradient(circle at top, rgba(248, 250, 252, 0.18), rgba(15, 23, 42, 1));
+      flex-shrink: 0;
+    }
+
+    .cis-brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .cis-brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cis-brand-name {
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .cis-brand-tagline {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cis-nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .cis-nav-links a {
+      padding: 6px 11px;
+      border-radius: 999px;
+      color: #e5e7eb;
+      border: 1px solid transparent;
+    }
+
+    .cis-nav-links a:hover {
+      border-color: rgba(148, 163, 184, 0.7);
+      text-decoration: none;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .cis-nav-links a.cis-nav-primary {
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+      color: #111827;
+      border-color: rgba(15, 23, 42, 1);
+      box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.9),
+        0 0 20px rgba(250, 204, 21, 0.4);
+    }
+
+    .cis-nav-links a.cis-nav-primary:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.95),
+        0 0 28px rgba(250, 204, 21, 0.55);
+    }
+
+    /* HERO */
+    .cis-hero {
+      margin-bottom: 56px;
+    }
+
+    .cis-hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 32px;
+      align-items: center;
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 235, 0.18), rgba(15, 23, 42, 0.98));
+      border-radius: 30px;
+      padding: 26px 24px 24px;
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 26px 70px rgba(0, 0, 0, 0.95);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cis-hero-inner::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        conic-gradient(
+          from 200deg,
+          rgba(250, 204, 21, 0.08),
+          rgba(34, 211, 238, 0.22),
+          rgba(16, 185, 129, 0.22),
+          rgba(59, 130, 246, 0.18),
+          rgba(250, 204, 21, 0.08)
+        );
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      animation: cisHalo 30s linear infinite;
+    }
+
+    .cis-hero-left,
+    .cis-hero-right {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cis-hero-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 11px;
+      color: #bae6fd;
+      margin-bottom: 8px;
+    }
+
+    .cis-hero-heading {
+      font-size: clamp(28px, 3.1vw, 38px);
+      letter-spacing: 0.02em;
+      margin: 0 0 10px;
+    }
+
+    .cis-hero-subheading {
+      font-size: 15px;
+      color: #e5e7eb;
+      margin: 0 0 14px;
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    .cis-hero-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 14px 0 18px;
+      font-size: 12px;
+    }
+
+    .cis-hero-stat {
+      padding: 10px 11px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+    }
+
+    .cis-hero-stat-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .cis-hero-stat-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .cis-hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .cis-btn-primary,
+    .cis-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+      text-decoration: none;
+    }
+
+    .cis-btn-primary {
+      background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+      color: #022c22;
+      border-color: rgba(15, 23, 42, 1);
+      box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.9),
+        0 0 24px rgba(45, 212, 191, 0.5);
+    }
+
+    .cis-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 14px 36px rgba(15, 23, 42, 0.95),
+        0 0 32px rgba(45, 212, 191, 0.65);
+      text-decoration: none;
+    }
+
+    .cis-btn-secondary {
+      background: rgba(15, 23, 42, 0.75);
+      color: #e5e7eb;
+      border-color: rgba(148, 163, 184, 0.75);
+    }
+
+    .cis-btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-1px);
+      text-decoration: none;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.9);
+    }
+
+    .cis-hero-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    /* HERO RIGHT – CARD STACK */
+    .cis-hero-right-card {
+      position: relative;
+      border-radius: 22px;
+      padding: 18px 16px 16px;
+      background:
+        radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 20px 45px rgba(15, 23, 42, 0.95),
+        0 0 40px rgba(56, 189, 248, 0.45);
+      overflow: hidden;
+    }
+
+    .cis-hero-right-card::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(34, 211, 238, 0.4), transparent 55%),
+        radial-gradient(circle at 80% 120%, rgba(16, 185, 129, 0.4), transparent 55%);
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      animation: cisMapGlow 18s ease-in-out infinite alternate;
+    }
+
+    .cis-hero-right-header {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 12px;
+    }
+
+    .cis-hero-right-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #bfdbfe;
+      margin-bottom: 4px;
+    }
+
+    .cis-hero-right-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .cis-hero-right-body {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+      color: #e5e7eb;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .cis-hero-right-badge {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      margin-top: 2px;
+    }
+
+    .cis-hero-right-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #facc15, #f97316);
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.9);
+    }
+
+    /* SECTIONS */
+    section {
+      margin-bottom: 40px;
+    }
+
+    .cis-section-title {
+      font-size: 22px;
+      margin: 0 0 8px;
+    }
+
+    .cis-section-sub {
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: #e5e7eb;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
+    /* GROUP / BUSINESS LINES */
+    .cis-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .cis-card {
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 235, 0.16), rgba(15, 23, 42, 0.98));
+      padding: 18px 18px 16px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.95);
+      font-size: 14px;
+    }
+
+    .cis-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .cis-card p {
+      margin: 0 0 10px;
+      line-height: 1.6;
+      color: #e5e7eb;
+    }
+
+    .cis-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .cis-chip {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 11px;
+      color: #e5e7eb;
+    }
+
+    /* GOVERNANCE */
+    .cis-grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 22px;
+    }
+
+    .cis-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      color: #d1d5db;
+      line-height: 1.7;
+    }
+
+    .cis-list li + li {
+      margin-top: 4px;
+    }
+
+    .cis-callout {
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      font-size: 13px;
+      line-height: 1.7;
+      color: #e5e7eb;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.95);
+    }
+
+    .cis-callout-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* CONTACT */
+    .cis-contact-block {
+      border-radius: 18px;
+      padding: 16px 18px 14px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      font-size: 13px;
+      line-height: 1.8;
+      color: #e5e7eb;
+    }
+
+    .cis-contact-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .cis-contact-column {
+      min-width: 240px;
+    }
+
+    .cis-contact-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .cis-small {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+
+    /* FOOTER */
+    .cis-footer {
+      margin-top: 26px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(15, 23, 42, 0.9);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      .cis-hero-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cis-hero-right {
+        order: -1;
+      }
+
+      .cis-grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cis-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      #cook-corporate-site {
+        padding: 24px 14px 40px;
+      }
+
+      .cis-nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cis-hero-inner {
+        padding: 20px 16px 18px;
+        border-radius: 24px;
+      }
+
+      .cis-hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .cis-contact-inner {
+        flex-direction: column;
+      }
+    }
+
+    @keyframes cisHalo {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+      }
+      50% {
+        transform: translate3d(-6%, 4%, 0) rotate(180deg);
+      }
+      100% {
+        transform: translate3d(0, 0, 0) rotate(360deg);
+      }
+    }
+
+    @keyframes cisMapGlow {
+      0% {
+        opacity: 0.3;
+        transform: translate3d(-6px, -3px, 0);
+      }
+      50% {
+        opacity: 0.6;
+        transform: translate3d(8px, 4px, 0);
+      }
+      100% {
+        opacity: 0.35;
+        transform: translate3d(10px, -2px, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="cook-corporate-site">
+    <div class="cis-shell">
+      <!-- NAV -->
+      <header class="cis-nav">
+        <div class="cis-brand">
+          <div class="cis-brand-mark">
+            <img
+              src="https://www.cook-international.com/s/CookIntllogo02.png"
+              alt="Cook International Limited emblem"
+              loading="lazy"
+            />
+          </div>
+          <div class="cis-brand-text">
+            <span class="cis-brand-name">Cook International Limited</span>
+            <span class="cis-brand-tagline">Corporate Headquarters · The Bahamas</span>
+          </div>
+        </div>
+        <nav class="cis-nav-links">
+          <a href="#home">Home</a>
+          <a href="#group">Our Group</a>
+          <a href="#governance">Governance</a>
+          <a href="#responsible-gaming">Responsible Gaming</a>
+          <a href="#contact">Contact</a>
+          <a
+            href="https://www.cook-international.com"
+            target="_blank"
+            rel="noopener"
+            class="cis-nav-primary"
+          >
+            Visit Cook International Casino
+          </a>
+        </nav>
+      </header>
+
+      <!-- HERO -->
+      <section id="home" class="cis-hero">
+        <div class="cis-hero-inner">
+          <div class="cis-hero-left">
+            <p class="cis-hero-eyebrow">International Entertainment &amp; Technology Group</p>
+
+            <h1 class="cis-hero-heading">
+              A Bahamas-Headquartered Company with a Global Digital Footprint
+            </h1>
+
+            <p class="cis-hero-subheading">
+              Cook International Limited is an international holding company based in Nassau,
+              New Providence, The Bahamas, overseeing licensed online gaming, technology,
+              and digital media brands serving players and customers around the world.
+            </p>
+
+            <div class="cis-hero-grid">
+              <div class="cis-hero-stat">
+                <div class="cis-hero-stat-label">Headquarters</div>
+                <div class="cis-hero-stat-value">Nassau, New Providence, The Bahamas</div>
+              </div>
+              <div class="cis-hero-stat">
+                <div class="cis-hero-stat-label">Core Verticals</div>
+                <div class="cis-hero-stat-value">Interactive Gaming · Tech · Media</div>
+              </div>
+              <div class="cis-hero-stat">
+                <div class="cis-hero-stat-label">Jurisdictions</div>
+                <div class="cis-hero-stat-value">The Bahamas · Curaçao &amp; Others</div>
+              </div>
+            </div>
+
+            <div class="cis-hero-cta-row">
+              <a href="#group" class="cis-btn-primary">Explore the Cook International Group</a>
+              <a href="#contact" class="cis-btn-secondary">Corporate &amp; Media Enquiries</a>
+            </div>
+
+            <p class="cis-hero-note">
+              Cook International Limited operates as a holding and management company. Regulated
+              activities, including online gaming, are conducted through duly licensed subsidiaries
+              and brands, including Cook International Casino, regulated by the Curaçao Gaming Authority
+              (Licence No: OGL/2024/558/0973).
+            </p>
+          </div>
+
+          <div class="cis-hero-right">
+            <div class="cis-hero-right-card">
+              <div class="cis-hero-right-header">
+                <div class="cis-hero-right-label">Registered Office</div>
+                <div class="cis-hero-right-title">
+                  Nassau, New Providence — Gateway to the Americas &amp; Beyond
+                </div>
+              </div>
+              <div class="cis-hero-right-body">
+                From its base in Nassau, Cook International Limited coordinates group-level
+                strategy, capital allocation, governance, and brand development across
+                international markets.
+                <br /><br />
+                The Bahamas is a long-established jurisdiction for international business
+                companies and cross-border corporate structures, making it a natural home
+                for a globally focused entertainment and technology group.
+              </div>
+              <div class="cis-hero-right-badge">
+                <span class="cis-hero-right-badge-dot" aria-hidden="true"></span>
+                <span>Incorporated in The Commonwealth of The Bahamas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GROUP / LINES OF BUSINESS -->
+      <section id="group">
+        <h2 class="cis-section-title">The Cook International Group</h2>
+        <p class="cis-section-sub">
+          Cook International Limited manages a portfolio of digital-first businesses across
+          gaming, technology, and content. Each operating brand is responsible for day-to-day
+          customer activity in its licensed markets, while group leadership focuses on long-term
+          value creation, governance, and shared infrastructure.
+        </p>
+
+        <div class="cis-grid-3">
+          <article class="cis-card">
+            <h3>Interactive Gaming &amp; Player Experiences</h3>
+            <p>
+              Cook International Casino is the group’s flagship online gaming brand, offering
+              table games, VIP experiences, and innovative bonus products to eligible players
+              under a Curaçao licence.
+            </p>
+            <p>
+              Operations are built around responsible play, transparent rules, and high-touch
+              hospitality for both casual players and VIP guests.
+            </p>
+            <div class="cis-chip-row">
+              <span class="cis-chip">Online Casino &amp; Table Games</span>
+              <span class="cis-chip">VIP &amp; High-Roller Programs</span>
+              <span class="cis-chip">Bonus &amp; Promotional Mechanics</span>
+            </div>
+          </article>
+
+          <article class="cis-card">
+            <h3>Technology, Infrastructure &amp; Corporate Web</h3>
+            <p>
+              Through Cook Technology Services and related technical teams, the group designs,
+              deploys, and maintains the web infrastructure, integrations, and IT support
+              that power its brands.
+            </p>
+            <p>
+              This includes static hosting, CDN-based deployments, DNS and SSL management, and
+              integration with third-party tools where appropriate.
+            </p>
+            <div class="cis-chip-row">
+              <span class="cis-chip">Corporate Websites &amp; Brand Hubs</span>
+              <span class="cis-chip">IT &amp; Hosting Strategy</span>
+              <span class="cis-chip">Technical SEO Foundations</span>
+            </div>
+          </article>
+
+          <article class="cis-card">
+            <h3>Digital Content, IP &amp; Brand Development</h3>
+            <p>
+              Cook International also invests in content-driven projects and intellectual
+              property — from interactive experiences to supporting media and communications
+              around its brands.
+            </p>
+            <p>
+              At the group level, this includes brand standards, visual identity, and
+              cross-property campaigns.
+            </p>
+            <div class="cis-chip-row">
+              <span class="cis-chip">Brand &amp; IP Management</span>
+              <span class="cis-chip">Content &amp; Media</span>
+              <span class="cis-chip">Cross-Brand Campaigns</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- GOVERNANCE & COMPLIANCE -->
+      <section id="governance">
+        <h2 class="cis-section-title">Governance, Compliance &amp; Risk Management</h2>
+        <p class="cis-section-sub">
+          As a Bahamas-headquartered international company, Cook International Limited
+          emphasizes clear structures, documented responsibilities, and a conservative
+          approach to regulatory and financial risk across the group.
+        </p>
+
+        <div class="cis-grid-2">
+          <div>
+            <ul class="cis-list">
+              <li>
+                <strong>Separation of roles:</strong> Holding-company oversight is separated from
+                licensed operating entities responsible for day-to-day customer activity.
+              </li>
+              <li>
+                <strong>Regulatory focus:</strong> Gaming operations are carried out through
+                entities licensed by, and subject to the rules of, the Curaçao Gaming Authority
+                and any other competent regulators in relevant markets.
+              </li>
+              <li>
+                <strong>AML &amp; KYC controls:</strong> Customer onboarding, payments, and
+                transaction monitoring are designed to align with internationally recognized
+                anti-money-laundering and know-your-customer standards, as implemented by the
+                applicable operating subsidiaries.
+              </li>
+              <li>
+                <strong>Data protection &amp; security:</strong> The group prioritizes secure,
+                access-controlled systems, limited data retention, and encrypted channels for
+                customer communications wherever technically feasible.
+              </li>
+              <li>
+                <strong>Board &amp; management oversight:</strong> Strategic decisions, capital
+                allocation, and the launch of new initiatives are subject to review at the
+                Cook International Limited board level.
+              </li>
+            </ul>
+          </div>
+
+          <div class="cis-callout">
+            <div class="cis-callout-label">Jurisdiction &amp; Corporate Status</div>
+            Cook International Limited is incorporated in The Commonwealth of The Bahamas and
+            acts as an international business and holding company for the group’s brands and
+            subsidiaries.
+            <br /><br />
+            Operational licences, including online gaming authorizations, are held by the
+            relevant operating entities and are clearly disclosed on their respective
+            consumer-facing websites. Players and counterparties should always rely on the
+            licence and terms stated on the specific brand site they are dealing with.
+          </div>
+        </div>
+      </section>
+
+      <!-- RESPONSIBLE GAMING -->
+      <section id="responsible-gaming">
+        <h2 class="cis-section-title">Responsible Gaming &amp; Player Safeguards</h2>
+        <p class="cis-section-sub">
+          While Cook International Limited operates at the corporate level, the group’s gaming
+          brands are expected to implement responsible gaming measures that prioritize player
+          safety and transparency.
+        </p>
+
+        <div class="cis-grid-2">
+          <div>
+            <ul class="cis-list">
+              <li>Clear eligibility and jurisdictional restrictions for online play.</li>
+              <li>Transparent rules, paytables, and game conditions for each product.</li>
+              <li>Account-level tools such as deposit limits, play limits, and self-exclusion where available.</li>
+              <li>Visible links to responsible gaming resources and support organizations.</li>
+              <li>Strict 21+ age requirement for real-money casino play where legally applicable.</li>
+            </ul>
+          </div>
+          <div class="cis-callout">
+            <div class="cis-callout-label">Where to Find Player-Facing Information</div>
+            Detailed responsible gaming information, eligibility rules, and game-specific
+            terms are published on the primary casino site at
+            <a href="https://www.cook-international.com" target="_blank" rel="noopener">
+              www.cook-international.com
+            </a>
+            and its dedicated policy pages.
+            <br /><br />
+            Players should always review the terms, rules, and responsible gaming
+            resources presented on the site where they register and play.
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <h2 class="cis-section-title">Contact &amp; Registered Office</h2>
+        <p class="cis-section-sub">
+          For corporate, media, or investor enquiries related to the Cook International group,
+          please use the contact details below. Customer service for gaming accounts remains
+          available through the relevant brand websites.
+        </p>
+
+        <div class="cis-contact-block">
+          <div class="cis-contact-inner">
+            <!-- Bahamas / Registered Office -->
+            <div class="cis-contact-column">
+              <div class="cis-contact-label">Registered Office — The Bahamas</div>
+              <strong>Cook International Limited</strong><br />
+              P.O. Box N-3924<br />
+              Marlborough &amp; Queen St.<br />
+              Nassau, New Providence, The Bahamas<br />
+              🌐
+              <a href="https://corporate.cook-international.com" target="_blank" rel="noopener">
+                https://corporate.cook-international.com
+              </a><br />
+              📧
+              <a href="mailto:info@cook-international.com">info@cook-international.com</a><br />
+              📱
+              <a href="tel:+13174421437">+1 (317) 442-1437</a>
+            </div>
+
+            <!-- Gaming Operations / Brand -->
+            <div class="cis-contact-column">
+              <div class="cis-contact-label">Gaming Brand &amp; Player Support</div>
+              <strong>Cook International Casino</strong><br />
+              Licensed &amp; regulated by the Curaçao Gaming Authority<br />
+              Licence No: OGL/2024/558/0973<br />
+              🌐
+              <a href="https://www.cook-international.com" target="_blank" rel="noopener">
+                https://www.cook-international.com
+              </a><br />
+              For player account questions, withdrawals, or game-related support, please use the
+              contact options provided on the casino website.
+            </div>
+
+            <!-- Media / Corporate Enquiries -->
+            <div class="cis-contact-column">
+              <div class="cis-contact-label">Media &amp; Corporate Enquiries</div>
+              For press, partnership, or corporate documentation requests, please contact:
+              <br /><br />
+              📧
+              <a href="mailto:corporate@cook-international.com">corporate@cook-international.com</a><br />
+              For time-sensitive matters, please reference your organization, topic, and any
+              relevant jurisdictions in the subject line so we can route your enquiry efficiently.
+            </div>
+          </div>
+
+          <p class="cis-small">
+            Cook International Limited is a holding and management company. Nothing on this
+            site constitutes an offer of securities, investment advice, or a solicitation for
+            players in any jurisdiction. Availability of services is always subject to local
+            law and the terms and conditions of the relevant operating brand.
+          </p>
+        </div>
+      </section>
+
+      <footer class="cis-footer">
+        Copyright © 2025 Cook International Limited. All Rights Reserved.
+      </footer>
+    </div>
+  </div>
+</body>
+</html>
