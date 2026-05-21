@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v1.4.0 Beta | Last Updated on 21 May 2026 @ 21:32:12Z -->
+<!-- CSC Portal Frontend v1.5.0 Beta | Last Updated on 21 May 2026 @ 21:48:53Z -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -54,6 +54,12 @@
     .portal-market-ticker{margin:0 0 16px;border-radius:20px;overflow:hidden;background:#020711;color:#fff;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;min-height:50px;box-shadow:0 18px 42px rgba(7,23,47,.18)}
     .portal-market-ticker-label{flex:0 0 auto;margin-left:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(201,151,43,.58);color:#f8d98e;background:rgba(7,23,47,.95);text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:900;z-index:2}.portal-market-ticker-window{overflow:hidden;flex:1;min-width:0}.portal-market-ticker-track{display:inline-flex;gap:20px;white-space:nowrap;animation:portalTicker 46s linear infinite;padding-left:24px;font-size:12px;font-weight:900}.portal-market-ticker-track span{display:inline-flex;gap:7px;color:#dfe8f6}.portal-up{color:#54d98c}.portal-down{color:#ff8a80}@keyframes portalTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .portal-chart-card{padding:18px;background:#071326;color:#fff;border-radius:24px}.portal-chart-card h2{margin:0 0 5px;color:#fff}.portal-chart-meta{margin:0 0 12px;color:#aebbd0;font-size:13px}.portal-chart{height:360px;border-radius:18px;background:linear-gradient(180deg,#0b1d35,#06101f);border:1px solid rgba(255,255,255,.12);overflow:hidden;position:relative}.portal-chart svg{width:100%;height:100%;display:block}.portal-chart-empty{display:grid;place-items:center;height:100%;color:#aebbd0;text-align:center;padding:22px}.portal-chart-tooltip{position:absolute;display:none;background:#fff;color:#0f172a;border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 10px 24px rgba(0,0,0,.22);pointer-events:none;z-index:5}.portal-chart-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.portal-chart-actions button{font-size:12px;padding:8px 10px}.portal-table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--portal-line);background:#fff}.portal-table{border-collapse:collapse;width:100%;min-width:920px;font-size:13px}.portal-table th,.portal-table td{padding:12px;border-bottom:1px solid #e8edf4;text-align:left;vertical-align:top}.portal-table th{position:sticky;top:0;background:#f8fafc;color:#334155;text-transform:uppercase;letter-spacing:.06em;font-size:11px;z-index:1}.portal-table td.num{text-align:right;font-variant-numeric:tabular-nums}.portal-table tr:last-child td{border-bottom:0}.portal-section-card{padding:20px}.portal-section-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.portal-section-head p{margin:4px 0 0;color:var(--portal-muted);line-height:1.55}.portal-badge{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;background:#eef2ff;color:#3538cd}.portal-badge.green{background:#ecfdf3;color:#05603a}.portal-badge.gold{background:#fffaeb;color:#93370d}.portal-badge.red{background:#fff1f3;color:#c01048}.portal-actions{display:flex;gap:8px;flex-wrap:wrap}.portal-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.portal-sign-pad{border:1px dashed rgba(7,23,47,.28);background:#fff;border-radius:18px;height:180px;touch-action:none}.portal-small{font-size:12px;color:var(--portal-muted);line-height:1.5}.portal-hidden{display:none!important}.portal-pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border-radius:18px;padding:14px;overflow:auto;max-height:360px;font-size:12px;line-height:1.5}.portal-split-list{display:grid;gap:12px}.portal-list-item{border:1px solid var(--portal-line);border-radius:16px;padding:14px;background:#fff;display:grid;gap:6px}.portal-list-item h3{margin:0;color:var(--portal-navy)}.portal-list-item p{margin:0;color:var(--portal-muted);font-size:13px;line-height:1.5}
+
+    .portal-tv-wrap{width:100%;min-height:56px;}
+    .portal-tv-chart-shell{height:360px;border-radius:18px;overflow:hidden;background:#071326;border:1px solid rgba(255,255,255,.12);}
+    .portal-tv-chart-shell .tradingview-widget-container,.portal-tv-chart-shell .tradingview-widget-container__widget{height:100%;width:100%;}
+    .portal-data-note{margin-top:12px;padding:12px 14px;border-radius:16px;background:#fff7e6;border:1px solid rgba(201,151,43,.28);color:#5c3d00;font-size:12px;line-height:1.55;}
+
     @media(max-width:900px){.portal-login-wrap,.portal-grid-2,.portal-grid-3,.portal-grid-4,.portal-form-grid{grid-template-columns:1fr}.portal-topbar{flex-direction:column}.portal-userline{text-align:left;white-space:normal}.portal-chart{height:300px}.portal-table{min-width:760px}.portal-market-ticker{align-items:center}.portal-market-ticker-label{margin-left:10px}.portal-shell{width:min(100% - 22px,1180px)}}
   </style>
 </head>
@@ -97,10 +103,68 @@
         <div id="portal-global-alert" class="portal-alert"></div>
 
         <section id="tab-dashboard" class="portal-panel active">
-          <div class="portal-market-ticker" aria-label="Market ticker"><div class="portal-market-ticker-label">CSC Market Watch</div><div class="portal-market-ticker-window"><div id="portal-ticker-track" class="portal-market-ticker-track"><span>Loading market data…</span></div></div></div>
+          <div class="portal-market-ticker" aria-label="CSC market ticker">
+            <div class="portal-market-ticker-label">CSC Market Watch</div>
+            <div class="portal-market-ticker-window portal-tv-wrap">
+              <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                {
+                  "symbols": [
+              {"description":"SPYI", "proName":"AMEX:SPYI"},
+              {"description":"VOO", "proName":"AMEX:VOO"},
+              {"description":"IJH", "proName":"AMEX:IJH"},
+              {"description":"KMX", "proName":"NYSE:KMX"},
+              {"description":"GEHC", "proName":"NASDAQ:GEHC"},
+              {"description":"CNH", "proName":"NYSE:CNH"},
+              {"description":"MAS", "proName":"NYSE:MAS"},
+              {"description":"MKTX", "proName":"NASDAQ:MKTX"},
+              {"description":"DINO", "proName":"NYSE:DINO"},
+              {"description":"CMCSA", "proName":"NASDAQ:CMCSA"},
+              {"description":"DIS", "proName":"NYSE:DIS"},
+              {"description":"PFE", "proName":"NYSE:PFE"},
+              {"description":"NXPI", "proName":"NASDAQ:NXPI"},
+              {"description":"AVGO", "proName":"NASDAQ:AVGO"},
+              {"description":"CRSP", "proName":"NASDAQ:CRSP"},
+              {"description":"NTLA", "proName":"NASDAQ:NTLA"},
+              {"description":"TERN", "proName":"NASDAQ:TERN"},
+              {"description":"ADMA", "proName":"NASDAQ:ADMA"},
+              {"description":"ANIP", "proName":"NASDAQ:ANIP"},
+              {"description":"LQDA", "proName":"NASDAQ:LQDA"}
+            ],
+                  "showSymbolLogo": true,
+                  "isTransparent": true,
+                  "displayMode": "regular",
+                  "colorTheme": "dark",
+                  "locale": "en"
+                }
+                </script>
+              </div>
+            </div>
+          </div>
           <div class="portal-grid portal-grid-4" id="summary-cards"></div>
           <div class="portal-grid portal-grid-2" style="margin-top:16px;">
-            <article class="portal-chart-card"><div class="portal-section-head"><div><h2>Market Watch Chart</h2><p id="chart-meta" class="portal-chart-meta">Cached market history from CSC backend.</p></div><span id="chart-source" class="portal-badge gold">Finnhub / Cached</span></div><div class="portal-chart" id="portal-chart"><div class="portal-chart-empty">Loading chart…</div><div class="portal-chart-tooltip" id="chart-tooltip"></div></div><div class="portal-chart-actions"><button class="portal-button portal-button-secondary" data-chart="VOO" type="button">VOO</button><button class="portal-button portal-button-secondary" data-chart="SPYI" type="button">SPYI</button><button class="portal-button portal-button-secondary" data-chart="IJH" type="button">IJH</button><button class="portal-button portal-button-secondary" data-chart="KMX" type="button">KMX</button></div></article>
+            <article class="portal-chart-card">
+              <div class="portal-section-head">
+                <div>
+                  <h2>Portfolio Watch Chart</h2>
+                  <p id="chart-meta" class="portal-chart-meta">TradingView visual chart uses the same working widget pattern as the Investors page.</p>
+                </div>
+                <span id="chart-source" class="portal-badge gold">TradingView / Visual</span>
+              </div>
+              <div class="portal-tv-chart-shell" id="portal-tv-chart"></div>
+              <div class="portal-chart-actions">
+                <button class="portal-button portal-button-secondary" data-tv-symbol="AMEX:SPYI" type="button">SPYI</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="AMEX:VOO" type="button">VOO</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="AMEX:IJH" type="button">IJH</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="NASDAQ:AVGO" type="button">AVGO</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="NYSE:DIS" type="button">DIS</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="NYSE:PFE" type="button">PFE</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="NYSE:KMX" type="button">KMX</button>
+                <button class="portal-button portal-button-secondary" data-tv-symbol="NASDAQ:CRSP" type="button">CRSP</button>
+              </div>
+              <p class="portal-data-note">TradingView market widgets are displayed for visual reference only. CSC portfolio records, cost basis, reports, and documents are maintained separately in the CSC records system. Backend price data for the research grid is cached through Tiingo.</p>
+            </article>
             <article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Status</p><h2 class="portal-section-title">Reporting Controls</h2><p>Market data powers ticker/chart/latest market value only. Research-only positions never count toward portfolio totals.</p></div></div><div id="dashboard-status" class="portal-split-list"></div></article>
           </div>
           <article class="portal-section-card portal-card" style="margin-top:16px;"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Portfolio Grid</h2><p>Owned holdings and research-only watchlist, separated by status.</p></div><button class="portal-button portal-button-dark" id="refresh-dashboard" type="button">Refresh</button></div><div id="dashboard-positions"></div></article>
@@ -127,6 +191,7 @@
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
     let CURRENT_CHART_SYMBOL = 'VOO';
+    let CURRENT_TV_SYMBOL = 'AMEX:VOO';
 
     function money(v){ const n=Number(v||0); return n.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}); }
     function pct(v){ const n=Number(v||0); return `${n>=0?'+':''}${n.toFixed(2)}%`; }
@@ -197,7 +262,7 @@
     async function loadESign(){ try{ const res=await cscJsonp('getESignRequests',{}); CSC_DATA.esign=res.data; renderESign(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
 
     function renderDashboard(data){
-      clearAlert('portal-global-alert'); renderTicker(data.marketPrices||[]); renderSummary(data.summary||{}); renderChart(data.marketHistory||[], CURRENT_CHART_SYMBOL); renderStatus(data); renderPositions(data.positions||{},'dashboard-positions');
+      clearAlert('portal-global-alert'); renderSummary(data.summary||{}); renderStatus(data); renderPositions(data.positions||{},'dashboard-positions'); renderTradingViewChart(CURRENT_TV_SYMBOL);
     }
     function renderTicker(prices){
       const track=document.getElementById('portal-ticker-track');
@@ -226,19 +291,54 @@
     window.approveReport=async function(reportId){ try{ const res=await cscJsonp('approveReport',{report_id:reportId,status:'approved'}); showAlert('portal-global-alert','Report approved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
     function renderDocuments(data){ const docs=data.documents||[]; if(!docs.length){document.getElementById('documents-content').innerHTML='<p class="portal-small">No documents uploaded yet.</p>';return;} document.getElementById('documents-content').innerHTML='<div class="portal-split-list">'+docs.map(d=>`<div class="portal-list-item"><h3>${esc(d.title||d.file_name)}</h3><p><span class="portal-badge">${esc(d.document_type||d.category||'document')}</span> ${esc(d.status||'')}</p><p>${esc(d.uploaded_at||'')} ${d.file_url?` · <a href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}</p><p>${esc(d.notes||'')}</p></div>`).join('')+'</div>'; }
     function renderESign(data){ const rows=data.requests||[]; if(!rows.length){document.getElementById('esign-content').innerHTML='<p class="portal-small">No e-sign requests found.</p>';return;} document.getElementById('esign-content').innerHTML='<div class="portal-split-list">'+rows.map(r=>`<div class="portal-list-item"><h3>${esc(r.title||r.esign_request_id)}</h3><p><span class="portal-badge ${r.request_status==='signed'?'green':'gold'}">${esc(r.request_status||'pending')}</span> ${esc(r.signer_email||'')}</p><p>${esc(r.message||'')}</p></div>`).join('')+'</div>'; }
-    function renderSettings(){ const u=CSC_SESSION||{}; document.getElementById('settings-content').innerHTML=`<div class="portal-grid portal-grid-3"><div class="portal-summary-card portal-card"><span>Email</span><strong style="font-size:18px;letter-spacing:0">${esc(u.email)}</strong><small>${esc(u.full_name)}</small></div><div class="portal-summary-card portal-card"><span>Role</span><strong style="font-size:22px;">${esc(u.role)}</strong><small>${isAdmin()?'Admin tools enabled':'Viewer tools only'}</small></div><div class="portal-summary-card portal-card"><span>Backend</span><strong style="font-size:18px;letter-spacing:0">CSC .gs</strong><small>FINNHUB_API_KEY stays in Script Properties</small></div></div>`; }
+    function renderSettings(){ const u=CSC_SESSION||{}; document.getElementById('settings-content').innerHTML=`<div class="portal-grid portal-grid-3"><div class="portal-summary-card portal-card"><span>Email</span><strong style="font-size:18px;letter-spacing:0">${esc(u.email)}</strong><small>${esc(u.full_name)}</small></div><div class="portal-summary-card portal-card"><span>Role</span><strong style="font-size:22px;">${esc(u.role)}</strong><small>${isAdmin()?'Admin tools enabled':'Viewer tools only'}</small></div><div class="portal-summary-card portal-card"><span>Backend</span><strong style="font-size:18px;letter-spacing:0">CSC .gs</strong><small>TIINGO_API_KEY powers cached grid prices only</small></div></div>`; }
+
+    function renderTradingViewChart(symbol){
+      const mount=document.getElementById('portal-tv-chart');
+      if(!mount) return;
+      const label=(symbol||'AMEX:VOO').split(':').pop();
+      document.getElementById('chart-meta').textContent=`${label} TradingView visual chart`;
+      mount.innerHTML='<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>';
+      const script=document.createElement('script');
+      script.type='text/javascript';
+      script.src='https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+      script.async=true;
+      script.text=JSON.stringify({
+        symbols:[[label, `${symbol}|1D`]],
+        chartOnly:false,
+        width:"100%",
+        height:"100%",
+        locale:"en",
+        colorTheme:"dark",
+        autosize:true,
+        showVolume:false,
+        showMA:false,
+        hideDateRanges:false,
+        hideMarketStatus:false,
+        hideSymbolLogo:false,
+        scalePosition:"right",
+        scaleMode:"Normal",
+        fontFamily:"Arial, sans-serif",
+        fontSize:"12",
+        noTimeScale:false,
+        valuesTracking:"1",
+        changeMode:"price-and-percent"
+      });
+      mount.querySelector('.tradingview-widget-container').appendChild(script);
+    }
+
     function renderChart(rows,symbol){
       const mount=document.getElementById('portal-chart'); const tooltip=document.getElementById('chart-tooltip'); document.getElementById('chart-meta').textContent=`${symbol} cached market history`;
       const data=(rows||[]).filter(r=>Number(r.close_price||r.last_price||0)>0).map(r=>({date:r.price_date||r.price_time_utc||'', close:Number(r.close_price||r.last_price)}));
-      if(data.length<2){ mount.innerHTML='<div class="portal-chart-empty">No chart history cached yet. Run Refresh Market Data after adding FINNHUB_API_KEY in Apps Script Properties.</div><div class="portal-chart-tooltip" id="chart-tooltip"></div>'; return; }
+      if(data.length<2){ mount.innerHTML='<div class="portal-chart-empty">No chart history cached yet. Run Refresh Market Data after adding TIINGO_API_KEY in Apps Script Properties.</div><div class="portal-chart-tooltip" id="chart-tooltip"></div>'; return; }
       const w=900,h=360,p=34; const vals=data.map(d=>d.close); const min=Math.min(...vals), max=Math.max(...vals); const range=max-min||1; const pts=data.map((d,i)=>[p+(i*(w-p*2)/(data.length-1)), h-p-((d.close-min)/range*(h-p*2)), d]);
       const path=pts.map((pt,i)=>(i?'L':'M')+pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' '); const area=path+` L ${w-p} ${h-p} L ${p} ${h-p} Z`;
       mount.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(symbol)} price chart"><defs><linearGradient id="cscChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9972b" stop-opacity=".42"/><stop offset="1" stop-color="#c9972b" stop-opacity="0"/></linearGradient></defs><g stroke="rgba(255,255,255,.12)" stroke-width="1">${[0,1,2,3].map(i=>`<line x1="${p}" x2="${w-p}" y1="${p+i*(h-p*2)/3}" y2="${p+i*(h-p*2)/3}"/>`).join('')}</g><path d="${area}" fill="url(#cscChartFill)"/><path d="${path}" fill="none" stroke="#f4d783" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(pt=>`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="3" fill="#fff" opacity=".75"><title>${esc(pt[2].date)} ${money(pt[2].close)}</title></circle>`).join('')}<text x="${p}" y="24" fill="#aebbd0" font-size="12">${esc(data[0].date)} → ${esc(data[data.length-1].date)}</text><text x="${w-p}" y="24" text-anchor="end" fill="#f4d783" font-size="14" font-weight="800">Last ${money(data[data.length-1].close)}</text></svg><div class="portal-chart-tooltip" id="chart-tooltip"></div>`;
     }
 
     document.getElementById('refresh-dashboard').addEventListener('click', loadDashboard);
-    document.getElementById('refresh-market').addEventListener('click', async()=>{ try{showAlert('portal-global-alert','Refreshing market data…','warn'); await cscJsonp('refreshMarketData',{include_history:'true',chart_symbol:CURRENT_CHART_SYMBOL}); showAlert('portal-global-alert','Market data refresh complete.','ok'); loadDashboard(); loadPositions(); }catch(e){showAlert('portal-global-alert',e.message,'error');} });
-    document.querySelectorAll('[data-chart]').forEach(btn=>btn.addEventListener('click',()=>{CURRENT_CHART_SYMBOL=btn.dataset.chart;loadDashboard();}));
+    document.getElementById('refresh-market').addEventListener('click', async()=>{ try{showAlert('portal-global-alert','Refreshing market data…','warn'); await cscJsonp('refreshMarketData',{include_history:'true',chart_symbol:CURRENT_CHART_SYMBOL}); showAlert('portal-global-alert','Tiingo backend grid data refresh complete. TradingView widgets update visually on their own.','ok'); loadDashboard(); loadPositions(); }catch(e){showAlert('portal-global-alert',e.message,'error');} });
+    document.querySelectorAll('[data-tv-symbol]').forEach(btn=>btn.addEventListener('click',()=>{CURRENT_TV_SYMBOL=btn.dataset.tvSymbol; CURRENT_CHART_SYMBOL=(CURRENT_TV_SYMBOL.split(':').pop()||'VOO'); renderTradingViewChart(CURRENT_TV_SYMBOL);}));
 
     document.getElementById('test-report')?.addEventListener('click',async()=>{ try{const res=await cscJsonp('testReport',{}); showAlert('portal-global-alert','Test report generated and saved to Reports.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
     document.getElementById('settings-test-report')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('testReport',{}); out.textContent=JSON.stringify(res,null,2); loadReports();}catch(e){out.textContent=e.message;} });
