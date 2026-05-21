@@ -1,9 +1,9 @@
 [Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
-# CSC Portal v1.6.0 Beta - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+# CSC Portal v1.6.2 Beta - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 
 **Cook Services Company, LLC**  
-**Build:** CSC Portal v1.6.0 Beta  
+**Build:** CSC Portal v1.6.2 Beta  
 **Updated:** 21 May 2026 @ 23:12:29Z
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
