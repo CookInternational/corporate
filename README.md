@@ -1,13 +1,43 @@
 [Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
-# CSC Portal v1.6.2 Beta - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+# CSC Portal v1.7.0 Alpha - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 
 **Cook Services Company, LLC**  
-**Build:** CSC Portal v1.6.2 Beta  
-**Updated:** 21 May 2026 @ 23:12:29Z
+**Build:** CSC Portal v1.7.0 Alpha  
+**Updated:** 21 May 2026 @ 23:46:42Z UTC  
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
 **Contact:** cookservicescompany@gmail.com
+
+# CSC Portal Backend v1.7.0 Alpha
+
+Last Updated: 21 May 2026 @ 23:46:42Z UTC  
+Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+
+## Purpose
+This build cleans the report/parser backend so bank statements produce real numbers instead of zero-filled reports.
+
+## Major changes
+- Cleaned duplicate function declarations from the prior hotfix stack.
+- Preserved one `doGet` and one `doPost`.
+- Added U.S. Bank Business Essentials Checking parser.
+- Added Fidelity GPS Guided Portfolio Summary parser for portfolio-reference values.
+- Added Drive OCR / Google Docs text extraction path for PDFs.
+- Reports now use the latest complete bank-statement-backed 15th-to-15th period.
+- Report numbers pull from `Statements.parsed_summary`.
+- No new Google Sheet tabs.
+- No canonical header changes.
+
+## Required setup
+1. Apps Script Project Settings: show `appsscript.json`.
+2. Services: enable Advanced Drive API v2.
+3. Use the included manifest.
+4. Run `CSC_manualParseStatements()`.
+5. Run `CSC_manualGenerateReportForLatestCompletePeriod()`.
+
+## Statement parsing target
+For uploaded U.S. Bank statements, the parser extracts account summary fields, daily balance summary, and transactions where possible. For the March/April statement pair, reports can derive the 15 March–15 April period using the daily balances and parsed transaction activity.
+
 
 This README documents the CSC private portal reports/documents update. It is built on top of the locked CSC Website Google Sheet and the existing corporate GitHub Pages site.
 
