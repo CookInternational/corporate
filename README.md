@@ -1,141 +1,36 @@
-# Cook Services Company, LLC Corporate Website | Copyright © 2026 Cook Services Company, LLC.  All Rights Reserved. 
+[Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
+# CSC Portal v1.6.0 Beta - Reports, Documents & Drive Vault
 
-Static GitHub Pages website for Cook Services Company, LLC.
+**Cook Services Company, LLC**  
+**Build:** CSC Portal v1.6.0 Beta  
+**Updated:** 21 May 2026 @ 22:19:05Z  
+**Website:** https://corporate.cook-international.com  
+**Portal:** https://corporate.cook-international.com/portal/  
+**Contact:** cookservicescompany@gmail.com
 
-## Updated Public Site Scope
+This README documents the CSC private portal reports/documents update. It is built on top of the locked CSC Website Google Sheet and the existing corporate GitHub Pages site.
 
-This build updates the public-facing CSC corporate website only.
+## What changed in v1.6.0 Beta
 
-Included changes:
+This build adds the Reports/Documents foundation that was missing from the v1.5.0 Beta portal:
 
-- `index.html` — refreshed homepage positioning for Cook Services Company, LLC and CSC Investments.
-- `investors/index.html` — new public CSC Investments page with a research-only portfolio snapshot, TradingView-style market dashboard, ticker tape, filters, and all 20 CSC Investments holdings/reference prices.
-- `terms/index.html` — professional Terms of Service with no-securities-offering language, Rule 506(b)-safe posture, and Rule 506(d) correction.
-- `privacy/index.html` — professional Privacy Policy with investor/contact-data, future portal, market-data, and security language.
-- `assets/csc-shell.js` — shared header/footer updates, enlarged header logo, CSC Investments footer logo, global contact email update, and Investors navigation.
-- `assets/csc-style.css` — premium CSC/CSC Investments styling, responsive header/footer/logo sizing, investors page layout, market widgets, ticker, filters, cards, and legal page polish.
+- Drive Vault Sync for files manually uploaded to Google Drive.
+- Document classification/edit controls inside `/portal/`.
+- Statement parsing workflow using the existing `Statements` tab only.
+- 15th-to-15th monthly report period logic.
+- Branded report emails with CSC Investments logo, portal button, and footer.
+- Corrected all CSC contact email references to `cookservicescompany@gmail.com`.
+- Added `appsscript.json` using Drive API v2 Advanced Service only.
 
-## Not Included Yet
-
-- `/portal/` is intentionally not built in this pass.
-- No login system is included in this pass.
-- No account-specific cost basis, contribution history, investor documents, or restricted portal data is included in this pass.
-
-## Contact
-
-Cook Services Company, LLC public contact email:
-
-`cookservicescompany@gmail.com`
-
-All CSC public mailto links should use:
-
-`mailto:cookservicescompany@gmail.com`
-
-CGN News may remain a portfolio/brand link, but CGN News emails are not used as Cook Services Company corporate contact information.
-
-## Logos
-
-Header logo:
-
-`/CSCLogo01.png`
-
-Footer CSC Investments logo:
-
-`/CSCInvestmentsLogo.png`
-
-Both header and footer logos link back to `/`.
-
-## Investors Page
-
-Public route:
-
-`/investors/`
-
-The page displays:
-
-- CSC Investments public portfolio snapshot.
-- TradingView-style market chart widget.
-- TradingView ticker/ticker tape pattern using CSC Investments watchlist symbols.
-- Research-only watchlist cards grouped by sleeve.
-- Search and sleeve filters.
-- Cost basis / reference prices as of `05-19-26`.
-
-The page is informational only and is not a securities offering, investment advice, legal advice, tax advice, financial advice, or accounting advice.
-
-## Market Data Strategy
-
-This public build uses embedded TradingView widgets and static reference/cost-basis data.
-
-Future options:
-
-- Static `/assets/investments-watchlist.json` export.
-- Google Sheets watchlist tab.
-- Google Apps Script endpoint such as `?action=getCSCInvestmentsWatchlist`.
-- Delayed quote fields using Google Sheets / GOOGLEFINANCE where appropriate.
-
-Do not scrape Yahoo Finance.
-
-## Legal Posture
-
-The website uses a 506(b)-safe public posture:
-
-- No public offering language.
-- No public solicitation language.
-- No “Invest Now,” “Become an Investor,” “Request Offering Materials,” or similar CTA.
-- Public information is research-only and informational.
-- Rule 506(d) is correctly described as bad-actor disqualification and related compliance review, not an offering exemption.
-
-## Deploy
-
-Upload the changed files to the GitHub Pages repository root, commit, and confirm GitHub Pages is publishing from the correct branch.
-
-
-## SEO / Indexing Package
-
-This build is configured for the GitHub Pages custom domain:
-
-`corporate.cook-international.com`
-
-Included search/indexability files:
-
-- `CNAME` — set to `corporate.cook-international.com`
-- `robots.txt` — allows crawling and points to the sitemap
-- `sitemap.xml` — lists the homepage, Investors page, Terms page, and Privacy page
-- `favicon.ico`
-- `favicon-48x48.png`
-- `favicon-96x96.png`
-- `apple-touch-icon.png`
-- `site.webmanifest`
-- `.nojekyll`
-
-After deployment, submit this sitemap in Google Search Console:
-
-`https://corporate.cook-international.com/sitemap.xml`
-
-# CSC Private Portal v1.0 — Setup & Testing README
-
-This build adds the private Cook Services Company `/portal/` system and targeted mobile fixes to `/investors/`.
-
-## Returned website files
-
-Only these website files need to be updated in the corporate repo:
+## Returned files
 
 ```txt
-/portal/index.html
-/investors/index.html
+CSC_PORTAL_BACKEND_v1.6.0_Beta.gs
+portal/index.html
+appsscript.json
+CSC_PORTAL_REPORTS_DOCUMENTS_README.md
+CSC_Portal_Reports_Documents_Manual_v1.0.pdf
 ```
-
-No other website files are required for this build.
-
-## Backend file
-
-Upload this Apps Script file into the CSC Website Google Apps Script project:
-
-```txt
-CSC_PORTAL_BACKEND.gs
-```
-
-This file is intentionally CSC-branded and uses the existing CSC Website Google Sheet only.
 
 ## Locked Google Sheet
 
@@ -151,7 +46,7 @@ Spreadsheet ID:
 1mt6mEqqPajvsXzUb6DKuxoIhVEkiMXx8SP2rqyEMI_Q
 ```
 
-Use only these approved tabs:
+Use only these existing tabs:
 
 ```txt
 Config
@@ -178,432 +73,269 @@ Budget
 Logs
 ```
 
-Do not add extra tabs.
+Do not add new tabs.
 
 ## Required Config rows
 
 Confirm these rows exist in `Config`:
 
 ```txt
-config_key	config_value	description	value_type	is_secret	environment	updated_at	updated_by
-WEB_APP_URL	https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec	Main CSC Google Apps Script Web App endpoint	string	FALSE	production		
-DRIVE_DOCUMENTS_FOLDER_ID	1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL	Main CSC portal Google Drive document vault folder	string	FALSE	production		
-MARKET_DATA_PROVIDER	FMP	Primary market data provider for ticker, chart, latest quotes, ETFs, and index quotes	string	FALSE	production		
-MARKET_DATA_CACHE_MINUTES	15	Minimum quote cache window before backend refreshes market prices	number	FALSE	production		
-MONTHLY_REPORT_DAY	15	Monthly investor report generation day	number	FALSE	production		
-MONTHLY_REPORT_HOUR_ET	9	Monthly investor report generation hour in Eastern Time	number	FALSE	production		
-MONTHLY_REPORT_AUTO_SEND	FALSE	V1 safety lock. Reports generate but do not send final investor email unless approved.	boolean	FALSE	production		
-PORTAL_DOMAIN	https://corporate.cook-international.com/portal/	CSC portal URL	string	FALSE	production		
+WEB_APP_URL = https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
+DRIVE_DOCUMENTS_FOLDER_ID = 1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
+MARKET_DATA_PROVIDER = TIINGO
+MARKET_DATA_CACHE_MINUTES = 15
+MONTHLY_REPORT_DAY = 15
+MONTHLY_REPORT_HOUR_ET = 9
+MONTHLY_REPORT_AUTO_SEND = FALSE
+PORTAL_DOMAIN = https://corporate.cook-international.com/portal/
 ```
 
-## Private API key setup
+## Apps Script Properties
 
-Do not paste the market API key into the Google Sheet or website.
+Do not put private keys in the sheet or website.
+
+Set:
+
+```txt
+TIINGO_API_KEY = your Tiingo token
+```
+
+## appsscript.json
+
+Use the included `appsscript.json`. It uses:
+
+- `America/New_York`
+- V8 runtime
+- Sheets scope
+- Drive scope
+- external request scope
+- send mail scope
+- script trigger scope
+- Drive Advanced Service v2 only
+
+Do not include both Drive v2 and Drive v3 under the same `Drive` userSymbol.
+
+## Advanced Drive Service
 
 In Apps Script:
 
 ```txt
-Project Settings → Script Properties → Add script property
+Services -> + -> Drive API
 ```
 
-Add:
+Enable Drive API. The manifest in this build is configured for Drive API v2.
+
+## Drive Vault Sync
+
+The portal can now sync manually uploaded files from the configured Drive folder.
+
+Backend action:
 
 ```txt
-FMP_API_KEY = your Financial Modeling Prep API key
+syncDriveVaultDocuments
 ```
 
-## Drive document vault
-
-Drive folder ID:
-
-```txt
-1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
-```
-
-The Apps Script owner must have access to this folder. Keep the folder restricted/private. Portal users should access documents through the portal workflow, not public Drive sharing.
-
-## Apps Script authorization
-
-Deploy the Apps Script web app as:
-
-```txt
-Execute as: Me
-Who has access: Anyone
-```
-
-This does not make the portal data public because the backend requires portal session tokens for private actions.
-
-## Optional PDF text extraction / OCR
-
-For statement parsing, the backend attempts summary-level extraction only. It stores the result in:
-
-```txt
-Statements.parsed_summary
-Statements.parsed_status
-Logs.raw_payload_json
-```
-
-No extra parsing tabs are added.
-
-For better PDF/OCR extraction, enable the Advanced Google Service:
-
-```txt
-Apps Script → Services → Add a service → Drive API
-```
-
-Also enable Drive API in the linked Google Cloud project if prompted.
-
-If Drive API is not enabled, uploaded statements still save to Drive and log to `Documents` / `Statements`, but `parsed_status` will remain `needs_review`.
-
-## User setup
-
-Users are admin-created only. No public signup.
-
-Michael:
-
-```txt
-Email: michaelcook1995@icloud.com
-Role: super_admin
-```
-
-Doug:
-
-```txt
-Email: ckeller2136@gmail.com
-Role: investor
-```
-
-Do not paste plain-text passwords into the Sheet.
-
-### Initial password setup
-
-In `CSC_PORTAL_BACKEND.gs`, temporarily edit these two constants near the top:
+Manual Apps Script function:
 
 ```js
-var CSC_INITIAL_MICHAEL_PASSWORD = "CHANGE_ME_BEFORE_RUNNING";
-var CSC_INITIAL_DOUG_PASSWORD = "CHANGE_ME_BEFORE_RUNNING";
+CSC_manualSyncDriveVaultDocuments()
 ```
 
-Replace the placeholder values with strong temporary passwords.
-
-Then run this function once from the Apps Script editor:
-
-```js
-CSC_setInitialPortalPasswords
-```
-
-After it succeeds, immediately clear the passwords back to placeholders or remove the temporary values before saving again.
-
-The function will create/update:
+Portal button:
 
 ```txt
-PortalUsers
-ReportRecipients
+Settings -> Sync Drive Vault
+Documents -> Sync Drive Vault
 ```
 
-## Header initialization
+The sync function:
 
-If any approved tabs are empty or missing headers, run:
+- opens the Drive folder from `DRIVE_DOCUMENTS_FOLDER_ID`
+- scans each file
+- checks whether `drive_file_id` already exists in `Documents`
+- creates missing `Documents` rows
+- marks synced files as `status = synced_from_drive`
+- marks synced files as `uploaded_by = drive_sync`
+- auto-classifies obvious file types
+- creates `Statements` rows for statement/report files
+- logs sync activity to `Logs.raw_payload_json`
 
-```js
-CSC_initializeHeadersOnly
-```
+## Document classification
 
-This creates headers only for the approved tabs. It does not add extra tabs.
-
-## Monthly report trigger
-
-The portal Settings tab has a button to create the monthly trigger.
-
-You can also run this manually after logging in as Michael and using Settings:
+Admins can classify/update:
 
 ```txt
-Create Monthly Trigger
+title
+category
+document_type
+status
+related_account_id
+related_report_id
+notes
 ```
 
-The backend creates a trigger for:
+Allowed document types:
 
 ```txt
-15th day of each month, approximately 9:00 AM Eastern
+company_document
+operating_agreement
+investor_packet
+budget
+bank_statement
+fidelity_statement
+brokerage_statement
+report_pdf
+tax_cpa
+signed_document
+esign_document
+other
 ```
 
-V1 safety rule:
+Allowed statuses:
 
 ```txt
-MONTHLY_REPORT_AUTO_SEND = FALSE
+uploaded
+synced_from_drive
+classified
+parsed
+needs_review
+approved
+archived
 ```
 
-Reports generate as pending review. Final investor email sends only after approval.
+## Statement parsing
 
-## Market data behavior
+Statement parsing is conservative. It attempts Drive/Google Docs OCR/text extraction when available, stores summary results in `Statements.parsed_summary`, and stores detailed debug information in `Logs.raw_payload_json`.
 
-Primary source:
+No extra parsing tabs are created.
+
+If parsing fails, is low-confidence, or totals cannot be validated, the statement remains:
 
 ```txt
-Financial Modeling Prep / FMP
+parsed_status = needs_review
 ```
 
-Backend behavior:
+The report then remains:
 
 ```txt
-FMP → Apps Script → MarketPrices / MarketHistory → /portal frontend
+status = pending_review
 ```
 
-The browser never sees the FMP API key.
+## 15th-to-15th reports
 
-Market data may update:
+Reports now use a 15th-to-15th period.
+
+Example:
 
 ```txt
-last_price
+Report generated: 15 June 2026
+Period start: 15 May 2026
+Period end: 15 June 2026
+```
+
+Report title format:
+
+```txt
+Cook Services Company Monthly Investor Report - [period start] to [period end]
+```
+
+## Report inputs
+
+Reports read existing tabs only:
+
+```txt
+Accounts
+Positions
+Transactions
 MarketPrices
 MarketHistory
-chart/ticker display
-calculated market value display
-```
-
-Market data must never overwrite:
-
-```txt
-quantity
-average_cost
-cost_basis
-transactions
-statements
-capital contributions
-member ledger
-approved financial records
-```
-
-## Research-only rule
-
-Rows in `Positions` where either condition is true are excluded from all portfolio totals:
-
-```txt
-position_status = research_only
-include_in_portfolio_totals = FALSE
-```
-
-They display only in the research/watchlist section.
-
-Owned rows count only when:
-
-```txt
-position_status = owned
-include_in_portfolio_totals = TRUE
-```
-
-## Website update notes
-
-### `/portal/index.html`
-
-Adds:
-
-```txt
-Login
-Dashboard
-Positions
-Reports
+Statements
 Documents
-E-Sign
-Settings
+BusinessUpdates
+Budget
+CapitalContributions
+MemberLedger
 ```
 
-### `/investors/index.html`
+Reports include:
 
-Targeted changes only:
+- executive summary
+- 15th-to-15th period
+- portfolio snapshot
+- cash/bank summary
+- Fidelity/brokerage summary
+- owned holdings
+- research-only watchlist
+- cost basis review
+- unrealized gain/loss summary
+- budget summary
+- capital contribution summary
+- documents/statements used
+- statement parsing status
+- exceptions / needs review
+- business updates
+- risk and compliance notes
+
+## Approval rule
+
+Generated reports default to:
 
 ```txt
-- Added Investor Login button to the left of Contact Cook Services Company.
-- Investor Login links to /portal/.
-- Mobile ticker now stays in the same horizontal layout as desktop.
-- Mobile bottom position cards become horizontal scroll cards.
-- No change to what /investors reads or how its existing page data/functions work.
+pending_review
 ```
 
-## Exact testing checklist
-
-### 1. Deploy website files
-
-Copy these files into the corporate repo:
+Final investor emails send only when the report is:
 
 ```txt
-/portal/index.html
-/investors/index.html
+approved
+approved_with_exceptions
 ```
 
-Commit and push to GitHub Pages.
+If pending review, the final investor email does not send.
 
-### 2. Deploy Apps Script
+## Branded emails
 
-Paste/upload `CSC_PORTAL_BACKEND.gs` into the CSC Website Apps Script project.
-
-Confirm:
+Monthly report emails now use:
 
 ```txt
-CSC_SPREADSHEET_ID = 1mt6mEqqPajvsXzUb6DKuxoIhVEkiMXx8SP2rqyEMI_Q
-CSC_DRIVE_DOCUMENTS_FOLDER_ID = 1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
+replyTo: cookservicescompany@gmail.com
 ```
 
-### 3. Add FMP key
+The email shell includes:
 
-Apps Script → Project Settings → Script Properties:
+- CSC Investments logo
+- dark CSC header
+- gold portal button
+- footer contact block
+- corporate.cook-international.com link
 
-```txt
-FMP_API_KEY = your key
-```
+## Portal testing checklist
 
-### 4. Run setup functions
+1. Replace `/portal/index.html`.
+2. Paste `CSC_PORTAL_BACKEND_v1.6.0_Beta.gs` into Apps Script.
+3. Replace `appsscript.json`.
+4. Enable Drive API service.
+5. Redeploy Apps Script as:
+   - Execute as: Me
+   - Who has access: Anyone
+6. Run `CSC_manualSyncDriveVaultDocuments()`.
+7. Open `/portal/`.
+8. Login as Michael.
+9. Go to Documents.
+10. Click Sync Drive Vault.
+11. Confirm manually uploaded files appear.
+12. Classify a file.
+13. Parse a statement.
+14. Generate a report.
+15. Confirm report period is 15th-to-15th.
+16. Approve a report.
+17. Send approved report.
+18. Confirm EmailLog records the send.
 
-Run:
+## Important safety notes
 
-```js
-CSC_initializeHeadersOnly
-```
-
-Set temporary passwords and run:
-
-```js
-CSC_setInitialPortalPasswords
-```
-
-Then clear the temporary password constants.
-
-### 5. Re-deploy web app
-
-Deploy as:
-
-```txt
-Execute as: Me
-Who has access: Anyone
-```
-
-Use this URL:
-
-```txt
-https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
-```
-
-### 6. Test backend health
-
-Open:
-
-```txt
-https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec?action=health
-```
-
-Expected:
-
-```txt
-ok: true
-spreadsheet_id present
-drive_folder_id present
-tabs listed
-```
-
-### 7. Test portal login
-
-Open:
-
-```txt
-https://corporate.cook-international.com/portal/
-```
-
-Login as Michael:
-
-```txt
-michaelcook1995@icloud.com
-```
-
-Expected:
-
-```txt
-Dashboard loads
-Tabs appear
-Settings shows super_admin
-```
-
-### 8. Test market data refresh
-
-In `/portal/`:
-
-```txt
-Settings or Positions → Refresh Market Data
-```
-
-Expected:
-
-```txt
-MarketPrices fills/updates
-MarketHistory fills/updates for chart symbol
-Dashboard ticker updates
-Chart displays
-```
-
-### 9. Test positions
-
-Expected:
-
-```txt
-Research-only rows display separately
-Portfolio totals remain zero unless owned rows exist
-No research-only ticker counts toward market value, cost basis, gain/loss, or account value
-```
-
-### 10. Test document upload
-
-Upload a small PDF first.
-
-Expected:
-
-```txt
-File appears in Drive folder
-Documents row created
-If statement type, Statements row created
-parsed_status = needs_review unless extraction succeeds
-```
-
-### 11. Test report generation
-
-In Reports:
-
-```txt
-Generate Report
-```
-
-Expected:
-
-```txt
-Reports row created
-status = pending_review
-html_body populated
-summary/notes show review items
-```
-
-### 12. Test approval and email
-
-Approve report from the portal.
-
-Then click:
-
-```txt
-Send Approved Report
-```
-
-Expected:
-
-```txt
-Email sends to active ReportRecipients
-EmailLog records each send
-Reports.emailed_at updates
-```
-
-### 13. Test `/investors/` mobile
-
-On mobile width:
-
-```txt
-Ticker remains horizontal like desktop
-Investor Login button appears before Contact Cook Services Company
-Bottom position cards scroll left/right
-Existing investor page data/functions remain unchanged
-```
+- This portal creates management reports, not audited financial statements.
+- Never rely on OCR/extracted statement data without review.
+- Never allow TradingView widget values to become accounting source-of-truth.
+- Research-only positions never count toward portfolio totals.
+- Cost basis, quantity, and ownership status remain CSC record fields only.
