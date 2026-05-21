@@ -1,5 +1,5 @@
 [Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
-# CSC Portal v1.6.0 Beta - Reports, Documents & Drive Vault
+# CSC Portal v1.6.0 Beta - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 **Cook Services Company, LLC**  
 **Build:** CSC Portal v1.6.0 Beta  
@@ -339,3 +339,8 @@ The email shell includes:
 - Never allow TradingView widget values to become accounting source-of-truth.
 - Research-only positions never count toward portfolio totals.
 - Cost basis, quantity, and ownership status remain CSC record fields only.
+
+Last Updated: 21 May 2026 @ 22:19:05Z  
+Developed by Cook Technology Services
+Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+End of README
