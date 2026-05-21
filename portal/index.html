@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSC Portal | Cook Services Company, LLC</title>
+  <meta name="description" content="Private Cook Services Company investor and account portal.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://corporate.cook-international.com/portal/">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#061a33">
+  <link rel="stylesheet" href="/assets/csc-style.css">
+  <style>
+    :root{--portal-navy:#07172f;--portal-navy-2:#0b2344;--portal-gold:#c9972b;--portal-line:rgba(15,23,42,.13);--portal-muted:#64748b;--portal-bg:#f6f1e7;--portal-card:#fffefa;--portal-good:#0f8a4b;--portal-bad:#b42318;--portal-warn:#9a6700;}
+    body{background:radial-gradient(circle at top left,rgba(201,151,43,.2),transparent 30rem),linear-gradient(180deg,#fffaf1 0%,#f1eadf 48%,#eaf0f8 100%);}
+    .portal-main{min-height:78vh;padding:32px 0 54px;}
+    .portal-shell{width:min(1180px,calc(100% - 32px));margin:0 auto;}
+    .portal-card{background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.72);border-radius:24px;box-shadow:0 22px 60px rgba(11,20,38,.12);}
+    .portal-login-wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(310px,.72fr);gap:24px;align-items:stretch;margin-top:28px;}
+    .portal-login-hero{padding:clamp(24px,4vw,46px);background:linear-gradient(135deg,rgba(7,23,47,.98),rgba(12,42,82,.95));color:#fff;border-radius:30px;position:relative;overflow:hidden;box-shadow:0 28px 70px rgba(7,23,47,.28)}
+    .portal-login-hero:before{content:"";position:absolute;inset:auto -18% -42% auto;width:430px;height:430px;background:radial-gradient(circle,rgba(201,151,43,.45),transparent 68%);pointer-events:none;}
+    .portal-login-hero img{width:92px;max-width:34vw;margin-bottom:20px;filter:drop-shadow(0 18px 22px rgba(0,0,0,.22));}
+    .portal-login-hero h1{font-size:clamp(34px,5vw,64px);line-height:.95;letter-spacing:-.06em;margin:0 0 14px;color:#fff;}
+    .portal-login-hero p{color:rgba(255,255,255,.82);line-height:1.7;max-width:680px;}
+    .portal-login-panel{padding:28px;align-self:center;}
+    .portal-kicker{margin:0 0 8px;text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--portal-gold);font-weight:900;}
+    .portal-login-panel h2,.portal-section-title{margin:0 0 14px;color:var(--portal-navy);font-size:clamp(24px,3vw,36px);letter-spacing:-.04em;}
+    .portal-field{display:grid;gap:7px;margin-bottom:14px;}
+    .portal-field label{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#334155;}
+    .portal-input,.portal-select,.portal-textarea{width:100%;border:1px solid var(--portal-line);border-radius:14px;padding:12px 13px;font:inherit;background:#fff;color:#0f172a;}
+    .portal-textarea{min-height:108px;resize:vertical;}
+    .portal-button{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:11px 16px;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer;gap:8px;transition:transform .12s ease,box-shadow .12s ease,background .12s ease;}
+    .portal-button:hover{transform:translateY(-1px);text-decoration:none;}
+    .portal-button-primary{background:linear-gradient(135deg,#f4d783,#c9972b);color:#111827;box-shadow:0 12px 28px rgba(201,151,43,.28);}
+    .portal-button-secondary{background:#fff;color:var(--portal-navy);border:1px solid var(--portal-line);}
+    .portal-button-dark{background:var(--portal-navy);color:#fff;}
+    .portal-button-danger{background:#fee4e2;color:#912018;border:1px solid #fecdca;}
+    .portal-alert{display:none;margin:14px 0 0;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;border:1px solid var(--portal-line);}
+    .portal-alert.show{display:block;}.portal-alert.error{background:#fff2f0;color:#912018;border-color:#fecdca}.portal-alert.ok{background:#ecfdf3;color:#05603a;border-color:#abefc6}.portal-alert.warn{background:#fffaeb;color:#93370d;border-color:#fedf89}
+    .portal-app{display:none;}
+    .portal-app.active{display:block;}
+    .portal-topbar{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin:20px 0 18px;padding:22px 24px;background:linear-gradient(135deg,var(--portal-navy),var(--portal-navy-2));color:#fff;border-radius:26px;box-shadow:0 22px 56px rgba(7,23,47,.22);}
+    .portal-topbar h1{margin:0 0 7px;color:#fff;font-size:clamp(28px,4vw,52px);line-height:1;letter-spacing:-.06em}.portal-topbar p{margin:0;color:rgba(255,255,255,.78);line-height:1.55}.portal-userline{font-size:12px;color:rgba(255,255,255,.76);text-align:right;line-height:1.5;white-space:nowrap;}
+    .portal-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px;margin:0 0 18px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.88);border-radius:999px;box-shadow:0 14px 34px rgba(11,20,38,.08);}
+    .portal-tab{flex:0 0 auto;border:0;border-radius:999px;background:transparent;color:#334155;font-weight:900;padding:10px 14px;cursor:pointer;}.portal-tab.active{background:var(--portal-navy);color:#fff;}
+    .portal-panel{display:none;}.portal-panel.active{display:block;}
+    .portal-grid{display:grid;gap:16px}.portal-grid-2{grid-template-columns:1.1fr .9fr}.portal-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.portal-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .portal-summary-card{padding:18px}.portal-summary-card span{display:block;color:var(--portal-muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.portal-summary-card strong{display:block;margin-top:8px;font-size:clamp(24px,3.2vw,38px);color:var(--portal-navy);letter-spacing:-.05em}.portal-summary-card small{display:block;margin-top:4px;color:var(--portal-muted);}
+    .portal-market-ticker{margin:0 0 16px;border-radius:20px;overflow:hidden;background:#020711;color:#fff;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;min-height:50px;box-shadow:0 18px 42px rgba(7,23,47,.18)}
+    .portal-market-ticker-label{flex:0 0 auto;margin-left:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(201,151,43,.58);color:#f8d98e;background:rgba(7,23,47,.95);text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:900;z-index:2}.portal-market-ticker-window{overflow:hidden;flex:1;min-width:0}.portal-market-ticker-track{display:inline-flex;gap:20px;white-space:nowrap;animation:portalTicker 46s linear infinite;padding-left:24px;font-size:12px;font-weight:900}.portal-market-ticker-track span{display:inline-flex;gap:7px;color:#dfe8f6}.portal-up{color:#54d98c}.portal-down{color:#ff8a80}@keyframes portalTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .portal-chart-card{padding:18px;background:#071326;color:#fff;border-radius:24px}.portal-chart-card h2{margin:0 0 5px;color:#fff}.portal-chart-meta{margin:0 0 12px;color:#aebbd0;font-size:13px}.portal-chart{height:360px;border-radius:18px;background:linear-gradient(180deg,#0b1d35,#06101f);border:1px solid rgba(255,255,255,.12);overflow:hidden;position:relative}.portal-chart svg{width:100%;height:100%;display:block}.portal-chart-empty{display:grid;place-items:center;height:100%;color:#aebbd0;text-align:center;padding:22px}.portal-chart-tooltip{position:absolute;display:none;background:#fff;color:#0f172a;border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:0 10px 24px rgba(0,0,0,.22);pointer-events:none;z-index:5}.portal-chart-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.portal-chart-actions button{font-size:12px;padding:8px 10px}.portal-table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--portal-line);background:#fff}.portal-table{border-collapse:collapse;width:100%;min-width:920px;font-size:13px}.portal-table th,.portal-table td{padding:12px;border-bottom:1px solid #e8edf4;text-align:left;vertical-align:top}.portal-table th{position:sticky;top:0;background:#f8fafc;color:#334155;text-transform:uppercase;letter-spacing:.06em;font-size:11px;z-index:1}.portal-table td.num{text-align:right;font-variant-numeric:tabular-nums}.portal-table tr:last-child td{border-bottom:0}.portal-section-card{padding:20px}.portal-section-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.portal-section-head p{margin:4px 0 0;color:var(--portal-muted);line-height:1.55}.portal-badge{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;background:#eef2ff;color:#3538cd}.portal-badge.green{background:#ecfdf3;color:#05603a}.portal-badge.gold{background:#fffaeb;color:#93370d}.portal-badge.red{background:#fff1f3;color:#c01048}.portal-actions{display:flex;gap:8px;flex-wrap:wrap}.portal-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.portal-sign-pad{border:1px dashed rgba(7,23,47,.28);background:#fff;border-radius:18px;height:180px;touch-action:none}.portal-small{font-size:12px;color:var(--portal-muted);line-height:1.5}.portal-hidden{display:none!important}.portal-pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border-radius:18px;padding:14px;overflow:auto;max-height:360px;font-size:12px;line-height:1.5}.portal-split-list{display:grid;gap:12px}.portal-list-item{border:1px solid var(--portal-line);border-radius:16px;padding:14px;background:#fff;display:grid;gap:6px}.portal-list-item h3{margin:0;color:var(--portal-navy)}.portal-list-item p{margin:0;color:var(--portal-muted);font-size:13px;line-height:1.5}
+    @media(max-width:900px){.portal-login-wrap,.portal-grid-2,.portal-grid-3,.portal-grid-4,.portal-form-grid{grid-template-columns:1fr}.portal-topbar{flex-direction:column}.portal-userline{text-align:left;white-space:normal}.portal-chart{height:300px}.portal-table{min-width:760px}.portal-market-ticker{align-items:center}.portal-market-ticker-label{margin-left:10px}.portal-shell{width:min(100% - 22px,1180px)}}
+  </style>
+</head>
+<body>
+  <div id="csc-site-header"></div>
+  <main id="main" class="portal-main">
+    <div class="portal-shell">
+      <section id="portal-login" class="portal-login-wrap" aria-labelledby="portal-login-title">
+        <div class="portal-login-hero">
+          <img src="/CSCLogo01.png" alt="Cook Services Company logo">
+          <p class="portal-kicker">Private CSC Portal</p>
+          <h1 id="portal-login-title">Investor reporting, documents, and portfolio records.</h1>
+          <p>This portal is for authorized Cook Services Company users only. It provides dashboard visibility, positions, reports, document storage, and internal e-sign acknowledgments.</p>
+        </div>
+        <form id="login-form" class="portal-login-panel portal-card">
+          <p class="portal-kicker">Secure Login</p>
+          <h2>Account Login</h2>
+          <div class="portal-field"><label for="login-email">Email</label><input class="portal-input" id="login-email" name="email" type="email" autocomplete="username" required></div>
+          <div class="portal-field"><label for="login-password">Password</label><input class="portal-input" id="login-password" name="password" type="password" autocomplete="current-password" required></div>
+          <button class="portal-button portal-button-primary" type="submit">Login</button>
+          <p class="portal-small">No public signup. Users are created by CSC administration only.</p>
+          <div id="login-alert" class="portal-alert"></div>
+        </form>
+      </section>
+
+      <section id="portal-app" class="portal-app" aria-labelledby="portal-title">
+        <div class="portal-topbar">
+          <div><p class="portal-kicker">Cook Services Company</p><h1 id="portal-title">CSC Account Portal</h1><p>Private dashboard for portfolio reporting, documents, statements, monthly reports, and e-sign records.</p></div>
+          <div class="portal-userline"><strong id="portal-user-name">User</strong><br><span id="portal-user-role">Role</span><br><button id="logout-button" class="portal-button portal-button-secondary" type="button" style="margin-top:8px;">Logout</button></div>
+        </div>
+
+        <nav class="portal-tabs" aria-label="Portal sections">
+          <button class="portal-tab active" data-tab="dashboard" type="button">Dashboard</button>
+          <button class="portal-tab" data-tab="positions" type="button">Positions</button>
+          <button class="portal-tab" data-tab="reports" type="button">Reports</button>
+          <button class="portal-tab" data-tab="documents" type="button">Documents</button>
+          <button class="portal-tab" data-tab="esign" type="button">E-Sign</button>
+          <button class="portal-tab" data-tab="settings" type="button">Settings</button>
+        </nav>
+
+        <div id="portal-global-alert" class="portal-alert"></div>
+
+        <section id="tab-dashboard" class="portal-panel active">
+          <div class="portal-market-ticker" aria-label="Market ticker"><div class="portal-market-ticker-label">CSC Market Watch</div><div class="portal-market-ticker-window"><div id="portal-ticker-track" class="portal-market-ticker-track"><span>Loading market data…</span></div></div></div>
+          <div class="portal-grid portal-grid-4" id="summary-cards"></div>
+          <div class="portal-grid portal-grid-2" style="margin-top:16px;">
+            <article class="portal-chart-card"><div class="portal-section-head"><div><h2>Market Watch Chart</h2><p id="chart-meta" class="portal-chart-meta">Cached market history from CSC backend.</p></div><span id="chart-source" class="portal-badge gold">FMP / Cached</span></div><div class="portal-chart" id="portal-chart"><div class="portal-chart-empty">Loading chart…</div><div class="portal-chart-tooltip" id="chart-tooltip"></div></div><div class="portal-chart-actions"><button class="portal-button portal-button-secondary" data-chart="VOO" type="button">VOO</button><button class="portal-button portal-button-secondary" data-chart="SPYI" type="button">SPYI</button><button class="portal-button portal-button-secondary" data-chart="IJH" type="button">IJH</button><button class="portal-button portal-button-secondary" data-chart="KMX" type="button">KMX</button></div></article>
+            <article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Status</p><h2 class="portal-section-title">Reporting Controls</h2><p>Market data powers ticker/chart/latest market value only. Research-only positions never count toward portfolio totals.</p></div></div><div id="dashboard-status" class="portal-split-list"></div></article>
+          </div>
+          <article class="portal-section-card portal-card" style="margin-top:16px;"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Portfolio Grid</h2><p>Owned holdings and research-only watchlist, separated by status.</p></div><button class="portal-button portal-button-dark" id="refresh-dashboard" type="button">Refresh</button></div><div id="dashboard-positions"></div></article>
+        </section>
+
+        <section id="tab-positions" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Holdings & Research Watchlist</h2><p>Owned positions count only when <strong>position_status = owned</strong> and <strong>include_in_portfolio_totals = TRUE</strong>.</p></div><button class="portal-button portal-button-dark" id="refresh-market" type="button">Refresh Market Data</button></div><div id="positions-content"></div></article></section>
+
+        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Monthly Investor Reports</h2><p>Reports generate into the existing Reports tab. Final emails send only after approval.</p></div><div class="portal-actions"><button class="portal-button portal-button-dark" id="generate-report" type="button">Generate Report</button><button class="portal-button portal-button-primary" id="send-report" type="button">Send Approved Report</button></div></div><div id="reports-content"></div></article></section>
+
+        <section id="tab-documents" class="portal-panel"><div class="portal-grid portal-grid-2"><article class="portal-section-card portal-card"><p class="portal-kicker">Upload</p><h2 class="portal-section-title">Document Vault</h2><p class="portal-small">Files upload to the configured CSC Google Drive folder and are logged in Documents. Bank/Fidelity statements also log to Statements.</p><form id="document-upload-form"><div class="portal-field"><label for="doc-title">Title</label><input class="portal-input" id="doc-title" name="title" required></div><div class="portal-form-grid"><div class="portal-field"><label for="doc-type">Document Type</label><select class="portal-select" id="doc-type" name="document_type"><option value="company_document">Company Document</option><option value="bank_statement">Bank Statement</option><option value="fidelity_statement">Fidelity Statement</option><option value="brokerage_statement">Brokerage Statement</option><option value="report_pdf">Report PDF</option><option value="signed_document">Signed Document</option></select></div><div class="portal-field"><label for="doc-category">Category</label><input class="portal-input" id="doc-category" name="category" placeholder="Reports, Bank, Fidelity, Legal"></div></div><div class="portal-field"><label for="doc-file">File</label><input class="portal-input" id="doc-file" name="file" type="file" required></div><button class="portal-button portal-button-primary" type="submit">Upload Document</button></form><div id="upload-alert" class="portal-alert"></div></article><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Vault</p><h2 class="portal-section-title">Documents</h2></div><button class="portal-button portal-button-dark" id="refresh-documents" type="button">Refresh</button></div><div id="documents-content"></div></article></div></section>
+
+        <section id="tab-esign" class="portal-panel"><div class="portal-grid portal-grid-2"><article class="portal-section-card portal-card"><p class="portal-kicker">Internal E-Sign</p><h2 class="portal-section-title">Create Request</h2><form id="esign-create-form"><div class="portal-field"><label for="esign-document-id">Document ID</label><input class="portal-input" id="esign-document-id" name="document_id" required></div><div class="portal-field"><label for="esign-title">Title</label><input class="portal-input" id="esign-title" name="title" required></div><div class="portal-field"><label for="esign-email">Signer Email</label><input class="portal-input" id="esign-email" name="signer_email" type="email" required></div><div class="portal-field"><label for="esign-message">Message</label><textarea class="portal-textarea" id="esign-message" name="message"></textarea></div><button class="portal-button portal-button-primary" type="submit">Create E-Sign Request</button></form><div id="esign-create-alert" class="portal-alert"></div></article><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Requests</p><h2 class="portal-section-title">Pending & Completed</h2></div><button class="portal-button portal-button-dark" id="refresh-esign" type="button">Refresh</button></div><div id="esign-content"></div></article></div></section>
+
+        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
+      </section>
+    </div>
+  </main>
+  <div id="csc-site-footer"></div>
+
+  <script>
+    const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
+    const SESSION_KEY = 'csc_portal_session_v1';
+    let CSC_SESSION = null;
+    let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
+    let CURRENT_CHART_SYMBOL = 'VOO';
+
+    function money(v){ const n=Number(v||0); return n.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}); }
+    function pct(v){ const n=Number(v||0); return `${n>=0?'+':''}${n.toFixed(2)}%`; }
+    function esc(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+    function showAlert(id,msg,type='ok'){ const el=document.getElementById(id); if(!el) return; el.className='portal-alert show '+type; el.textContent=msg; }
+    function clearAlert(id){ const el=document.getElementById(id); if(el){el.className='portal-alert';el.textContent='';} }
+    function isAdmin(){ return CSC_SESSION && ['super_admin','admin'].includes(CSC_SESSION.role); }
+
+    function cscJsonp(action, params={}){
+      return new Promise((resolve,reject)=>{
+        const cb='csc_cb_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+        const qs=new URLSearchParams({action, callback: cb, token: CSC_SESSION?.token || '', ...params});
+        const script=document.createElement('script');
+        const timer=setTimeout(()=>{cleanup();reject(new Error('Request timed out'));},25000);
+        function cleanup(){clearTimeout(timer);delete window[cb];script.remove();}
+        window[cb]=(payload)=>{cleanup(); payload && payload.ok ? resolve(payload) : reject(new Error(payload?.error || 'Request failed'));};
+        script.onerror=()=>{cleanup();reject(new Error('Network/script error'));};
+        script.src=CSC_WEB_APP_URL+'?'+qs.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    function cscPost(action, data={}){
+      return new Promise((resolve,reject)=>{
+        const requestId='req_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+        const iframe=document.createElement('iframe'); iframe.name='csc_iframe_'+requestId; iframe.style.display='none';
+        const form=document.createElement('form'); form.method='POST'; form.action=CSC_WEB_APP_URL; form.target=iframe.name; form.style.display='none';
+        const payload={...data, token: CSC_SESSION?.token || ''};
+        const fields={action, request_id:requestId, payload:JSON.stringify(payload)};
+        Object.keys(fields).forEach(k=>{ const input=document.createElement('input'); input.type='hidden'; input.name=k; input.value=fields[k]; form.appendChild(input); });
+        const timer=setTimeout(()=>{cleanup();reject(new Error('Request timed out'));},60000);
+        function cleanup(){clearTimeout(timer);window.removeEventListener('message',onMessage);form.remove();iframe.remove();}
+        function onMessage(event){ const msg=event.data||{}; if(!msg || msg.source!=='CSC_PORTAL' || msg.requestId!==requestId) return; cleanup(); msg.payload && msg.payload.ok ? resolve(msg.payload) : reject(new Error(msg.payload?.error || 'Request failed')); }
+        window.addEventListener('message',onMessage);
+        document.body.appendChild(iframe); document.body.appendChild(form); form.submit();
+      });
+    }
+
+    function saveSession(session){ CSC_SESSION=session; localStorage.setItem(SESSION_KEY,JSON.stringify(session)); }
+    function loadSession(){ try{ CSC_SESSION=JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(e){ CSC_SESSION=null; } return CSC_SESSION; }
+    function clearSession(){ CSC_SESSION=null; localStorage.removeItem(SESSION_KEY); }
+    function showApp(){ document.getElementById('portal-login').style.display='none'; document.getElementById('portal-app').classList.add('active'); document.getElementById('portal-user-name').textContent=CSC_SESSION.full_name||CSC_SESSION.email; document.getElementById('portal-user-role').textContent=(CSC_SESSION.role||'').replace('_',' '); loadDashboard(); }
+    function showLogin(){ document.getElementById('portal-login').style.display='grid'; document.getElementById('portal-app').classList.remove('active'); }
+
+    document.getElementById('login-form').addEventListener('submit', async e=>{
+      e.preventDefault(); clearAlert('login-alert');
+      const email=document.getElementById('login-email').value.trim(); const password=document.getElementById('login-password').value;
+      try{ const res=await cscPost('login',{email,password}); saveSession(res.session); showApp(); }
+      catch(err){ showAlert('login-alert',err.message,'error'); }
+    });
+    document.getElementById('logout-button').addEventListener('click', async ()=>{ try{await cscPost('logout',{});}catch(e){} clearSession(); showLogin(); });
+
+    document.querySelectorAll('.portal-tab').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('.portal-tab').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.portal-panel').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active'); if(btn.dataset.tab==='positions') loadPositions(); if(btn.dataset.tab==='reports') loadReports(); if(btn.dataset.tab==='documents') loadDocuments(); if(btn.dataset.tab==='esign') loadESign(); if(btn.dataset.tab==='settings') renderSettings(); }));
+
+    async function loadDashboard(){
+      try{ const res=await cscJsonp('getDashboard',{chart_symbol:CURRENT_CHART_SYMBOL}); CSC_DATA.dashboard=res.data; renderDashboard(res.data); }
+      catch(err){ showAlert('portal-global-alert',err.message,'error'); }
+    }
+    async function loadPositions(){ try{ const res=await cscJsonp('getPositions',{}); CSC_DATA.positions=res.data; renderPositions(res.data,'positions-content'); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
+    async function loadReports(){ try{ const res=await cscJsonp('getReports',{}); CSC_DATA.reports=res.data; renderReports(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
+    async function loadDocuments(){ try{ const res=await cscJsonp('getDocuments',{}); CSC_DATA.documents=res.data; renderDocuments(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
+    async function loadESign(){ try{ const res=await cscJsonp('getESignRequests',{}); CSC_DATA.esign=res.data; renderESign(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
+
+    function renderDashboard(data){
+      clearAlert('portal-global-alert'); renderTicker(data.marketPrices||[]); renderSummary(data.summary||{}); renderChart(data.marketHistory||[], CURRENT_CHART_SYMBOL); renderStatus(data); renderPositions(data.positions||{},'dashboard-positions');
+    }
+    function renderTicker(prices){
+      const track=document.getElementById('portal-ticker-track');
+      const rows=(prices||[]).slice(0,40); if(!rows.length){track.innerHTML='<span>No market prices cached yet. Refresh market data in Settings.</span>';return;}
+      const html=rows.map(r=>`<span><b>${esc(r.ticker)}</b> ${money(r.last_price)} <em class="${Number(r.day_change_pct)>=0?'portal-up':'portal-down'}">${pct(Number(r.day_change_pct||0))}</em></span>`).join(''); track.innerHTML=html+html;
+    }
+    function renderSummary(s){
+      const cards=[['Total Market Value',money(s.total_market_value),'Owned holdings only'],['Total Cost Basis',money(s.total_cost_basis),'Cost basis is never market-derived'],['Unrealized Gain/Loss',money(s.unrealized_gain_loss),pct(s.unrealized_gain_loss_pct||0)],['Cash Balance',money(s.cash_balance),'From Accounts / Statements']];
+      document.getElementById('summary-cards').innerHTML=cards.map(c=>`<article class="portal-summary-card portal-card"><span>${c[0]}</span><strong>${c[1]}</strong><small>${c[2]}</small></article>`).join('');
+    }
+    function renderStatus(data){
+      const s=data.summary||{}; const items=[['Owned positions',s.owned_positions_count||0,'Counted in totals'],['Research-only positions',s.research_positions_count||0,'Shown separately only'],['Latest quote refresh',data.last_market_update||'Not available','MarketPrices cache'],['Report safety lock',data.monthly_auto_send===true?'Auto-send allowed':'Manual approval required','V1 safety mode']];
+      document.getElementById('dashboard-status').innerHTML=items.map(i=>`<div class="portal-list-item"><h3>${esc(i[1])}</h3><p><strong>${esc(i[0])}</strong><br>${esc(i[2])}</p></div>`).join('');
+    }
+    function renderPositions(data, mountId){
+      const mount=document.getElementById(mountId); const owned=data.owned||[]; const research=data.research||[]; const all=[...owned,...research];
+      if(!all.length){ mount.innerHTML='<p class="portal-small">No positions found. Confirm the Positions tab has the approved headers and rows.</p>'; return; }
+      const table=(rows,title)=>`<h3>${title}</h3><div class="portal-table-wrap"><table class="portal-table"><thead><tr><th>Status</th><th>Ticker</th><th>Name</th><th>Sleeve</th><th>Qty</th><th class="num">Avg Cost</th><th class="num">Cost Basis</th><th class="num">Last Price</th><th class="num">Market Value</th><th class="num">Gain/Loss</th><th>Notes</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="portal-badge ${r.position_status==='owned'?'green':'gold'}">${esc(r.position_status||'')}</span></td><td><strong>${esc(r.ticker)}</strong></td><td>${esc(r.security_name)}</td><td>${esc(r.sleeve)}</td><td>${esc(r.quantity||0)}</td><td class="num">${money(r.average_cost)}</td><td class="num">${money(r.cost_basis)}</td><td class="num">${money(r.last_price||r.research_price_snapshot)}</td><td class="num">${money(r.market_value)}</td><td class="num">${money(r.total_gain_loss)}</td><td>${esc(r.notes)}</td></tr>`).join('')}</tbody></table></div>`;
+      mount.innerHTML=(owned.length?table(owned,'Owned Holdings'):'<h3>Owned Holdings</h3><p class="portal-small">No owned holdings currently counted in totals.</p>')+(research.length?table(research,'Research-Only Watchlist'):'');
+    }
+    function renderReports(data){
+      const reports=data.reports||[]; if(!reports.length){document.getElementById('reports-content').innerHTML='<p class="portal-small">No reports found yet.</p>';return;}
+      document.getElementById('reports-content').innerHTML='<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')?'gold':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview</button>${isAdmin()?`<button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve</button>`:''}</div></div>`).join('')+'</div><div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
+    }
+    window.previewReport=function(reportId){ const r=(CSC_DATA.reports?.reports||[]).find(x=>x.report_id===reportId); const el=document.getElementById('report-preview'); if(!r||!el)return; el.style.display='block'; el.innerHTML=r.html_body||'<p>No HTML body saved.</p>'; el.scrollIntoView({behavior:'smooth',block:'start'}); }
+    window.approveReport=async function(reportId){ try{ const res=await cscPost('approveReport',{report_id:reportId,status:'approved'}); showAlert('portal-global-alert','Report approved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
+    function renderDocuments(data){ const docs=data.documents||[]; if(!docs.length){document.getElementById('documents-content').innerHTML='<p class="portal-small">No documents uploaded yet.</p>';return;} document.getElementById('documents-content').innerHTML='<div class="portal-split-list">'+docs.map(d=>`<div class="portal-list-item"><h3>${esc(d.title||d.file_name)}</h3><p><span class="portal-badge">${esc(d.document_type||d.category||'document')}</span> ${esc(d.status||'')}</p><p>${esc(d.uploaded_at||'')} ${d.file_url?` · <a href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}</p><p>${esc(d.notes||'')}</p></div>`).join('')+'</div>'; }
+    function renderESign(data){ const rows=data.requests||[]; if(!rows.length){document.getElementById('esign-content').innerHTML='<p class="portal-small">No e-sign requests found.</p>';return;} document.getElementById('esign-content').innerHTML='<div class="portal-split-list">'+rows.map(r=>`<div class="portal-list-item"><h3>${esc(r.title||r.esign_request_id)}</h3><p><span class="portal-badge ${r.request_status==='signed'?'green':'gold'}">${esc(r.request_status||'pending')}</span> ${esc(r.signer_email||'')}</p><p>${esc(r.message||'')}</p></div>`).join('')+'</div>'; }
+    function renderSettings(){ const u=CSC_SESSION||{}; document.getElementById('settings-content').innerHTML=`<div class="portal-grid portal-grid-3"><div class="portal-summary-card portal-card"><span>Email</span><strong style="font-size:18px;letter-spacing:0">${esc(u.email)}</strong><small>${esc(u.full_name)}</small></div><div class="portal-summary-card portal-card"><span>Role</span><strong style="font-size:22px;">${esc(u.role)}</strong><small>${isAdmin()?'Admin tools enabled':'Viewer tools only'}</small></div><div class="portal-summary-card portal-card"><span>Backend</span><strong style="font-size:18px;letter-spacing:0">CSC .gs</strong><small>FMP API key stays in Script Properties</small></div></div>`; }
+    function renderChart(rows,symbol){
+      const mount=document.getElementById('portal-chart'); const tooltip=document.getElementById('chart-tooltip'); document.getElementById('chart-meta').textContent=`${symbol} cached market history`;
+      const data=(rows||[]).filter(r=>Number(r.close_price||r.last_price||0)>0).map(r=>({date:r.price_date||r.price_time_utc||'', close:Number(r.close_price||r.last_price)}));
+      if(data.length<2){ mount.innerHTML='<div class="portal-chart-empty">No chart history cached yet. Run Refresh Market Data after adding the FMP API key.</div><div class="portal-chart-tooltip" id="chart-tooltip"></div>'; return; }
+      const w=900,h=360,p=34; const vals=data.map(d=>d.close); const min=Math.min(...vals), max=Math.max(...vals); const range=max-min||1; const pts=data.map((d,i)=>[p+(i*(w-p*2)/(data.length-1)), h-p-((d.close-min)/range*(h-p*2)), d]);
+      const path=pts.map((pt,i)=>(i?'L':'M')+pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' '); const area=path+` L ${w-p} ${h-p} L ${p} ${h-p} Z`;
+      mount.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(symbol)} price chart"><defs><linearGradient id="cscChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9972b" stop-opacity=".42"/><stop offset="1" stop-color="#c9972b" stop-opacity="0"/></linearGradient></defs><g stroke="rgba(255,255,255,.12)" stroke-width="1">${[0,1,2,3].map(i=>`<line x1="${p}" x2="${w-p}" y1="${p+i*(h-p*2)/3}" y2="${p+i*(h-p*2)/3}"/>`).join('')}</g><path d="${area}" fill="url(#cscChartFill)"/><path d="${path}" fill="none" stroke="#f4d783" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(pt=>`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="3" fill="#fff" opacity=".75"><title>${esc(pt[2].date)} ${money(pt[2].close)}</title></circle>`).join('')}<text x="${p}" y="24" fill="#aebbd0" font-size="12">${esc(data[0].date)} → ${esc(data[data.length-1].date)}</text><text x="${w-p}" y="24" text-anchor="end" fill="#f4d783" font-size="14" font-weight="800">Last ${money(data[data.length-1].close)}</text></svg><div class="portal-chart-tooltip" id="chart-tooltip"></div>`;
+    }
+
+    document.getElementById('refresh-dashboard').addEventListener('click', loadDashboard);
+    document.getElementById('refresh-market').addEventListener('click', async()=>{ try{showAlert('portal-global-alert','Refreshing market data…','warn'); await cscPost('refreshMarketData',{include_history:true,chart_symbol:CURRENT_CHART_SYMBOL}); showAlert('portal-global-alert','Market data refresh complete.','ok'); loadDashboard(); loadPositions(); }catch(e){showAlert('portal-global-alert',e.message,'error');} });
+    document.querySelectorAll('[data-chart]').forEach(btn=>btn.addEventListener('click',()=>{CURRENT_CHART_SYMBOL=btn.dataset.chart;loadDashboard();}));
+    document.getElementById('generate-report').addEventListener('click',async()=>{ try{const res=await cscPost('generateMonthlyReport',{}); showAlert('portal-global-alert','Report generated.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
+    document.getElementById('send-report').addEventListener('click',async()=>{ try{const res=await cscPost('sendApprovedReport',{}); showAlert('portal-global-alert','Approved report email workflow complete.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
+    document.getElementById('refresh-documents').addEventListener('click', loadDocuments);
+    document.getElementById('refresh-esign').addEventListener('click', loadESign);
+    document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
+    document.getElementById('manual-trigger-setup').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscPost('createMonthlyTrigger',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
+    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded and logged.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
+    document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
+
+    loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
+  </script>
+  <script src="/assets/csc-shell.js"></script>
+</body>
+</html>
