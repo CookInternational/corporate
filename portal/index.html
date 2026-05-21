@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v1.6.0 Beta | Last Updated on 21 May 2026 @ 22:19:05Z -->
+<!-- CSC Portal Frontend v1.6.1 Beta | Last Updated on 21 May 2026 @ 22:59:26Z -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -68,6 +68,10 @@
     .portal-classify-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #e8edf4;}
     .portal-classify-form .portal-field{margin-bottom:0;}
     @media(max-width:760px){.portal-classify-form{grid-template-columns:1fr;}}
+
+    .portal-report-editor{display:grid;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #e8edf4;}
+    .portal-report-editor textarea{min-height:170px;font-family:Arial,sans-serif;}
+    .portal-statement-json{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;min-height:190px;}
 
     @media(max-width:900px){.portal-login-wrap,.portal-grid-2,.portal-grid-3,.portal-grid-4,.portal-form-grid{grid-template-columns:1fr}.portal-topbar{flex-direction:column}.portal-userline{text-align:left;white-space:normal}.portal-chart{height:300px}.portal-table{min-width:760px}.portal-market-ticker{align-items:center}.portal-market-ticker-label{margin-left:10px}.portal-shell{width:min(100% - 22px,1180px)}}
   </style>
@@ -181,7 +185,7 @@
 
         <section id="tab-positions" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Holdings & Research Watchlist</h2><p>Owned positions count only when <strong>position_status = owned</strong> and <strong>include_in_portfolio_totals = TRUE</strong>.</p></div><button class="portal-button portal-button-dark" id="refresh-market" type="button">Refresh Market Data</button></div><div id="positions-content"></div></article></section>
 
-        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Monthly Investor Reports</h2><p>Reports generate into the existing Reports tab using a 15th-to-15th reporting period. Final emails send only after approval.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="test-report" type="button">Test Report</button><button class="portal-button portal-button-dark" id="generate-report" type="button">Generate Report</button><button class="portal-button portal-button-primary" id="send-report" type="button">Send Approved Report</button></div></div><div id="reports-content"></div></article></section>
+        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Monthly Investor Reports</h2><p>Reports generate into the existing Reports tab using a 15th-to-15th reporting period. If the current period is missing statement coverage, the report uses the latest complete available statement period and stays pending review.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="test-report" type="button">Test Report</button><button class="portal-button portal-button-dark" id="generate-report" type="button">Generate Report</button><button class="portal-button portal-button-primary" id="send-report" type="button">Send Approved Report</button></div></div><div class="portal-data-note">Narrative sections can be edited before approval. Accounting numbers must be corrected in source records such as Statements, Accounts, Positions, Transactions, Budget, CapitalContributions, or MemberLedger.</div><div id="reports-content"></div></article></section>
 
         <section id="tab-documents" class="portal-panel">
           <div class="portal-grid portal-grid-2">
@@ -218,6 +222,7 @@
                 <div><p class="portal-kicker">View Documents</p><h2 class="portal-section-title">Document Vault</h2><p>Sync, classify, review, and open uploaded Drive vault files.</p></div>
                 <div class="portal-actions">
                   <button class="portal-button portal-button-secondary" id="sync-drive-vault" type="button">Sync Drive Vault</button>
+                  <button class="portal-button portal-button-secondary" id="parse-statements" type="button">Parse Statements</button>
                   <button class="portal-button portal-button-dark" id="refresh-documents" type="button">Refresh Documents</button>
                 </div>
               </div>
@@ -244,7 +249,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v1.6.0 Beta';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v1.6.1 Beta';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -344,49 +349,18 @@
     }
     function renderReports(data){
       const reports=data.reports||[]; if(!reports.length){document.getElementById('reports-content').innerHTML='<p class="portal-small">No reports found yet.</p>';return;}
-      document.getElementById('reports-content').innerHTML='<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')?'gold':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview</button>${isAdmin()?`<button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve</button>`:''}</div></div>`).join('')+'</div><div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
+      document.getElementById('reports-content').innerHTML='<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')||String(r.status).includes('draft')?'gold':String(r.status).includes('sent')?'green':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><p class="portal-small">${esc(r.notes||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview / Edit</button>${isAdmin()?`<button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve</button>`:''}</div></div>`).join('')+'</div><div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
     }
-    window.previewReport=function(reportId){ const r=(CSC_DATA.reports?.reports||[]).find(x=>x.report_id===reportId); const el=document.getElementById('report-preview'); if(!r||!el)return; el.style.display='block'; el.innerHTML=r.html_body||'<p>No HTML body saved.</p>'; el.scrollIntoView({behavior:'smooth',block:'start'}); }
+    window.previewReport=function(reportId){
+      const r=(CSC_DATA.reports?.reports||[]).find(x=>x.report_id===reportId); const el=document.getElementById('report-preview'); if(!r||!el)return;
+      el.style.display='block';
+      const body=r.html_body||'<p>No HTML body saved.</p>';
+      el.innerHTML=`<div class="portal-section-head"><div><p class="portal-kicker">Report Review</p><h2 class="portal-section-title">${esc(r.report_title||r.report_id)}</h2><p>Text can be edited here. Correct accounting numbers in source records, not hidden report HTML.</p></div><span class="portal-badge gold">${esc(r.status||'pending_review')}</span></div><div id="report-preview-body">${body}</div>${isAdmin()?`<div class="portal-report-editor"><div class="portal-field"><label>Executive Summary / Report Summary</label><textarea class="portal-textarea" id="edit-report-summary">${esc(r.summary||'')}</textarea></div><div class="portal-field"><label>Report HTML Body</label><textarea class="portal-textarea" id="edit-report-html">${esc(r.html_body||'')}</textarea></div><div class="portal-field"><label>Notes / Exceptions / Investor Notes</label><textarea class="portal-textarea" id="edit-report-notes">${esc(r.notes||'')}</textarea></div><div class="portal-field"><label>Business Update to Save</label><textarea class="portal-textarea" id="edit-business-update" placeholder="Write a manual Business Updates paragraph here if needed."></textarea></div><div class="portal-actions"><button class="portal-button portal-button-primary" onclick="saveReportDraft('${esc(r.report_id)}','draft')">Save Draft</button><button class="portal-button portal-button-secondary" onclick="saveReportDraft('${esc(r.report_id)}','pending_review')">Mark Pending Review</button><button class="portal-button portal-button-secondary" onclick="saveBusinessUpdateForReport('${esc(r.report_id)}')">Save Business Update</button><button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve Report</button></div></div>`:''}`;
+      el.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    window.saveReportDraft=async function(reportId,status){ try{ await cscPost('saveReportEdits',{report_id:reportId,status,summary:document.getElementById('edit-report-summary').value,html_body:document.getElementById('edit-report-html').value,notes:document.getElementById('edit-report-notes').value}); showAlert('portal-global-alert','Report edits saved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
+    window.saveBusinessUpdateForReport=async function(reportId){ try{ const text=document.getElementById('edit-business-update').value.trim(); if(!text){showAlert('portal-global-alert','Write a Business Update first.','warn');return;} await cscPost('saveBusinessUpdate',{report_id:reportId,title:'Manual Business Update',category:'Business Updates',update_text:text}); showAlert('portal-global-alert','Business update saved. Regenerate or edit report text to include it.','ok'); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
     window.approveReport=async function(reportId){ try{ const res=await cscJsonp('approveReport',{report_id:reportId,status:'approved'}); showAlert('portal-global-alert','Report approved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
-    function renderDocuments(data){
-      const docs=data.documents||[];
-      const mount=document.getElementById('documents-content');
-      if(!docs.length){mount.innerHTML='<p class="portal-small">No documents found yet. Click Sync Drive Vault if files were manually uploaded to Google Drive.</p>';return;}
-      const filtered=docs.filter(d=>{
-        const type=String(d.document_type||'').toLowerCase();
-        const category=String(d.category||'').toLowerCase();
-        const status=String(d.status||'').toLowerCase();
-        if(CURRENT_DOC_FILTER==='statements') return ['bank_statement','fidelity_statement','brokerage_statement','report_pdf'].includes(type);
-        if(CURRENT_DOC_FILTER==='legal') return ['company_document','operating_agreement','investor_packet'].includes(type) || category.includes('legal') || category.includes('company');
-        if(CURRENT_DOC_FILTER==='reports') return type==='report_pdf' || category.includes('report');
-        if(CURRENT_DOC_FILTER==='signed') return ['signed_document','esign_document'].includes(type) || category.includes('signed');
-        if(CURRENT_DOC_FILTER==='needs_review') return status==='needs_review' || String(d.notes||'').toLowerCase().includes('review');
-        return true;
-      });
-      if(!filtered.length){mount.innerHTML='<p class="portal-small">No documents match this filter.</p>';return;}
-      mount.innerHTML='<div class="portal-split-list">'+filtered.map(d=>{
-        const docId=esc(d.document_id||'');
-        const reviewBadge=(String(d.status||'').toLowerCase()==='needs_review'||String(d.notes||'').toLowerCase().includes('review'))?'<span class="portal-badge red">Needs Review</span>':'';
-        const classifyForm=isAdmin()?`<form class="portal-classify-form" data-classify-document="${docId}">
-          <div class="portal-field"><label>Title</label><input class="portal-input" name="title" value="${esc(d.title||d.file_name||'')}"></div>
-          <div class="portal-field"><label>Category</label><input class="portal-input" name="category" value="${esc(d.category||'')}"></div>
-          <div class="portal-field"><label>Document Type</label><select class="portal-select" name="document_type">${['company_document','operating_agreement','investor_packet','budget','bank_statement','fidelity_statement','brokerage_statement','report_pdf','tax_cpa','signed_document','esign_document','other'].map(v=>`<option value="${v}" ${String(d.document_type)===v?'selected':''}>${v}</option>`).join('')}</select></div>
-          <div class="portal-field"><label>Status</label><select class="portal-select" name="status">${['uploaded','synced_from_drive','classified','parsed','needs_review','approved','archived'].map(v=>`<option value="${v}" ${String(d.status)===v?'selected':''}>${v}</option>`).join('')}</select></div>
-          <div class="portal-field"><label>Related Account ID</label><input class="portal-input" name="related_account_id" value="${esc(d.related_account_id||'')}"></div>
-          <div class="portal-field"><label>Related Report ID</label><input class="portal-input" name="related_report_id" value="${esc(d.related_report_id||'')}"></div>
-          <div class="portal-field" style="grid-column:1/-1"><label>Notes</label><textarea class="portal-textarea" name="notes">${esc(d.notes||'')}</textarea></div>
-          <div class="portal-actions" style="grid-column:1/-1"><button class="portal-button portal-button-primary" type="submit">Save Classification</button>${['bank_statement','fidelity_statement','brokerage_statement','report_pdf'].includes(String(d.document_type||''))?`<button class="portal-button portal-button-secondary" type="button" onclick="parseStatementDocument('${docId}')">Parse Statement</button>`:''}</div>
-        </form>`:'';
-        return `<div class="portal-list-item">
-          <h3>${esc(d.title||d.file_name)}</h3>
-          <p><span class="portal-badge">${esc(d.document_type||d.category||'document')}</span> <span class="portal-badge gold">${esc(d.status||'')}</span> ${reviewBadge}</p>
-          <p><strong>Category:</strong> ${esc(d.category||'')}<br><strong>Uploaded:</strong> ${esc(d.uploaded_at||'')} by ${esc(d.uploaded_by||'')}<br><strong>File:</strong> ${esc(d.file_name||'')}</p>
-          <div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open / View</a>`:''}</div>
-          <p>${esc(d.notes||'')}</p>
-          ${classifyForm}
-        </div>`;
-      }).join('')+'</div>';
-    }
     function renderESign(data){ const rows=data.requests||[]; if(!rows.length){document.getElementById('esign-content').innerHTML='<p class="portal-small">No e-sign requests found.</p>';return;} document.getElementById('esign-content').innerHTML='<div class="portal-split-list">'+rows.map(r=>`<div class="portal-list-item"><h3>${esc(r.title||r.esign_request_id)}</h3><p><span class="portal-badge ${r.request_status==='signed'?'green':'gold'}">${esc(r.request_status||'pending')}</span> ${esc(r.signer_email||'')}</p><p>${esc(r.message||'')}</p></div>`).join('')+'</div>'; }
     function renderSettings(){ const u=CSC_SESSION||{}; document.getElementById('settings-content').innerHTML=`<div class="portal-grid portal-grid-3"><div class="portal-summary-card portal-card"><span>Email</span><strong style="font-size:18px;letter-spacing:0">${esc(u.email)}</strong><small>${esc(u.full_name)}</small></div><div class="portal-summary-card portal-card"><span>Role</span><strong style="font-size:22px;">${esc(u.role)}</strong><small>${isAdmin()?'Admin tools enabled':'Viewer tools only'}</small></div><div class="portal-summary-card portal-card"><span>Backend</span><strong style="font-size:18px;letter-spacing:0">CSC .gs</strong><small>TIINGO_API_KEY powers cached grid prices only</small></div></div>`; }
 
@@ -469,6 +443,7 @@
     document.getElementById('send-report').addEventListener('click',async()=>{ try{const res=await cscJsonp('sendApprovedReport',{}); showAlert('portal-global-alert','Approved report email workflow complete.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
     document.getElementById('refresh-documents').addEventListener('click', loadDocuments);
     document.getElementById('sync-drive-vault')?.addEventListener('click', syncDriveVault);
+    document.getElementById('parse-statements')?.addEventListener('click', parseStatements);
     document.querySelectorAll('[data-doc-filter]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-doc-filter]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');CURRENT_DOC_FILTER=btn.dataset.docFilter;renderDocuments(CSC_DATA.documents||{documents:[]});}));
     document.getElementById('refresh-esign').addEventListener('click', loadESign);
     document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
@@ -490,7 +465,7 @@
       }catch(err){showAlert('portal-global-alert',err.message,'error');}
     });
 
-    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded and logged.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
+    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Automatic reading may need review.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
     document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
 
     loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
