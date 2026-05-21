@@ -20,6 +20,59 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#061a33">
   <link rel="stylesheet" href="/assets/csc-style.css">
+  <style>
+    /* CSC Portal targeted investor-page mobile refinements — no data-source/function changes */
+    .csc-investor-login-button {
+      background: linear-gradient(135deg, #f4d783, #c9972b);
+      color: #111827;
+      border-color: rgba(201,151,43,.45);
+    }
+    @media (max-width: 760px) {
+      .csc-investor-ticker {
+        flex-direction: row !important;
+        align-items: center !important;
+        padding-top: 0 !important;
+        min-height: 52px;
+      }
+      .csc-investor-ticker-label {
+        margin-left: 10px !important;
+        white-space: nowrap;
+      }
+      .csc-investor-tv-ticker {
+        width: auto !important;
+        flex: 1 1 auto !important;
+      }
+      .csc-custom-ticker {
+        display: none !important;
+      }
+      .csc-watchlist-grid {
+        display: flex !important;
+        grid-template-columns: none !important;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 2px 6px 16px 2px;
+      }
+      .csc-watchlist-grid .csc-watch-card,
+      .csc-watchlist-grid .csc-empty-card {
+        flex: 0 0 min(84vw, 360px);
+        scroll-snap-align: start;
+      }
+      .csc-watchlist-grid::-webkit-scrollbar {
+        height: 8px;
+      }
+      .csc-watchlist-grid::-webkit-scrollbar-thumb {
+        background: rgba(7,23,47,.28);
+        border-radius: 999px;
+      }
+    }
+    @media (max-width: 560px) {
+      .csc-custom-ticker {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="csc-site-header"></div>
@@ -82,6 +135,7 @@
         <div class="csc-hero-actions">
           <a class="csc-button csc-button-primary" href="#portfolio-snapshot">View Portfolio Snapshot</a>
           <a class="csc-button csc-button-secondary" href="#market-dashboard">Review CSC Investment Portfolio</a>
+          <a class="csc-button csc-button-secondary csc-investor-login-button" href="/portal/">Investor Login</a>
           <a class="csc-button csc-button-secondary" href="mailto:cookservicescompany@gmail.com">Contact Cook Services Company</a>
         </div>
       </div>
