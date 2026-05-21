@@ -150,16 +150,69 @@
     function cscPost(action, data={}){
       return new Promise((resolve,reject)=>{
         const requestId='req_'+Date.now()+'_'+Math.floor(Math.random()*99999);
-        const iframe=document.createElement('iframe'); iframe.name='csc_iframe_'+requestId; iframe.style.display='none';
-        const form=document.createElement('form'); form.method='POST'; form.action=CSC_WEB_APP_URL; form.target=iframe.name; form.style.display='none';
+        const targetName='csc_iframe_'+requestId;
+
+        const iframe=document.createElement('iframe');
+        iframe.name=targetName;
+        iframe.id=targetName;
+        iframe.setAttribute('name', targetName);
+        iframe.style.display='none';
+
+        const form=document.createElement('form');
+        form.method='POST';
+        // Put action/request_id in the query string AND hidden fields.
+        // This makes Apps Script receive them reliably across iframe/form POST deployments.
+        form.action=CSC_WEB_APP_URL+'?action='+encodeURIComponent(action)+'&request_id='+encodeURIComponent(requestId);
+        form.target=targetName;
+        form.enctype='application/x-www-form-urlencoded';
+        form.acceptCharset='UTF-8';
+        form.style.display='none';
+
         const payload={...data, token: CSC_SESSION?.token || ''};
         const fields={action, request_id:requestId, payload:JSON.stringify(payload)};
-        Object.keys(fields).forEach(k=>{ const input=document.createElement('input'); input.type='hidden'; input.name=k; input.value=fields[k]; form.appendChild(input); });
-        const timer=setTimeout(()=>{cleanup();reject(new Error('Request timed out'));},60000);
-        function cleanup(){clearTimeout(timer);window.removeEventListener('message',onMessage);form.remove();iframe.remove();}
-        function onMessage(event){ const msg=event.data||{}; if(!msg || msg.source!=='CSC_PORTAL' || msg.requestId!==requestId) return; cleanup(); msg.payload && msg.payload.ok ? resolve(msg.payload) : reject(new Error(msg.payload?.error || 'Request failed')); }
+        Object.keys(fields).forEach(k=>{
+          const input=document.createElement('input');
+          input.type='hidden';
+          input.name=k;
+          input.value=fields[k];
+          form.appendChild(input);
+        });
+
+        let settled=false;
+        const timer=setTimeout(()=>{
+          cleanup();
+          reject(new Error('Portal login request timed out. Confirm the Apps Script web app is deployed as Execute as Me / Anyone, then redeploy the latest code.'));
+        },60000);
+
+        function cleanup(){
+          clearTimeout(timer);
+          window.removeEventListener('message',onMessage);
+          setTimeout(()=>{ form.remove(); iframe.remove(); },0);
+        }
+
+        function onMessage(event){
+          const msg=event.data||{};
+          if(!msg || msg.source!=='CSC_PORTAL' || msg.requestId!==requestId) return;
+          settled=true;
+          cleanup();
+          msg.payload && msg.payload.ok ? resolve(msg.payload) : reject(new Error(msg.payload?.error || 'Request failed'));
+        }
+
+        iframe.addEventListener('load',()=>{
+          // If the Apps Script HTML response fails to postMessage, keep waiting until timeout.
+          // This avoids false failures on Google's intermediate redirect/load event.
+        });
+
         window.addEventListener('message',onMessage);
-        document.body.appendChild(iframe); document.body.appendChild(form); form.submit();
+        document.body.appendChild(iframe);
+        document.body.appendChild(form);
+
+        try {
+          form.submit();
+        } catch (err) {
+          cleanup();
+          reject(err);
+        }
       });
     }
 
