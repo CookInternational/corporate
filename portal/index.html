@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v2.1.0 Alpha | Last Updated on 22 May 2026 @ 17:27:35Z UTC -->
+<!-- CSC Portal Frontend v2.2.0 Alpha | Last Updated on 22 May 2026 @ 18:01:05Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -218,7 +218,7 @@
 
         <section id="tab-positions" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Holdings & Research Watchlist</h2><p>Owned positions count only when <strong>position_status = owned</strong> and <strong>include_in_portfolio_totals = TRUE</strong>.</p></div><button class="portal-button portal-button-dark" id="refresh-market" type="button">Refresh Market Data</button></div><div id="positions-content"></div></article></section>
 
-        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>v2.1.0 Alpha makes CustomReport operational: save, pending review, approve, and send are all tied to the exact same report_id.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-dark" id="run-custom-setup-check" type="button">Run Setup Check</button></div></div><div class="portal-data-note"><strong>CustomReport Workflow Mode is active.</strong> Save Draft creates/updates the matching Reports row as draft. Mark Pending Review creates/updates it as pending_review. Approve This Report syncs CustomReport and Reports as approved. Send This Approved Report sends only that exact approved report.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
+        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>Manual report workflow. You can write a blank report, save it, approve it, choose recipients, send it, or send a test copy to yourself.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-secondary" id="start-blank-report" type="button">Start Blank Report</button><button class="portal-button portal-button-dark" id="run-custom-setup-check" type="button">Run Setup Check</button></div></div><div class="portal-data-note"><strong>Manual sending only.</strong> No time triggers. Use the Send Controls below to choose the report and recipients, then click <strong>Send Report</strong>. Use <strong>Test Send to Me</strong> to send only to the logged-in admin.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
 
         <section id="tab-documents" class="portal-panel">
           <div class="portal-grid portal-grid-2">
@@ -274,7 +274,7 @@
 
         <section id="tab-esign" class="portal-panel"><div class="portal-grid portal-grid-2"><article class="portal-section-card portal-card"><p class="portal-kicker">Internal E-Sign</p><h2 class="portal-section-title">Create Request</h2><form id="esign-create-form"><div class="portal-field"><label for="esign-document-id">Document ID</label><input class="portal-input" id="esign-document-id" name="document_id" required></div><div class="portal-field"><label for="esign-title">Title</label><input class="portal-input" id="esign-title" name="title" required></div><div class="portal-field"><label for="esign-email">Signer Email</label><input class="portal-input" id="esign-email" name="signer_email" type="email" required></div><div class="portal-field"><label for="esign-message">Message</label><textarea class="portal-textarea" id="esign-message" name="message"></textarea></div><button class="portal-button portal-button-primary" type="submit">Create E-Sign Request</button></form><div id="esign-create-alert" class="portal-alert"></div></article><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Requests</p><h2 class="portal-section-title">Pending & Completed</h2></div><button class="portal-button portal-button-dark" id="refresh-esign" type="button">Refresh</button></div><div id="esign-content"></div></article></div></section>
 
-        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
+        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
       </section>
     </div>
   </main>
@@ -282,7 +282,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.1.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.2.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -311,7 +311,7 @@
       });
     }
 
-    function cscPost(action, data={}){
+    function cscPost(action, data={}, opts={}){
       return new Promise((resolve,reject)=>{
         const requestId='req_'+Date.now()+'_'+Math.floor(Math.random()*99999);
         const targetName='csc_iframe_'+requestId;
@@ -324,7 +324,8 @@
         const payload={...data, token: CSC_SESSION?.token || ''};
         const fields={action, request_id:requestId, payload:JSON.stringify(payload)};
         Object.keys(fields).forEach(k=>{ const input=document.createElement('input'); input.type='hidden'; input.name=k; input.value=fields[k]; form.appendChild(input); });
-        const timer=setTimeout(()=>{cleanup();reject(new Error('Request timed out. Confirm the Apps Script web app is deployed as Execute as Me / Anyone and the latest version is deployed.'));},60000);
+        const timeoutMs=opts.timeoutMs || (action==='uploadDocument'?240000:90000);
+        const timer=setTimeout(()=>{cleanup();reject(new Error(action==='uploadDocument'?'Upload response timed out, but the file may still have uploaded. Refresh Documents to confirm.':'Request timed out. Confirm the Apps Script web app is deployed as Execute as Me / Anyone and the latest version is deployed.'));},timeoutMs);
         function cleanup(){clearTimeout(timer);window.removeEventListener('message',onMessage);setTimeout(()=>{form.remove();iframe.remove();},0);}
         function onMessage(event){ const msg=event.data||{}; if(!msg || msg.source!=='CSC_PORTAL' || msg.requestId!==requestId) return; cleanup(); msg.payload && msg.payload.ok ? resolve(msg.payload) : reject(new Error(msg.payload?.error || 'Request failed')); }
         window.addEventListener('message',onMessage);
@@ -381,8 +382,35 @@
       mount.innerHTML=(owned.length?table(owned,'Owned Holdings'):'<h3>Owned Holdings</h3><p class="portal-small">No owned holdings currently counted in totals.</p>')+(research.length?table(research,'Research-Only Watchlist'):'');
     }
     function renderReports(data){
-      const reports=data.reports||[]; if(!reports.length){document.getElementById('reports-content').innerHTML='<p class="portal-small">No reports found yet.</p>';return;}
-      document.getElementById('reports-content').innerHTML='<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')||String(r.status).includes('draft')?'gold':String(r.status).includes('sent')?'green':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><p class="portal-small">${esc(r.notes||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview / Edit</button>${isAdmin()?`<button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve</button>`:''}</div></div>`).join('')+'</div><div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
+      const reports=data.reports||[];
+      const recipients=data.recipients||[];
+      const sendControls=renderReportSendControls(reports,recipients);
+      const listHtml=!reports.length?'<p class="portal-small">No reports found yet. Click Start Blank Report or open the Custom Report Builder and Save Draft.</p>':'<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')||String(r.status).includes('draft')?'gold':String(r.status).includes('sent')?'green':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><p class="portal-small">Report ID: ${esc(r.report_id||'')}<br>${esc(r.notes||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview / Edit</button>${isAdmin()?`<button class="portal-button portal-button-secondary" onclick="selectReportForSending('${esc(r.report_id)}')">Select to Send</button><button class="portal-button portal-button-primary" onclick="approveSelectedReport('${esc(r.report_id)}')">Approve</button><button class="portal-button portal-button-dark" onclick="sendSelectedReport('${esc(r.report_id)}')">Send Report</button><button class="portal-button portal-button-secondary" onclick="testSendSelectedReport('${esc(r.report_id)}')">Test Send to Me</button>`:''}</div></div>`).join('')+'</div>';
+      document.getElementById('reports-content').innerHTML=sendControls+listHtml+'<div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
+    }
+
+    function renderReportSendControls(reports, recipients){
+      if(!isAdmin()) return '';
+      const reportOptions=(reports||[]).map(r=>`<option value="${esc(r.report_id||'')}">${esc((r.status||'')+' — '+(r.report_title||r.report_id||''))}</option>`).join('');
+      const recipientOptions=(recipients||[]).map(r=>`<label class="portal-list-item" style="display:flex;gap:10px;align-items:flex-start;"><input type="checkbox" class="report-recipient-checkbox" value="${esc(r.email||'')}" ${String(r.receive_monthly_report).toUpperCase()==='TRUE'?'checked':''}><span><strong>${esc(r.full_name||r.email)}</strong><br><span class="portal-small">${esc(r.email||'')} · ${esc(r.role||'recipient')}</span></span></label>`).join('') || '<p class="portal-small">No active recipients found in ReportRecipients.</p>';
+      return `<div class="portal-section-card portal-card" style="margin-bottom:16px;background:#fffdf7;"><div class="portal-section-head"><div><p class="portal-kicker">Send Controls</p><h2 class="portal-section-title">Send Report</h2><p>Choose the report, choose recipients, then send manually. No report time triggers are used.</p></div></div><div class="portal-form-grid"><div class="portal-field"><label>Report to Send</label><select class="portal-select" id="send-report-id">${reportOptions}</select></div><div class="portal-field"><label>Manual Recipient Emails</label><input class="portal-input" id="manual-recipient-emails" placeholder="Optional: email1@example.com, email2@example.com"></div></div><div class="portal-field"><label>Recipients</label><div id="report-recipient-list" class="portal-grid portal-grid-2">${recipientOptions}</div></div><div class="portal-actions"><button class="portal-button portal-button-primary" type="button" onclick="approveSelectedReport()">Approve Selected Report</button><button class="portal-button portal-button-dark" type="button" onclick="sendSelectedReport()">Send Report</button><button class="portal-button portal-button-secondary" type="button" onclick="testSendSelectedReport()">Test Send to Me</button><button class="portal-button portal-button-secondary" type="button" onclick="runCustomReportSetupCheck()">Run Setup Check</button><button class="portal-button portal-button-secondary" type="button" onclick="startBlankReport()">Start Blank Report</button></div><p class="portal-small"><strong>Send Report</strong> requires the selected report to be approved. <strong>Test Send to Me</strong> sends only to the logged-in admin and does not mark the report sent.</p></div>`;
+    }
+
+    function selectedRecipientEmails(){
+      const checked=[...document.querySelectorAll('.report-recipient-checkbox:checked')].map(x=>x.value).filter(Boolean);
+      const manual=String(document.getElementById('manual-recipient-emails')?.value||'').split(/[;,\n]/).map(x=>x.trim()).filter(Boolean);
+      return [...new Set([...checked,...manual])];
+    }
+    function selectedReportId(fallback){ return fallback || document.getElementById('send-report-id')?.value || (CSC_DATA.custom_report&&CSC_DATA.custom_report.report_id) || ''; }
+    window.selectReportForSending=function(reportId){ const sel=document.getElementById('send-report-id'); if(sel){sel.value=reportId; sel.scrollIntoView({behavior:'smooth',block:'center'});} showAlert('portal-global-alert','Selected report '+reportId+' for sending.','ok'); }
+    window.approveSelectedReport=async function(reportId){
+      try{ const rid=selectedReportId(reportId); if(!rid) throw new Error('Select a report first.'); await cscPost('approveCustomReport',{report_id:rid,status:'approved'}); showAlert('portal-global-alert','Selected report approved.','ok'); await loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    window.sendSelectedReport=async function(reportId){
+      try{ const rid=selectedReportId(reportId); if(!rid) throw new Error('Select a report first.'); const emails=selectedRecipientEmails(); if(!emails.length) throw new Error('Choose at least one recipient or type a manual email.'); const res=await cscPost('sendCustomReport',{report_id:rid,recipient_emails:emails.join(',')}); showAlert('portal-global-alert',`Report sent to ${res.sent||0} recipient(s).`,'ok'); await loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    window.testSendSelectedReport=async function(reportId){
+      try{ const rid=selectedReportId(reportId); if(!rid) throw new Error('Select a report first.'); const res=await cscPost('sendCustomReportTest',{report_id:rid,test_to_me:'TRUE'}); showAlert('portal-global-alert',`Test report sent to you. Sent: ${res.sent||0}.`,'ok'); await loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
 
 
@@ -608,7 +636,7 @@
       const y=now.getUTCFullYear();
       const m=String(now.getUTCMonth()+1).padStart(2,'0');
       const d=String(now.getUTCDate()).padStart(2,'0');
-      const idDate=`${y}_${m}_${d}`;
+      const idDate=`${y}_${m}_${d}_${Date.now()}`;
       return {
         custom_report_id:`cr_${idDate}_manual`,
         report_id:`report_${idDate}_manual`,
@@ -642,8 +670,16 @@
         status:'active',
         updated_by:(CSC_SESSION&&CSC_SESSION.full_name)||'Portal User',
         updated_at:stamp,
-        notes:'v2.1.0 fail-open draft. Save Draft will create/update CustomReport and the matching Reports row.'
+        notes:'v2.2.0 blank/manual draft. Save Draft creates or updates both CustomReport and the matching Reports row.'
       };
+    }
+
+    function startBlankReport(){
+      const row=defaultCustomReportRow();
+      CSC_DATA.custom_report=row;
+      const mount=document.getElementById('custom-report-builder');
+      if(mount){ mount.style.display='block'; renderCustomReportBuilder(row); }
+      showAlert('portal-global-alert','Blank report opened. Fill it in, then Save Draft.','ok');
     }
 
     async function openCustomReportBuilder(){
@@ -706,11 +742,11 @@
           <button class="portal-button portal-button-primary" type="button" onclick="customReportWorkflow('saveCustomReportDraft')">Save Draft</button>
           <button class="portal-button portal-button-secondary" type="button" onclick="customReportWorkflow('markCustomReportPendingReview')">Mark Pending Review</button>
           <button class="portal-button portal-button-dark" type="button" onclick="customReportWorkflow('approveCustomReport')">Approve This Report</button>
-          <button class="portal-button portal-button-primary" type="button" onclick="customReportWorkflow('sendCustomReport')">Send This Approved Report</button>
+          <button class="portal-button portal-button-primary" type="button" onclick="customReportWorkflow('sendCustomReport')">Send Report</button><button class="portal-button portal-button-secondary" type="button" onclick="customReportWorkflow('sendCustomReportTest')">Test Send to Me</button>
           <button class="portal-button portal-button-secondary" type="button" onclick="runCustomReportSetupCheck()">Run Setup Check</button>
           <button class="portal-button portal-button-secondary" type="button" onclick="document.getElementById('custom-report-builder').style.display='none'">Close</button>
         </div>
-        <p class="portal-small">Send only works after this exact report_id is approved and active recipients exist. Sensitive bank/brokerage PDFs should not be uploaded to Drive.</p>
+        <p class="portal-small">Send Report uses the recipients selected in the Reports tab. Test Send to Me sends only to the logged-in admin. Normal send requires approval first. Sensitive bank/brokerage PDFs should not be uploaded to Drive.</p>
       </div>`;
       mount.scrollIntoView({behavior:'smooth',block:'start'});
       refreshCustomReportWorkflowStatus();
@@ -750,7 +786,8 @@
         if(action==='saveCustomReportDraft'){ payload.report_status='draft'; label='Draft saved and matching Reports row updated as draft.'; }
         if(action==='markCustomReportPendingReview'){ payload.report_status='pending_review'; label='Report marked pending review and matching Reports row updated.'; }
         if(action==='approveCustomReport'){ payload.report_status='approved'; payload.status='approved'; label='This report was approved in CustomReport and Reports.'; }
-        if(action==='sendCustomReport'){ label='This approved report was sent.'; }
+        if(action==='sendCustomReport'){ payload.recipient_emails=selectedRecipientEmails().join(','); label='This report was sent.'; }
+        if(action==='sendCustomReportTest'){ payload.test_to_me='TRUE'; label='Test report sent to you.'; }
         const res=await cscPost(action,payload);
         if(res.custom_report){
           CSC_DATA.custom_report=res.custom_report;
@@ -784,7 +821,7 @@
     async function saveCustomReport(){ return customReportWorkflow('saveCustomReportDraft'); }
     async function generateCustomReport(){ return customReportWorkflow('markCustomReportPendingReview'); }
 
-    // generateCustomReport is an alias in the v2.1.0 workflow block above.
+    // generateCustomReport is an alias in the v2.2.0 workflow block above.
 
 
 
@@ -799,41 +836,29 @@
     window.saveReportDraft=async function(reportId,status){ try{ await cscPost('saveReportEdits',{report_id:reportId,status,summary:document.getElementById('edit-report-summary').value,html_body:document.getElementById('edit-report-html').value,notes:document.getElementById('edit-report-notes').value}); showAlert('portal-global-alert','Report edits saved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
     window.saveBusinessUpdateForReport=async function(reportId){ try{ const text=document.getElementById('edit-business-update').value.trim(); if(!text){showAlert('portal-global-alert','Write a Business Update first.','warn');return;} await cscPost('saveBusinessUpdate',{report_id:reportId,title:'Manual Business Update',category:'Business Updates',update_text:text}); showAlert('portal-global-alert','Business update saved. Regenerate or edit report text to include it.','ok'); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
     window.approveReport=async function(reportId){ try{ const res=await cscJsonp('approveReport',{report_id:reportId,status:'approved'}); showAlert('portal-global-alert','Report approved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
-    function renderESign(data){ const rows=data.requests||[]; if(!rows.length){document.getElementById('esign-content').innerHTML='<p class="portal-small">No e-sign requests found.</p>';return;} document.getElementById('esign-content').innerHTML='<div class="portal-split-list">'+rows.map(r=>`<div class="portal-list-item"><h3>${esc(r.title||r.esign_request_id)}</h3><p><span class="portal-badge ${r.request_status==='signed'?'green':'gold'}">${esc(r.request_status||'pending')}</span> ${esc(r.signer_email||'')}</p><p>${esc(r.message||'')}</p></div>`).join('')+'</div>'; }
-    function renderSettings(){ const u=CSC_SESSION||{}; document.getElementById('settings-content').innerHTML=`<div class="portal-grid portal-grid-3"><div class="portal-summary-card portal-card"><span>Email</span><strong style="font-size:18px;letter-spacing:0">${esc(u.email)}</strong><small>${esc(u.full_name)}</small></div><div class="portal-summary-card portal-card"><span>Role</span><strong style="font-size:22px;">${esc(u.role)}</strong><small>${isAdmin()?'Admin tools enabled':'Viewer tools only'}</small></div><div class="portal-summary-card portal-card"><span>Backend</span><strong style="font-size:18px;letter-spacing:0">CSC .gs</strong><small>TIINGO_API_KEY from Script Properties/Config powers cached grid prices only</small></div></div>`; }
-
-    function renderTradingViewChart(symbol){
-      const mount=document.getElementById('portal-tv-chart');
-      if(!mount) return;
-      const label=(symbol||'AMEX:VOO').split(':').pop();
-      document.getElementById('chart-meta').textContent=`${label} TradingView visual chart`;
-      mount.innerHTML='<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>';
-      const script=document.createElement('script');
-      script.type='text/javascript';
-      script.src='https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
-      script.async=true;
-      script.text=JSON.stringify({
-        symbols:[[label, `${symbol}|1D`]],
-        chartOnly:false,
-        width:"100%",
-        height:"100%",
-        locale:"en",
-        colorTheme:"dark",
-        autosize:true,
-        showVolume:false,
-        showMA:false,
-        hideDateRanges:false,
-        hideMarketStatus:false,
-        hideSymbolLogo:false,
-        scalePosition:"right",
-        scaleMode:"Normal",
-        fontFamily:"Arial, sans-serif",
-        fontSize:"12",
-        noTimeScale:false,
-        valuesTracking:"1",
-        changeMode:"price-and-percent"
-      });
-      mount.querySelector('.tradingview-widget-container').appendChild(script);
+    function renderESign(data){
+      const rows=data.requests||[];
+      if(!rows.length){document.getElementById('esign-content').innerHTML='<p class="portal-small">No e-sign requests found.</p>';return;}
+      document.getElementById('esign-content').innerHTML='<div class="portal-split-list">'+rows.map(r=>`<div class="portal-list-item" id="esign-card-${esc(r.esign_request_id)}"><h3>${esc(r.title||r.esign_request_id)}</h3><p><span class="portal-badge ${r.request_status==='signed'?'green':'gold'}">${esc(r.request_status||'pending')}</span> Signer: ${esc(r.signer_email||'')}</p><p>${esc(r.message||'')}</p><p class="portal-small"><strong>Document:</strong> ${esc(r.document_title||r.document_id||'No document attached')}<br>${esc(r.document_file_name||'')}</p><div class="portal-actions">${r.document_url?`<a class="portal-button portal-button-secondary" href="${esc(r.document_url)}" target="_blank" rel="noopener">View Document</a>`:''}${String(r.request_status||'pending')!=='signed'?`<button class="portal-button portal-button-primary" type="button" onclick="openESignPanel('${esc(r.esign_request_id)}')">View & E-Sign</button>`:`<span class="portal-badge green">Signed ${esc(r.signed_at||'')}</span>`}</div><div class="esign-panel-mount" data-esign-id="${esc(r.esign_request_id)}"></div></div>`).join('')+'</div>';
+    }
+    window.openESignPanel=function(esignId){
+      const rows=(CSC_DATA.esign&&CSC_DATA.esign.requests)||[];
+      const r=rows.find(x=>String(x.esign_request_id)===String(esignId));
+      const mount=document.querySelector(`.esign-panel-mount[data-esign-id="${CSS.escape(esignId)}"]`);
+      if(!r||!mount) return;
+      if(mount.innerHTML.trim()){mount.innerHTML='';return;}
+      mount.innerHTML=`<div class="portal-manual-editor"><h4>View and E-Sign Document</h4><p class="portal-small">Open and review the document first. Then type your legal name, check consent, and submit the e-sign acknowledgment.</p>${r.document_url?`<p><a class="portal-button portal-button-secondary" href="${esc(r.document_url)}" target="_blank" rel="noopener">Open Document in Drive</a></p>`:'<p class="portal-small" style="color:#912018">No document link is attached to this request. Ask an admin to re-create the request with a valid document.</p>'}<div class="portal-field"><label>Typed Legal Name</label><input class="portal-input" id="esign-name-${esc(esignId)}" value="${esc(CSC_SESSION?.full_name||'')}"></div><label class="portal-small" style="display:flex;gap:8px;align-items:flex-start;"><input type="checkbox" id="esign-consent-${esc(esignId)}"> <span>I reviewed the document and agree to sign this CSC internal e-sign acknowledgment electronically.</span></label><div class="portal-actions"><button class="portal-button portal-button-primary" type="button" onclick="completeESignRequest('${esc(esignId)}')">Submit E-Sign</button><button class="portal-button portal-button-secondary" type="button" onclick="this.closest('.esign-panel-mount').innerHTML=''">Cancel</button></div></div>`;
+    }
+    window.completeESignRequest=async function(esignId){
+      try{
+        const name=document.getElementById('esign-name-'+esignId)?.value||'';
+        const consent=document.getElementById('esign-consent-'+esignId)?.checked;
+        if(!name.trim()) throw new Error('Type your legal name before signing.');
+        if(!consent) throw new Error('Check the e-sign consent box before signing.');
+        await cscPost('completeESign',{esign_request_id:esignId,typed_legal_name:name,consent_checkbox:'TRUE'});
+        showAlert('portal-global-alert','Document e-signed.','ok');
+        await loadESign();
+      }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
 
     function renderChart(rows,symbol){
@@ -855,7 +880,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.1.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.2.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
@@ -873,6 +898,7 @@
     document.getElementById('test-report')?.addEventListener('click',async()=>{ try{const res=await cscJsonp('testReport',{}); showAlert('portal-global-alert','Test report generated and saved to Reports.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
     document.getElementById('settings-test-report')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('testReport',{}); out.textContent=JSON.stringify(res,null,2); loadReports();}catch(e){out.textContent=e.message;} });
     document.getElementById('open-custom-report')?.addEventListener('click', openCustomReportBuilder);
+    document.getElementById('start-blank-report')?.addEventListener('click', startBlankReport);
     document.getElementById('run-custom-setup-check')?.addEventListener('click', runCustomReportSetupCheck);
     document.getElementById('generate-report')?.addEventListener('click', generateCustomReport);
     document.getElementById('send-report')?.addEventListener('click',async()=>{ try{ await customReportWorkflow('sendCustomReport'); }catch(e){showAlert('portal-global-alert',e.message,'error');} });
@@ -884,7 +910,6 @@
     document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-sync-drive')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('syncDriveVaultDocuments',{}); out.textContent=JSON.stringify(res,null,2); loadDocuments();}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('parseStatements',{reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
-    document.getElementById('manual-trigger-setup').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('createMonthlyTrigger',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
 
     document.addEventListener('submit',async e=>{
       const form=e.target.closest('[data-classify-document]');
@@ -900,7 +925,7 @@
       }catch(err){showAlert('portal-global-alert',err.message,'error');}
     });
 
-    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Sensitive bank/brokerage statement uploads are blocked in v2.1.0 Alpha; use CustomReport for report values.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
+    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; const btn=e.target.querySelector('button[type=submit]'); if(!file){showAlert('upload-alert','Choose a file.','error');return;} if(btn){btn.disabled=true;btn.textContent='Uploading…';} showAlert('upload-alert','Uploading to the CSC Website Drive folder. Please wait.','warn'); const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64},{timeoutMs:240000}); showAlert('upload-alert','Document uploaded and logged.','ok'); e.target.reset(); await loadDocuments(); }catch(err){ showAlert('upload-alert',err.message,'error'); try{await loadDocuments();}catch(x){} } finally { if(btn){btn.disabled=false;btn.textContent='Upload Document';} } }; reader.onerror=()=>{ if(btn){btn.disabled=false;btn.textContent='Upload Document';} showAlert('upload-alert','Could not read file.','error'); }; reader.readAsDataURL(file); });
     document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
 
     loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
