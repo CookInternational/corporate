@@ -1,154 +1,150 @@
-# CSC Portal v2.0.0 Alpha — Manual Statement Entry, Brokerage Prefill & Report Source Lock
+[README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md](https://github.com/user-attachments/files/28160644/README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md)
+# CSC Portal v2.4.0 Alpha — Tiingo Grid, TradingView Ticker & Password Access Hardfix
 
-# CSC Portal v2.0.0 Alpha — Setup Notes
-
-Build stamp: 22 May 2026 @ 17:27:35Z UTC
-
-## What to run first
-
-1. Paste `CSC_PORTAL_BACKEND_v2.0.0_Alpha.gs` into Apps Script.
-2. Confirm `appsscript_v2.0.0_Alpha.json`.
-3. Confirm `TIINGO_API_KEY` exists in Script Properties and Config backup.
-4. Deploy a new Web App version.
-5. Replace the portal website file with `index_v2.0.0_Alpha.html`.
-6. Hard refresh.
-7. Log in as `michaelcook1995@icloud.com`.
-8. Go to Reports.
-9. Click Open Custom Report Builder.
-10. Click Run Setup Check.
-
-## Working report workflow
-
-Save Draft -> Mark Pending Review -> Approve This Report -> Send This Approved Report.
-
-Every button acts on the same `custom_report_id` and `report_id`.
-
-## Troubleshooting
-
-If Send fails:
-- Run Setup Check.
-- Confirm Reports status is approved.
-- Confirm ReportRecipients has active TRUE and receive_monthly_report TRUE.
-- Confirm Apps Script deployment is latest v2.0.0.
-- Confirm MailApp permission is available.
-
-
-**Last Updated:** 22 May 2026 @ 17:27:35Z UTC 
-**Backend Build Stamp:** 22 May 2026 @ 17:27:35Z UTC
-**Backend Version:** `CSC PORTAL BACKEND v2.0.0 Alpha`  
-**Frontend Version:** `CSC Portal Frontend v2.0.0 Alpha`  
+**Last Updated:** 22 May 2026 @ 19:21:15Z UTC  
+**Backend Build Stamp:** 22 May 2026 @ 19:21:15Z UTC  
+**Backend Version:** `CSC PORTAL BACKEND v2.4.0 Alpha`  
+**Frontend Version:** `CSC Portal Frontend v2.4.0 Alpha`  
+**Sheet Name:** `CSC Website`  
+**Spreadsheet ID:** `1AiSta8CqjbBAu5dZeiQoFmQ0Xdn054-v6soEa_hQ_RE`  
+**Drive Folder Name:** `CSC Website`  
+**Drive Folder ID:** `1qkgKz196pp0LHBgyoiTeABnImZ8sX569`  
+**Web App URL:** `https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec`  
+**Portal URL:** `https://corporate.cook-international.com/portal/`  
+**Executing Account:** `tips@cgnnews.net`  
+**Visible Sender Name:** `Cook Services Company`  
 **Company:** Cook Services Company, LLC  
-**Website:** https://corporate.cook-international.com  
-**Portal:** https://corporate.cook-international.com/portal/  
-**Contact:** cookservicescompany@gmail.com  
 **Copyright:** Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 ---
 
-## Purpose
+## 1. Purpose
 
-CSC Portal v1.8.0 Alpha makes the portal reliable by moving the financial reporting source of truth to **manual verified entries**.
+CSC Portal v2.4.0 Alpha is the current production-alpha private investor portal for Cook Services Company.
 
-Previous OCR and AI parsing attempts reached the uploaded statement files, but the backend logs showed the core failure clearly:
+This build keeps the v2 reporting, document, upload, and e-sign workflows intact, while adding three critical fixes:
 
-- Drive/OCR statement parsing returned `text_length: 0` and `parser: none`.
-- OpenAI statement parsing returned `OpenAI did not return valid JSON`.
-- Reports could not safely use parser output because no verified statement values were making it into `Statements.parsed_summary`.
+1. **Tiingo-backed Portfolio Grid pricing** for both owned and research-only positions.
+2. **TradingView ticker rendering after login**, so the market ticker does not fail inside a hidden portal container.
+3. **Password access controls**, including Forgot Password on login and Change Password in Settings for admins and investors.
 
-This build stops treating PDF parsing as the required path. PDFs stay in the Drive vault as source documentation. CSC admin users manually enter verified bank and brokerage numbers. Reports use those manual verified values first.
-
----
-
-## Operating principle
-
-v1.8.0 Alpha uses this rule:
-
-```text
-Manual verified numbers first.
-Tiingo market prefill second, only for brokerage market-price assistance.
-PDF links as proof.
-Parser / AI / Plaid disabled by default.
-No fake zeros.
-```
-
-Reports must never silently use missing values as real zeros. A blank number remains blank/null unless an admin intentionally enters `0`.
+The portal remains manual-first for financial reporting. It does not require OCR, OpenAI statement parsing, Plaid, or sensitive bank-statement uploads to Drive.
 
 ---
 
-## What changed from v7.1.0 / v7.1.1
-
-### 1. Manual statement mode is now the source of truth
-
-The portal now treats manually entered and verified statement summaries as the primary report source.
-
-Manual entries are saved into the existing `Statements.parsed_summary` JSON field. No new tabs are required.
-
-### 2. OCR, AI parsing, and Plaid are disabled by default
-
-The parser tools are no longer part of the normal report workflow.
-
-Default switches:
+## 2. Core operating rules
 
 ```text
-CSC_MANUAL_STATEMENT_MODE_ENABLED = true
-CSC_LEGACY_STATEMENT_PARSER_ENABLED = false
-CSC_OPENAI_STATEMENT_READER_ENABLED = false
-CSC_PLAID_ENABLED = false
+CustomReport is the report source of truth.
+Manual report edits always win.
+Reports are sent manually only.
+No monthly report time triggers.
+Tiingo is a market-price helper only.
+TradingView is visual only.
+Research-only positions never count toward portfolio totals.
+Sensitive bank/SSN/tax PDFs are not uploaded to Drive.
 ```
 
-Config-tab soft switches should also default to:
-
-```text
-manual_statement_mode_enabled = TRUE
-legacy_statement_parser_enabled = FALSE
-openai_statement_reader_enabled = FALSE
-plaid_enabled = FALSE
-```
-
-### 3. Brokerage values can be prefilled with Tiingo
-
-Brokerage/Fidelity values may use Tiingo for market data assistance.
-
-Tiingo can safely prefill:
-
-- latest price
-- latest price date/time
-- estimated market value if quantity is entered
-- unrealized gain/loss if quantity and manual cost basis are entered
-- market-data source note
-
-Tiingo must **not** be treated as the official accounting source for:
-
-- cost basis
-- contributions
-- withdrawals
-- tax lots
-- ownership status
-- official brokerage statement balances
-
-Those remain editable/manual.
-
-### 4. Manual overrides always win
-
-For both bank and brokerage reporting:
-
-1. Manual verified entry
-2. Manual draft entry, with report marked pending review
-3. Tiingo prefill for brokerage market values only, with review flag if not verified
-4. Parser / AI / Plaid only if explicitly re-enabled later
-5. Needs Review
-
-### 5. Source PDF links are attached to reports
-
-Every report should include a **Source Documents Used** section with Drive links to the bank statements, Fidelity reports, brokerage statements, signed documents, and other supporting records used.
+Reports must never silently use fake zeroes. A blank value should stay blank unless Michael intentionally enters `0`.
 
 ---
 
-## Existing tabs used
+## 3. v2.4.0 Alpha changes
 
-Do **not** add new tabs.
+### 3.1 Tiingo Portfolio Grid hardfix
 
-Use existing tabs only:
+The Portfolio Grid now prices research-only rows as well as owned rows.
+
+Backend behavior:
+
+```text
+Build quote list from MarketWatchlist + Positions.
+Deduplicate tickers.
+Fetch Tiingo quotes.
+Save quote data to MarketPrices.
+Join MarketPrices into every Positions row.
+Prefer fresh MarketPrices.last_price over stale Positions.last_price.
+Fallback to Positions.research_price_snapshot only if no Tiingo price exists.
+```
+
+Research-only behavior:
+
+```text
+position_status = research / research_only
+include_in_portfolio_totals = FALSE
+```
+
+Research-only rows show:
+
+```text
+last_price
+day_change
+day_change_pct
+quote_time_utc
+provider
+provider_status
+```
+
+Research-only rows do **not** affect:
+
+```text
+total_market_value
+total_cost_basis
+unrealized_gain_loss
+portfolio totals
+CustomReport totals
+investor report totals
+```
+
+Owned rows only count in totals when:
+
+```text
+position_status = owned
+include_in_portfolio_totals = TRUE
+```
+
+---
+
+### 3.2 TradingView ticker hardfix
+
+The market ticker is no longer dependent on static TradingView script tags inside a hidden portal container.
+
+Frontend behavior:
+
+```text
+User logs in.
+Portal app becomes visible.
+Dashboard renders.
+renderTradingViewTicker() runs.
+TradingView ticker tape is injected dynamically.
+```
+
+This matches the reliable TradingView pattern used by the Investors page.
+
+TradingView widgets are visual/reference only. They do not update official records, cost basis, report numbers, or accounting values.
+
+---
+
+### 3.3 Password access hardfix
+
+v2.4.0 adds:
+
+```text
+Forgot Password? on login
+Password reset email flow
+Reset password screen from email link
+Change Password card in Settings
+Investor-accessible password change
+Session invalidation after password change
+```
+
+No new sheet tab is required. Password reset tokens are stored in the existing `Sessions` tab.
+
+---
+
+## 4. Required Google Sheet tabs
+
+The live `CSC Website` spreadsheet must contain these tabs:
 
 ```text
 Config
@@ -172,505 +168,788 @@ Approvals
 CapitalContributions
 MemberLedger
 Budget
+CustomReport
 Logs
 ```
 
+Do not rename these tabs.
+
 ---
 
-## Required Config keys
+## 5. Config setup
 
-Confirm these keys exist or add them to the existing `Config` tab:
+Required Config keys:
 
 ```text
-WEB_APP_URL = https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
-DRIVE_DOCUMENTS_FOLDER_ID = 1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
+VERSION = CSC Portal v2.4.0 Alpha
+BACKEND_VERSION = CSC PORTAL BACKEND v2.4.0 Alpha
+FRONTEND_VERSION = CSC Portal Frontend v2.4.0 Alpha
+WEB_APP_URL = https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec
+PORTAL_DOMAIN = https://corporate.cook-international.com/portal/
+FROM_NAME = Cook Services Company
+COMPANY_EMAIL = tips@cgnnews.net
+REPLY_TO = tips@cgnnews.net
+DRIVE_DOCUMENTS_FOLDER_ID = 1qkgKz196pp0LHBgyoiTeABnImZ8sX569
 MARKET_DATA_PROVIDER = TIINGO
 MARKET_DATA_CACHE_MINUTES = 15
-MONTHLY_REPORT_DAY = 15
-MONTHLY_REPORT_HOUR_ET = 9
+TIINGO_API_KEY_SOURCE = SCRIPT_PROPERTIES_AND_CONFIG_BACKUP
 MONTHLY_REPORT_AUTO_SEND = FALSE
-PORTAL_DOMAIN = https://corporate.cook-international.com/portal/
-
 manual_statement_mode_enabled = TRUE
+custom_report_mode_enabled = TRUE
 legacy_statement_parser_enabled = FALSE
 openai_statement_reader_enabled = FALSE
 plaid_enabled = FALSE
 brokerage_prefill_enabled = TRUE
 brokerage_prefill_provider = TIINGO
 manual_override_enabled = TRUE
+sensitive_drive_uploads_allowed = FALSE
 ```
 
-If the Tiingo key is currently stored in Config, preserve that pattern. If it is stored in Apps Script Properties, that is also acceptable. Do not expose the Tiingo key in the portal HTML.
+`TIINGO_API_KEY` may be stored in both Apps Script Project Settings and the Config tab as a backup. Script Properties are checked first.
 
 ---
 
-## appsscript.json
+## 6. Apps Script Project Settings
 
-The v1.8.0 Alpha manifest does not need extra OCR/DocumentApp permissions if OCR parsing is disabled.
+In Apps Script:
 
-Minimum expected scopes remain:
-
-```json
-"https://www.googleapis.com/auth/spreadsheets",
-"https://www.googleapis.com/auth/drive",
-"https://www.googleapis.com/auth/script.external_request",
-"https://www.googleapis.com/auth/script.send_mail",
-"https://www.googleapis.com/auth/script.scriptapp"
-```
-
-Advanced Drive API v2 can remain enabled for Drive vault sync and file operations. It is no longer the required statement-reading path.
-
----
-
-## Manual bank statement entry
-
-Each bank statement card in Documents should include a **Manual Numbers** button.
-
-The Manual Numbers editor should support:
+1. Open the CSC Portal project.
+2. Go to **Project Settings**.
+3. Under **Script Properties**, add or confirm:
 
 ```text
-institution
-account_name
-account_number_last4
-statement_type
-statement_period_start
-statement_period_end
-statement_date
-beginning_balance
-ending_balance
-cash_balance
-total_credits
-deposits
-total_other_deposits
-total_debits
-withdrawals
-card_withdrawals
-other_withdrawals
-checks_paid
-fees
-net_change
-balance_on_report_start
-balance_on_report_end
-balance_on_15th
-daily_balance_notes
-transaction_count_manual
-source_pdf_url
-source_drive_file_id
-manual_notes
-manual_entry_status
-verified_by
-verified_at
+TIINGO_API_KEY = your Tiingo API key
 ```
 
-Allowed manual entry statuses:
-
-```text
-draft
-verified
-needs_review
-```
+Do not expose the Tiingo key in portal HTML.
 
 ---
 
-## Manual parsed_summary shape
+## 7. appsscript.json
 
-Manual bank entries should save into `Statements.parsed_summary` like this:
+Use this manifest:
 
 ```json
 {
-  "parser": "manual_statement_entry_v180",
-  "source": "manual_entry",
-  "institution": "U.S. Bank",
-  "statement_type": "bank_statement",
-  "account_name": "CSC Checking",
-  "account_number_last4": "5923",
-  "statement_period_start": "2026-04-01",
-  "statement_period_end": "2026-04-30",
-  "statement_date": "2026-04-30",
-  "beginning_balance": 90.10,
-  "ending_balance": 22.29,
-  "cash_balance": 22.29,
-  "total_credits": 524.65,
-  "deposits": 524.65,
-  "total_debits": 592.46,
-  "withdrawals": 592.46,
-  "card_withdrawals": 542.46,
-  "other_withdrawals": 50.00,
-  "fees": 0,
-  "net_change": -67.81,
-  "balance_on_report_start": null,
-  "balance_on_report_end": null,
-  "balance_on_15th": 465.41,
-  "daily_balance_notes": "Manual entry from U.S. Bank statement daily balance summary.",
-  "transaction_count_manual": 50,
-  "source_pdf_url": "https://drive.google.com/...",
-  "source_drive_file_id": "...",
-  "manual_notes": "Entered from April U.S. Bank statement.",
-  "manual_entry_status": "verified",
-  "verified_by": "Michael Cook",
-  "verified_at": "2026-05-22T03:40:53Z",
-  "updated_at": "2026-05-22T03:40:53Z"
+  "timeZone": "America/New_York",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.send_mail",
+    "https://www.googleapis.com/auth/script.scriptapp"
+  ],
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "serviceId": "drive",
+        "version": "v2"
+      }
+    ]
+  }
 }
 ```
 
-Blank numeric fields should be `null`, not `0`.
+No Google Docs/OCR scope is required for the active report workflow because OCR parsing is not the production path.
 
 ---
 
-## Brokerage / Fidelity manual entry with Tiingo prefill
+## 8. PortalUsers setup
 
-Brokerage statements and Fidelity reports should also use manual verified entries.
+The `PortalUsers` tab uses this header:
 
-The portal should include a **Brokerage Numbers / Holdings** editor for brokerage-type documents and portfolio-reference documents.
+```text
+user_id	email	password_plaintext	password_hash	salt	full_name	role	status	phone	company	can_view_dashboard	can_view_reports	can_view_documents	can_esign	can_admin	last_login_at	created_at	updated_at	notes
+```
 
-The editor should support rows for holdings:
+Required active users:
+
+```text
+user_michael_cook	michaelcook1995@icloud.com	[temporary password]		Michael Cook	super_admin	active		Cook Services Company	TRUE	TRUE	TRUE	TRUE	TRUE
+user_ckeller_2136	ckeller2136@gmail.com	[temporary password]		Doug Cox	investor	active		Cook Services Company	TRUE	TRUE	TRUE	TRUE	FALSE
+```
+
+The portal currently supports `password_plaintext` for the v2 Alpha environment. `password_hash` and `salt` remain available for a later security hardening pass.
+
+Login rules:
+
+```text
+If password_plaintext exists, compare login password to password_plaintext.
+If password_plaintext is blank, fall back to password_hash/salt legacy behavior.
+Only active users can log in.
+```
+
+---
+
+## 9. Password reset and change-password workflow
+
+### 9.1 Forgot Password
+
+Login page includes:
+
+```text
+Forgot Password?
+```
+
+Backend action:
+
+```text
+requestPasswordReset
+```
+
+Behavior:
+
+```text
+User submits email.
+Backend checks for an active PortalUsers row.
+Response does not reveal whether the account exists.
+If account exists, backend creates a one-time token.
+The token hash is stored in Sessions.
+Token status = password_reset_pending.
+Token expires in 30 minutes.
+Backend sends password reset email through MailApp.
+```
+
+Reset link format:
+
+```text
+https://corporate.cook-international.com/portal/?reset_token=TOKEN&email=EMAIL
+```
+
+The email does not include the new password.
+
+### 9.2 Reset Password screen
+
+When the portal sees:
+
+```text
+?reset_token=...&email=...
+```
+
+it opens the reset-password screen with:
+
+```text
+New Password
+Confirm New Password
+Reset Password
+Back to Login
+```
+
+Backend action:
+
+```text
+resetPasswordWithToken
+```
+
+Behavior:
+
+```text
+Validate email.
+Hash submitted token.
+Find matching Sessions row with status password_reset_pending.
+Confirm token is not expired.
+Confirm password rules.
+Update PortalUsers.password_plaintext.
+Update PortalUsers.updated_at.
+Mark reset session status password_reset_used.
+Invalidate old active login sessions for that user.
+Return success.
+Frontend clears localStorage and returns to login.
+```
+
+### 9.3 Change Password in Settings
+
+Settings includes a Change Password card for every logged-in user, including investors.
+
+Fields:
+
+```text
+Current Password
+New Password
+Confirm New Password
+Change Password
+```
+
+Backend action:
+
+```text
+changePassword
+```
+
+Behavior:
+
+```text
+Requires valid session token.
+Works for super_admin, admin, and investor.
+Verifies current password.
+Applies password rules.
+Updates PortalUsers.password_plaintext.
+Updates PortalUsers.updated_at.
+Invalidates other active sessions for the user.
+Frontend logs the user out after success.
+```
+
+### 9.4 Password rules
+
+```text
+At least 10 characters
+At least one uppercase letter
+At least one lowercase letter
+At least one number
+At least one symbol
+Cannot match current password
+New password and confirmation must match
+```
+
+---
+
+## 10. MarketWatchlist setup
+
+The `MarketWatchlist` tab is used for Tiingo quote refreshes and TradingView widget symbols.
+
+Recommended watchlist rows include:
+
+```text
+SPYI
+VOO
+IJH
+KMX
+GEHC
+CNH
+MAS
+MKTX
+DINO
+CMCSA
+DIS
+PFE
+NXPI
+AVGO
+CRSP
+NTLA
+TERN
+ADMA
+ANIP
+LQDA
+```
+
+Every enabled ticker should have:
+
+```text
+enabled = TRUE
+provider = TIINGO
+refresh_interval_minutes = 15
+```
+
+---
+
+## 11. Positions setup
+
+The `Positions` tab controls the private portal Portfolio Grid.
+
+Owned holdings:
+
+```text
+position_status = owned
+include_in_portfolio_totals = TRUE
+```
+
+Research-only rows:
+
+```text
+position_status = research_only
+include_in_portfolio_totals = FALSE
+```
+
+Research-only rows still receive Tiingo last price, quote time, day change, and provider status.
+
+Cost basis remains manual.
+
+---
+
+## 12. MarketPrices setup
+
+`MarketPrices` is written by Tiingo refresh.
+
+Do not manually edit this tab unless troubleshooting.
+
+Important fields:
 
 ```text
 ticker
+provider_symbol
 security_name
-quantity
-manual_cost_basis
-manual_average_cost
-tiingo_last_price
-tiingo_price_date
-tiingo_market_value
-manual_market_value_override
-final_market_value
-unrealized_gain_loss
-unrealized_gain_loss_pct
-holding_notes
-include_in_portfolio_totals
-position_status
-```
-
-Tiingo prefill behavior:
-
-- Admin enters ticker and quantity.
-- Admin clicks **Prefill Brokerage Values**.
-- Backend fetches latest/cached Tiingo price.
-- Backend calculates estimated market value.
-- Admin can override market value or cost basis.
-- Manual override wins.
-- Cost basis remains manual.
-- Final values must be reviewed and saved.
-
-Brokerage parsed_summary example:
-
-```json
-{
-  "parser": "manual_brokerage_entry_v180",
-  "source": "manual_entry_with_tiingo_prefill",
-  "institution": "Fidelity",
-  "statement_type": "brokerage_statement",
-  "account_name": "CSC Investments Brokerage",
-  "account_number_last4": "1234",
-  "statement_period_start": "2026-04-01",
-  "statement_period_end": "2026-04-30",
-  "statement_date": "2026-04-30",
-  "brokerage_total_value": 8268.91,
-  "brokerage_cash": null,
-  "brokerage_manual_notes": "Fidelity GPS / statement values manually reviewed.",
-  "tiingo_prefill_used": true,
-  "tiingo_prefill_provider": "TIINGO",
-  "holdings": [
-    {
-      "ticker": "VOO",
-      "security_name": "Vanguard S&P 500 ETF",
-      "quantity": 1.25,
-      "manual_cost_basis": 600.00,
-      "manual_average_cost": 480.00,
-      "tiingo_last_price": 505.00,
-      "tiingo_price_date": "2026-05-22",
-      "tiingo_market_value": 631.25,
-      "manual_market_value_override": null,
-      "final_market_value": 631.25,
-      "unrealized_gain_loss": 31.25,
-      "unrealized_gain_loss_pct": 5.21,
-      "include_in_portfolio_totals": true,
-      "position_status": "owned",
-      "holding_notes": "Price prefilled from Tiingo; cost basis manually entered."
-    }
-  ],
-  "manual_entry_status": "verified",
-  "verified_by": "Michael Cook",
-  "verified_at": "2026-05-22T03:40:53Z",
-  "updated_at": "2026-05-22T03:40:53Z"
-}
+asset_type
+last_price
+previous_close
+open_price
+high_price
+low_price
+volume
+day_change
+day_change_pct
+currency
+market_state
+quote_time_utc
+provider
+provider_status
+raw_json
+updated_at
 ```
 
 ---
 
-## Backend actions for v1.8.0 Alpha
+## 13. Reports and CustomReport
 
-Required manual bank actions:
+### 13.1 CustomReport model
+
+`CustomReport` remains one report per row.
+
+Keep this header exactly:
 
 ```text
-getManualStatementEntry
-saveManualStatementEntry
-verifyManualStatementEntry
-clearManualStatementEntry
-getStatementDiagnostics
+custom_report_id	report_id	report_period_start	report_period_end	report_title	report_status	executive_summary	statement_numbers	portfolio_snapshot	cash_bank_summary	fidelity_brokerage_summary	owned_holdings	research_watchlist	transactions_cost_basis	budget_summary	capital_contributions	documents_statements_used	business_updates	exceptions	risk_compliance_notes	notes_to_investor	source_documents	total_market_value	total_cost_basis	unrealized_gain_loss	unrealized_gain_loss_pct	cash_balance	brokerage_reference_value	manual_override	status	updated_by	updated_at	notes
 ```
 
-Required brokerage/Tiingo actions:
+Each major report section is a column.
+
+### 13.2 Manual report workflow
+
+Reports are sent manually only:
 
 ```text
-getManualBrokerageEntry
-saveManualBrokerageEntry
-verifyManualBrokerageEntry
-prefillBrokerageFromTiingo
-refreshMarketData
-```
-
-Report actions that must continue working:
-
-```text
-getReports
-generateMonthlyReport
-testReport
-saveReportEdits
-saveReportSectionNote
-approveReport
-sendApprovedReport
-```
-
-Document actions that must continue working:
-
-```text
-getDocuments
-uploadDocument
-syncDriveVaultDocuments
-classifyDocument
-```
-
----
-
-## Report source priority
-
-Reports must use this priority order:
-
-```text
-1. Manual verified bank statement entry
-2. Manual verified brokerage/Fidelity entry
-3. Manual draft entry, but report remains pending_review
-4. Tiingo prefilled brokerage market value, only when manually reviewed
-5. Parser/AI/Plaid only if re-enabled later
-6. Needs Review
-```
-
-Manual verified values must not be overwritten by Tiingo, OCR, AI, or Plaid.
-
----
-
-## 15th-to-15th report handling
-
-CSC reports use a 15th-to-15th reporting window.
-
-If manual entries include exact 15th-to-15th balances:
-
-```text
-balance_on_report_start
-balance_on_report_end
-```
-
-the report should use those values.
-
-If only monthly beginning/ending balances are entered, the report may generate but must remain:
-
-```text
-pending_review
-```
-
-and include this exception:
-
-```text
-Manual monthly statement values were entered, but exact 15th-to-15th balances were not provided.
-```
-
-If `balance_on_15th` is entered, the report should use it where applicable and explain the basis in report notes.
-
----
-
-## Source Documents Used section
-
-Every generated report should include a section called:
-
-```text
-Source Documents Used
-```
-
-This section should include links to:
-
-- U.S. Bank statement PDFs
-- Huntington statement PDFs, when added
-- Fidelity brokerage statements / GPS reports
-- signed documents
-- budgets or supporting documents
-- manually attached Drive links
-
-PDFs are evidence/source documents only. They are not required to be parsed.
-
----
-
-## Portal UI requirements
-
-### Documents tab
-
-Each statement/brokerage document card should show:
-
-```text
-Manual status
-Source type
-Institution
-Account last four
-Statement period
-Beginning balance
-Ending balance
-Deposits / credits
-Withdrawals / debits
-Fees
-Brokerage total value, if brokerage
-Tiingo prefill status, if brokerage
-Source PDF link
-Verified by
-Verified at
-```
-
-Buttons:
-
-```text
-Manual Numbers
-Brokerage Numbers / Holdings
-Prefill Brokerage Values
+Start Blank Report or Open Custom Report Builder
 Save Draft
-Mark Verified
-Clear Manual Entry
-Open PDF
+Mark Pending Review
+Approve This Report
+Choose report
+Choose recipients
+Send Report
 ```
 
-### Reports tab
+No report time triggers are used.
 
-Reports should show:
+### 13.3 Send Controls
+
+Reports tab includes:
 
 ```text
-Statement-backed: Yes/No
-Manual verified source: Yes/No
-Brokerage prefill used: Yes/No
-Source statement IDs
-Source PDF links
-Exceptions
-Pending review / approved status
+Report selector
+Recipient checkboxes from ReportRecipients
+Manual recipient email field
+Approve Selected Report
+Send Report
+Test Send to Me
 ```
 
-### Settings tab
-
-Settings should show:
+Normal send requires:
 
 ```text
-Manual Statement Mode: Enabled
-Legacy Parser: Disabled
-OpenAI Statement Reader: Disabled
-Plaid: Disabled
-Brokerage Tiingo Prefill: Enabled
-Report Source Priority: Manual Verified Entries First
+Reports.status = approved
+or
+Reports.status = approved_with_exceptions
 ```
 
----
+Test send goes only to the logged-in admin and does not mark the report sent.
 
-## Safety rules
+Normal send marks `sent` only if at least one email actually sends.
 
-- Never store blank numeric fields as `0`.
-- Never let Tiingo overwrite manual verified values.
-- Never use TradingView widget values as accounting values.
-- Research-only positions never count toward portfolio totals.
-- Owned positions count only when explicitly marked owned and included in totals.
-- Cost basis remains manual unless separately verified.
-- PDF parser / AI parser / Plaid cannot override manual verified numbers.
-- Reports must remain `pending_review` until approved.
-- Investor emails only send approved or approved-with-exceptions reports.
+Every send attempt writes to `EmailLog`.
 
 ---
 
-## Setup steps
+## 14. ReportRecipients setup
 
-1. Replace the Apps Script backend with the v1.8.0 Alpha backend.
-2. Replace portal `/portal/index.html` with the v1.8.0 Alpha portal frontend.
-3. Confirm Config keys are present.
-4. Confirm Tiingo key is available through Config or Apps Script Properties.
-5. Deploy Apps Script as a new Web App version:
-   - Execute as: Me
-   - Who has access: Anyone, or the current portal setting.
-6. Upload or sync statement PDFs into the Drive vault.
-7. Open the portal.
-8. Go to Documents.
-9. Use Manual Numbers / Brokerage Numbers to enter verified values.
-10. Mark each entry verified.
-11. Generate the report.
-12. Review source links and exceptions.
-13. Approve the report.
-14. Send only after approval.
+The `ReportRecipients` tab must have at least one active recipient before normal sending can work.
 
----
-
-## Acceptance tests
-
-### Bank manual entry
-
-1. Open portal.
-2. Go to Documents.
-3. Open a U.S. Bank statement card.
-4. Click **Manual Numbers**.
-5. Enter January statement values.
-6. Save Draft.
-7. Refresh portal.
-8. Confirm values persist.
-9. Mark Verified.
-10. Confirm status shows Verified.
-11. Repeat for February, March, and April.
-
-### Brokerage / Tiingo prefill
-
-1. Open a Fidelity or brokerage document card.
-2. Click **Brokerage Numbers / Holdings**.
-3. Enter a ticker and quantity.
-4. Click **Prefill Brokerage Values**.
-5. Confirm Tiingo price and market value appear.
-6. Enter or edit cost basis manually.
-7. Save Draft.
-8. Mark Verified.
-9. Confirm verified brokerage value appears in report inputs.
-
-### Report generation
-
-1. Generate report.
-2. Confirm report uses manual bank values, not parser zeros.
-3. Confirm report uses verified brokerage values.
-4. Confirm Tiingo-assisted numbers are labeled as market-data prefills, not official brokerage accounting.
-5. Confirm source PDF Drive links appear.
-6. Confirm report remains pending review until approved.
-7. Confirm section pencil notes still save.
-8. Confirm Send Approved Report only sends approved reports.
-
----
-
-## Known design decision
-
-v1.8.0 Alpha intentionally stops trying to solve PDF OCR inside Apps Script as the critical reporting path.
-
-The portal is now designed to function reliably by combining:
+Header:
 
 ```text
-Manual verified statement numbers
-+ Tiingo brokerage market-price prefills
-+ source PDF links
-+ report approval controls
+recipient_id	full_name	email	role	active	receive_monthly_report	receive_esign_notice	delivery_preference	last_sent_at	notes	created_at	updated_at
 ```
 
-This is the stable foundation. OCR, AI, Plaid, or other aggregators can be reintroduced later as optional helpers, but not as the required path for investor reports.
+Required rows:
+
+```text
+recipient_michael_cook	Michael Cook	michaelcook1995@icloud.com	super_admin	TRUE	TRUE	TRUE	email		Test/admin recipient.
+recipient_ckeller_2136	Doug Cox	ckeller2136@gmail.com	investor	TRUE	TRUE	TRUE	email		Investor recipient.
+```
 
 ---
 
-Last Updated: 22 May 2026 @ 17:27:35Z UTC
+## 15. Documents and uploads
+
+Documents upload to:
+
+```text
+Drive Folder ID: 1qkgKz196pp0LHBgyoiTeABnImZ8sX569
+Drive Folder Name: CSC Website
+```
+
+Allowed in Drive:
+
+```text
+approved report PDFs
+signed documents
+operating agreements
+investor packets
+non-sensitive budget documents
+general company documents
+non-sensitive support files
+```
+
+Do **not** upload these to Drive:
+
+```text
+bank statements
+SSN documents
+full account-number documents
+routing-number documents
+tax ID documents
+identity documents
+raw sensitive brokerage PDFs
+```
+
+Documents tab features:
+
+```text
+Upload Document
+Sync Drive Vault
+Refresh Documents
+Edit Document Line
+View Document
+Manual Numbers for statement-type docs only
+```
+
+Non-statement documents show document metadata only.
+
+Statement-type documents show manual-number fields.
+
+---
+
+## 16. E-Sign workflow
+
+E-sign uses the existing tabs:
+
+```text
+Documents
+ESignRequests
+ESignEvents
+```
+
+A document appears as signable when:
+
+```text
+Documents.requires_signature = TRUE
+Documents.signature_status = pending
+```
+
+An e-sign request appears for a signer when:
+
+```text
+ESignRequests.signer_user_id = PortalUsers.user_id
+or
+ESignRequests.signer_email = PortalUsers.email
+ESignRequests.request_status = pending
+```
+
+Signer workflow:
+
+```text
+Open E-Sign tab
+View Document
+View & E-Sign
+Type legal name
+Check consent
+Submit E-Sign
+```
+
+Completed signatures write to `ESignEvents` and update request/document signature status.
+
+---
+
+## 17. Manual statement/brokerage reporting policy
+
+Manual report entry remains the reporting source of truth.
+
+For sensitive bank, brokerage, Fidelity, or tax documents:
+
+```text
+Do not upload sensitive PDFs to Drive.
+Upload them to ChatGPT only when conversion help is needed.
+Convert values into CustomReport text or manual verified fields.
+Do not store raw sensitive PDFs in Drive.
+```
+
+Manual verified values override:
+
+```text
+Tiingo
+TradingView
+OCR
+OpenAI parsing
+Plaid
+parser output
+old statement summaries
+```
+
+---
+
+## 18. TradingView policy
+
+TradingView is used for visual dashboard widgets only:
+
+```text
+Ticker tape
+Symbol overview chart
+Market visual reference
+```
+
+TradingView does not write to:
+
+```text
+Positions
+MarketPrices
+Reports
+CustomReport
+Budget
+CapitalContributions
+Statements
+Documents
+```
+
+Tiingo is the backend market-data source for the Portfolio Grid.
+
+---
+
+## 19. Deployment steps
+
+1. Paste `CSC_PORTAL_BACKEND_v2.4.0_Alpha.gs` into the Apps Script project.
+2. Replace `appsscript.json` if needed.
+3. Confirm `TIINGO_API_KEY` exists in Script Properties.
+4. Confirm Config has the v2.4.0 web app URL, Drive folder ID, and Tiingo backup/source rows.
+5. Deploy as a **new Web App version**.
+6. Replace the live portal website file with `index_v2.4.0_Alpha.html`.
+7. Hard refresh the browser.
+8. Log in as Michael.
+9. Open Settings.
+10. Run Health Check.
+11. Open Positions and run Refresh Market Data.
+12. Confirm research-only rows show Tiingo last prices.
+13. Open Dashboard and confirm TradingView ticker/chart render.
+14. Open Settings and test Change Password only after confirming you know the current password.
+15. Test Forgot Password with a controlled user email.
+
+---
+
+## 20. Acceptance tests
+
+### 20.1 Login
+
+1. Log in as Michael.
+2. Confirm dashboard loads.
+3. Log out.
+4. Log in as investor.
+5. Confirm investor can view assigned reports/documents/e-sign requests.
+
+### 20.2 Tiingo Portfolio Grid
+
+1. Confirm `TIINGO_API_KEY` exists in Script Properties.
+2. Open Positions.
+3. Click Refresh Market Data.
+4. Confirm MarketPrices updates.
+5. Confirm owned rows show last price.
+6. Confirm research-only rows show last price.
+7. Confirm research-only rows do not count in summary totals.
+8. Confirm cost basis is not overwritten.
+
+### 20.3 TradingView ticker/chart
+
+1. Log in.
+2. Open Dashboard.
+3. Confirm market ticker appears.
+4. Confirm chart appears.
+5. Click several chart symbols.
+6. Confirm no JavaScript errors and chart re-renders.
+
+### 20.4 Forgot Password
+
+1. Log out.
+2. Click Forgot Password.
+3. Enter a valid user email.
+4. Confirm a reset email is sent.
+5. Open reset link.
+6. Set a compliant new password.
+7. Confirm old sessions are invalidated.
+8. Log in with the new password.
+
+### 20.5 Change Password
+
+1. Log in as investor.
+2. Open Settings.
+3. Enter current password.
+4. Enter new password and confirm it.
+5. Submit.
+6. Confirm logout after success.
+7. Log in with the new password.
+
+### 20.6 Reports
+
+1. Open Reports.
+2. Start Blank Report.
+3. Fill a report section and manual numbers.
+4. Save Draft.
+5. Mark Pending Review.
+6. Approve This Report.
+7. Choose recipients.
+8. Test Send to Me.
+9. Send Report.
+10. Confirm EmailLog row.
+11. Confirm Reports status becomes sent only after successful send.
+
+### 20.7 Documents
+
+1. Upload a non-sensitive document.
+2. Confirm it appears in Documents.
+3. Edit Document Line.
+4. Change requires_signature to TRUE.
+5. Confirm signature_status becomes pending when appropriate.
+6. Confirm non-statement docs do not show bank balance fields.
+
+### 20.8 E-Sign
+
+1. Confirm a document has requires_signature TRUE and signature_status pending.
+2. Create or confirm ESignRequests row for Doug.
+3. Log in as Doug.
+4. Open E-Sign.
+5. View Document.
+6. View & E-Sign.
+7. Type legal name.
+8. Check consent.
+9. Submit E-Sign.
+10. Confirm request status becomes signed.
+
+---
+
+## 21. Troubleshooting
+
+### 21.1 Backend version looks old
+
+Run Health Check.
+
+If the backend does not show v2.4.0, deploy a new Apps Script Web App version and hard refresh the browser.
+
+### 21.2 Market prices do not update
+
+Check:
+
+```text
+TIINGO_API_KEY exists in Script Properties.
+MarketWatchlist rows have enabled = TRUE.
+Positions rows have ticker values.
+Apps Script has external_request scope.
+Refresh Market Data was clicked.
+```
+
+### 21.3 TradingView ticker does not show
+
+Check:
+
+```text
+Browser/ad blocker is not blocking s3.tradingview.com.
+Portal dashboard is visible before widget render.
+Hard refresh.
+Try another browser.
+```
+
+### 21.4 Forgot Password email is in Sent but not received
+
+If the email appears in the sender Sent folder, Apps Script/MailApp sent it. Check:
+
+```text
+recipient spam/junk/promotions
+filters
+blocked sender
+Google Workspace SPF/DKIM/DMARC
+bounce messages in tips@cgnnews.net
+```
+
+### 21.5 E-sign requests do not appear
+
+Check:
+
+```text
+ESignRequests.signer_user_id matches PortalUsers.user_id.
+ESignRequests.signer_email matches PortalUsers.email.
+ESignRequests.request_status = pending.
+Documents.document_id matches ESignRequests.document_id.
+Documents.requires_signature = TRUE.
+Documents.signature_status = pending.
+```
+
+### 21.6 Report send fails
+
+Check:
+
+```text
+Reports.status is approved or approved_with_exceptions.
+ReportRecipients.active = TRUE.
+ReportRecipients.receive_monthly_report = TRUE.
+At least one recipient is selected.
+Apps Script has send_mail scope.
+Logged-in user is admin/super_admin for normal send.
+```
+
+---
+
+## 22. Security and privacy notes
+
+This is an internal/private investor portal.
+
+Current v2 Alpha still supports `password_plaintext` for operational simplicity. Treat the spreadsheet as confidential. A future security upgrade should migrate to hashed passwords only.
+
+Do not store sensitive bank statements, full account numbers, SSNs, identity documents, raw tax documents, or raw sensitive brokerage PDFs in Drive.
+
+Use CustomReport and manual verified values for sensitive report data.
+
+---
+
+## 23. Known design decisions
+
+```text
+No report time triggers.
+No automatic bank PDF parser.
+No OpenAI parser required.
+No Plaid required.
+No TradingView accounting values.
+No research-only values in totals.
+Manual report approval before normal send.
+```
+
+---
+
+## 24. Version history summary
+
+### v2.0.0 Alpha
+CustomReport workflow bridge hardfix.
+
+### v2.1.0 Alpha
+Builder fail-open and blank report creation.
+
+### v2.2.0 Alpha
+Manual Send Report controls, recipient selection, Test Send to Me, e-sign view/sign controls, upload timeout improvement.
+
+### v2.3.0 Alpha
+TradingView chart restoration, document line editor, non-statement document metadata cleanup.
+
+### v2.4.0 Alpha
+Tiingo-backed research-only Portfolio Grid pricing, dynamic TradingView ticker, Forgot Password, reset password, and investor-accessible Change Password.
+
+---
+
+Last Updated: 22 May 2026 @ 19:21:15Z UTC  
 Developed by Cook Technology Services  
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
