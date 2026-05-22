@@ -1,3 +1,8 @@
+/*
+  CSC Corporate Shared Shell
+  Last Updated: 22 May 2026 @ 20:19:35Z UTC
+  Copyright © 2026 Cook Services Company, LLC | All Rights Reserved.
+*/
 (function () {
   const logoSrc = '/CSCLogo01.png';
   const investmentsLogoSrc = '/CSCInvestmentsLogo.png';
@@ -72,7 +77,9 @@
             </div>
           </div>
           <div class="csc-footer-bottom">
-            Copyright © ${year} Cook Services Company, LLC. All Rights Reserved.
+            <a class="csc-footer-copyright-link" href="https://www.cook-international.com/copyright/" aria-label="Cook Services Company copyright, trademark, and intellectual property notice">
+              Copyright © ${year} Cook Services Company, LLC. All Rights Reserved.
+            </a>
           </div>
         </div>
       </footer>
