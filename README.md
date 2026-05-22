@@ -1,9 +1,42 @@
-# CSC Portal v1.8.0 Alpha — Manual Statement Entry, Brokerage Prefill & Report Source Lock
+# CSC Portal v2.0.0 Alpha — Manual Statement Entry, Brokerage Prefill & Report Source Lock
 
-**Last Updated:** 22 May 2026 @ 03:40:53Z UTC  
-**Backend Build Stamp:** 22 May 2026 @ 03:40:53Z UTC  
-**Backend Version:** `CSC PORTAL BACKEND v1.8.0 Alpha`  
-**Frontend Version:** `CSC Portal Frontend v1.8.0 Alpha`  
+# CSC Portal v2.0.0 Alpha — Setup Notes
+
+Build stamp: 22 May 2026 @ 17:27:35Z UTC
+
+## What to run first
+
+1. Paste `CSC_PORTAL_BACKEND_v2.0.0_Alpha.gs` into Apps Script.
+2. Confirm `appsscript_v2.0.0_Alpha.json`.
+3. Confirm `TIINGO_API_KEY` exists in Script Properties and Config backup.
+4. Deploy a new Web App version.
+5. Replace the portal website file with `index_v2.0.0_Alpha.html`.
+6. Hard refresh.
+7. Log in as `michaelcook1995@icloud.com`.
+8. Go to Reports.
+9. Click Open Custom Report Builder.
+10. Click Run Setup Check.
+
+## Working report workflow
+
+Save Draft -> Mark Pending Review -> Approve This Report -> Send This Approved Report.
+
+Every button acts on the same `custom_report_id` and `report_id`.
+
+## Troubleshooting
+
+If Send fails:
+- Run Setup Check.
+- Confirm Reports status is approved.
+- Confirm ReportRecipients has active TRUE and receive_monthly_report TRUE.
+- Confirm Apps Script deployment is latest v2.0.0.
+- Confirm MailApp permission is available.
+
+
+**Last Updated:** 22 May 2026 @ 17:27:35Z UTC 
+**Backend Build Stamp:** 22 May 2026 @ 17:27:35Z UTC
+**Backend Version:** `CSC PORTAL BACKEND v2.0.0 Alpha`  
+**Frontend Version:** `CSC Portal Frontend v2.0.0 Alpha`  
 **Company:** Cook Services Company, LLC  
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
@@ -637,7 +670,7 @@ This is the stable foundation. OCR, AI, Plaid, or other aggregators can be reint
 
 ---
 
-Last Updated: 22 May 2026 @ 03:40:53Z UTC  
+Last Updated: 22 May 2026 @ 17:27:35Z UTC
 Developed by Cook Technology Services  
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
