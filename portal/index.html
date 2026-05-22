@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v2.0.0 Alpha | Last Updated on 22 May 2026 @ 17:27:35Z UTC -->
+<!-- CSC Portal Frontend v2.1.0 Alpha | Last Updated on 22 May 2026 @ 17:27:35Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -218,7 +218,7 @@
 
         <section id="tab-positions" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Holdings & Research Watchlist</h2><p>Owned positions count only when <strong>position_status = owned</strong> and <strong>include_in_portfolio_totals = TRUE</strong>.</p></div><button class="portal-button portal-button-dark" id="refresh-market" type="button">Refresh Market Data</button></div><div id="positions-content"></div></article></section>
 
-        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>v2.0.0 Alpha makes CustomReport operational: save, pending review, approve, and send are all tied to the exact same report_id.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-dark" id="run-custom-setup-check" type="button">Run Setup Check</button></div></div><div class="portal-data-note"><strong>CustomReport Workflow Mode is active.</strong> Save Draft creates/updates the matching Reports row as draft. Mark Pending Review creates/updates it as pending_review. Approve This Report syncs CustomReport and Reports as approved. Send This Approved Report sends only that exact approved report.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
+        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>v2.1.0 Alpha makes CustomReport operational: save, pending review, approve, and send are all tied to the exact same report_id.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-dark" id="run-custom-setup-check" type="button">Run Setup Check</button></div></div><div class="portal-data-note"><strong>CustomReport Workflow Mode is active.</strong> Save Draft creates/updates the matching Reports row as draft. Mark Pending Review creates/updates it as pending_review. Approve This Report syncs CustomReport and Reports as approved. Send This Approved Report sends only that exact approved report.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
 
         <section id="tab-documents" class="portal-panel">
           <div class="portal-grid portal-grid-2">
@@ -282,7 +282,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.0.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.1.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -602,17 +602,77 @@
       ['brokerage_reference_value','Brokerage Reference Value']
     ];
 
+    function defaultCustomReportRow(){
+      const now=new Date();
+      const stamp=now.toISOString();
+      const y=now.getUTCFullYear();
+      const m=String(now.getUTCMonth()+1).padStart(2,'0');
+      const d=String(now.getUTCDate()).padStart(2,'0');
+      const idDate=`${y}_${m}_${d}`;
+      return {
+        custom_report_id:`cr_${idDate}_manual`,
+        report_id:`report_${idDate}_manual`,
+        report_period_start:'',
+        report_period_end:'',
+        report_title:'Cook Services Company Monthly Investor Report',
+        report_status:'draft',
+        executive_summary:'',
+        statement_numbers:'',
+        portfolio_snapshot:'',
+        cash_bank_summary:'',
+        fidelity_brokerage_summary:'',
+        owned_holdings:'',
+        research_watchlist:'',
+        transactions_cost_basis:'',
+        budget_summary:'',
+        capital_contributions:'',
+        documents_statements_used:'',
+        business_updates:'',
+        exceptions:'',
+        risk_compliance_notes:'',
+        notes_to_investor:'',
+        source_documents:'',
+        total_market_value:'',
+        total_cost_basis:'',
+        unrealized_gain_loss:'',
+        unrealized_gain_loss_pct:'',
+        cash_balance:'',
+        brokerage_reference_value:'',
+        manual_override:'TRUE',
+        status:'active',
+        updated_by:(CSC_SESSION&&CSC_SESSION.full_name)||'Portal User',
+        updated_at:stamp,
+        notes:'v2.1.0 fail-open draft. Save Draft will create/update CustomReport and the matching Reports row.'
+      };
+    }
+
     async function openCustomReportBuilder(){
       const mount=document.getElementById('custom-report-builder');
+      if(!mount){ showAlert('portal-global-alert','Custom Report Builder mount point is missing from the page.','error'); return; }
+      clearAlert('portal-global-alert');
       mount.style.display='block';
-      mount.innerHTML='<p class="portal-small">Loading CustomReport…</p>';
+      const fallback=CSC_DATA.custom_report && Object.keys(CSC_DATA.custom_report).length ? CSC_DATA.custom_report : defaultCustomReportRow();
+      renderCustomReportBuilder(fallback);
+      const statusBox=document.getElementById('custom-report-workflow-status');
+      if(statusBox){statusBox.innerHTML='<strong>Builder opened.</strong> Loading saved CustomReport row…';}
       try{
         const res=await cscJsonp('getCustomReport',{});
-        CSC_DATA.custom_report=res.data.custom_report||{};
-        renderCustomReportBuilder(CSC_DATA.custom_report);
+        const loaded=(res.data&&res.data.custom_report)||res.custom_report||{};
+        if(loaded && Object.keys(loaded).length){
+          CSC_DATA.custom_report=loaded;
+          renderCustomReportBuilder(loaded);
+          showAlert('portal-global-alert','Custom Report Builder opened and saved row loaded.','ok');
+        }else{
+          CSC_DATA.custom_report=fallback;
+          const box=document.getElementById('custom-report-workflow-status');
+          if(box){box.innerHTML='<strong>Builder opened.</strong> No saved CustomReport row returned. Save Draft will create/update one.';}
+          showAlert('portal-global-alert','Custom Report Builder opened. No saved row was returned; Save Draft will create it.','warn');
+        }
       }catch(err){
-        mount.innerHTML='';
-        showAlert('portal-global-alert',err.message,'error');
+        CSC_DATA.custom_report=fallback;
+        const box=document.getElementById('custom-report-workflow-status');
+        if(box){box.innerHTML=`<strong>Builder opened in fail-open mode.</strong><br>Backend load failed: ${esc(err.message)}<br>You can still edit fields. Save Draft will try to create/update the CustomReport and matching Reports row.`;}
+        showAlert('portal-global-alert','Custom Report Builder opened in fail-open mode: '+err.message,'warn');
       }
     }
 
@@ -724,8 +784,7 @@
     async function saveCustomReport(){ return customReportWorkflow('saveCustomReportDraft'); }
     async function generateCustomReport(){ return customReportWorkflow('markCustomReportPendingReview'); }
 
-    async 
-    // generateCustomReport is an alias in the v2.0.0 workflow block above.
+    // generateCustomReport is an alias in the v2.1.0 workflow block above.
 
 
 
@@ -796,7 +855,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.0.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.1.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
@@ -841,7 +900,7 @@
       }catch(err){showAlert('portal-global-alert',err.message,'error');}
     });
 
-    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Sensitive bank/brokerage statement uploads are blocked in v2.0.0 Alpha; use CustomReport for report values.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
+    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Sensitive bank/brokerage statement uploads are blocked in v2.1.0 Alpha; use CustomReport for report values.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
     document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
 
     loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
