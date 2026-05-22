@@ -1,309 +1,123 @@
-[Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
-# CSC Portal v1.7.1 Alpha - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+# CSC Portal v1.8.0 Alpha — Manual Statement Entry, Brokerage Prefill & Report Source Lock
 
-
-**Cook Services Company, LLC**  
-**Build:** CSC Portal v1.7.1 Alpha  
-**Updated:** 22 May 2026 @ 02:50:49Z UTC   
+**Last Updated:** 22 May 2026 @ 03:40:53Z UTC  
+**Backend Build Stamp:** 22 May 2026 @ 03:40:53Z UTC  
+**Backend Version:** `CSC PORTAL BACKEND v1.8.0 Alpha`  
+**Frontend Version:** `CSC Portal Frontend v1.8.0 Alpha`  
+**Company:** Cook Services Company, LLC  
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
-**Contact:** cookservicescompany@gmail.com
-
-# CSC Portal Backend + Frontend v7.1.1 Alpha
-
-Last Updated: 22 May 2026 @ 02:50:49Z UTC  
-Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
-
-## Purpose
-This build adds Plan C: an OpenAI-powered statement document reader for CSC Portal. v7.1.0 proved that the backend could find the U.S. Bank statement rows, but Drive/OCR extraction returned `text_length: 0` and `parser: none`, so the U.S. Bank parser never received readable text.
-
-The v7.1.1 fix bypasses that failure path by sending the Drive PDF bytes from the backend to OpenAI as a file input, asking for strict statement JSON, validating the result, and saving it into `Statements.parsed_summary`.
-
-## Critical security note
-The OpenAI API key must not be hardcoded into the `.gs` file or portal HTML. This build reads it from the existing `Config` tab key:
-
-- `openai_api_key`
-
-Optional Config keys:
-
-- `openai_model` — defaults to `gpt-4.1` if blank.
-- `openai_statement_reader_enabled` — optional TRUE/FALSE soft switch.
-
-Because the API key was pasted into chat during troubleshooting, rotate that key after deployment/testing.
-
-## Manual enable / disable
-The backend has a hard kill switch near the top of the `.gs` file:
-
-- `CSC_AI_STATEMENT_READER_ENABLED = true` enables AI parsing.
-- `CSC_AI_STATEMENT_READER_ENABLED = false` disables all OpenAI statement reader actions immediately.
-
-The Config tab can also disable the feature with `openai_statement_reader_enabled = FALSE`, but the `.gs` flag is the hard override.
-
-## New backend actions
-- `aiParseStatement`
-- `aiParseStatements`
-- `aiTestStatementReader`
-- `getStatementParseDiagnostics`
-
-## Portal changes
-- Documents tab now has **AI Parse Statements** beside the legacy Drive OCR parse button.
-- Each statement card now has **AI Re-parse**.
-- Statement cards show parser source, model, confidence, review reasons, deposits, withdrawals, daily balance count, transaction count, and parsed summary preview.
-- Existing section-level report pencil notes from v7.1.0 are preserved.
-
-## Data flow
-1. Portal calls `aiParseStatements` or `aiParseStatement`.
-2. Backend verifies admin permissions.
-3. Backend checks `CSC_AI_STATEMENT_READER_ENABLED`.
-4. Backend reads `openai_api_key` from Config.
-5. Backend reads the Drive PDF blob.
-6. Backend sends the PDF file to OpenAI using file input.
-7. OpenAI returns JSON only.
-8. Backend validates/normalizes the JSON.
-9. Backend writes it to `Statements.parsed_summary`.
-10. Reports use `Statements.parsed_summary` as the source of truth.
-
-## No new tabs
-This build uses existing tabs only:
-
-- Config
-- Statements
-- Documents
-- Reports
-- Logs
-- Accounts
-- Positions
-- Transactions
-- Budget
-- CapitalContributions
-- MemberLedger
-- BusinessUpdates
-
-## Acceptance test
-1. Deploy the new backend.
-2. Deploy the new portal HTML.
-3. Confirm Config tab has `openai_api_key`.
-4. Set `CSC_AI_STATEMENT_READER_ENABLED = true` in the `.gs` file.
-5. Open the portal.
-6. Go to Documents.
-7. Click **AI Parse Statements**.
-8. Confirm U.S. Bank statements no longer show `parser: none`.
-9. Confirm `Statements.parsed_summary` contains `parser: openai_document_reader_v711`.
-10. Confirm parsed JSON has period dates, balances, deposits/withdrawals if visible, and review reasons if needed.
-11. Generate report.
-12. Confirm report is not silently all zeros.
-
-## Build files
-- `CSC_PORTAL_BACKEND_v7.1.1_Alpha.gs`
-- `index_v7.1.1_Alpha.html`
-- `README_CSC_PORTAL_v7.1.1_Alpha.md`
-- `appsscript_v7.1.1_Alpha.json`
-
-# CSC Portal v7.1.0 Alpha
-
-**Last Updated:** 22 May 2026 @ 02:19:59Z UTC  
-**Backend Build Stamp:** 22 May 2026 @ 02:19:59Z UTC  
-**Backend Version:** `CSC PORTAL BACKEND v7.1.0 Alpha`  
-**Frontend Version:** `CSC Portal Frontend v7.1.0 Alpha`  
+**Contact:** cookservicescompany@gmail.com  
 **Copyright:** Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
+---
+
 ## Purpose
 
-This build fixes the CSC Portal report pipeline so uploaded U.S. Bank statements and Fidelity GPS/reference reports are actually read, parsed, saved into `Statements.parsed_summary`, and used by the monthly investor report builder. It also updates the portal report preview so each report section has its own pencil-icon note editor.
+CSC Portal v1.8.0 Alpha makes the portal reliable by moving the financial reporting source of truth to **manual verified entries**.
 
-## What changed from v1.7.0 Alpha
+Previous OCR and AI parsing attempts reached the uploaded statement files, but the backend logs showed the core failure clearly:
 
-### 1. Verification-first PDF extraction
+- Drive/OCR statement parsing returned `text_length: 0` and `parser: none`.
+- OpenAI statement parsing returned `OpenAI did not return valid JSON`.
+- Reports could not safely use parser output because no verified statement values were making it into `Statements.parsed_summary`.
 
-The backend now treats statement parsing as a visible chain:
+This build stops treating PDF parsing as the required path. PDFs stay in the Drive vault as source documentation. CSC admin users manually enter verified bank and brokerage numbers. Reports use those manual verified values first.
 
-`Drive PDF → text extraction/OCR → parser detection → parsed_summary JSON → report builder → portal preview`
+---
 
-For every parsed statement, the backend records diagnostic values such as:
+## Operating principle
 
-- `text_length`
-- `extraction_method`
-- `parser`
-- `institution`
-- `statement_period_start`
-- `statement_period_end`
-- `beginning_balance`
-- `ending_balance`
-- `balance_by_date`
-- `parsed_at`
-- `needs_review`
-
-If text extraction fails or returns too little text, the statement is marked `needs_review` instead of silently producing zero-filled reports.
-
-### 2. U.S. Bank parser hardening
-
-The U.S. Bank parser was hardened for Business Essentials Checking statement formats, including:
-
-- optional dollar signs
-- spaces after dollar signs
-- trailing minus signs such as `542.46-`
-- item counts before amounts such as `Other Deposits 3 524.65`
-- beginning and ending balance fallback period detection
-- daily balance summaries for 15th-to-15th reporting
-- parsed transactions where possible
-
-### 3. Fidelity GPS/reference parser
-
-Fidelity GPS / Guided Portfolio Summary documents are treated as portfolio-reference material, not the official cash accounting source. The parser stores values such as total selected account value and account-level reference values, while marking the document as educational/reference-only.
-
-### 4. 15th-to-15th report logic
-
-Monthly reports still use the 15th-to-15th reporting window. If the requested period is incomplete, the report builder falls back to the latest complete two-month bank-statement-backed period and records the reason in report notes.
-
-Reports now use `Statements.parsed_summary` for statement-backed cash numbers and do not silently treat missing values as correct zero values.
-
-### 5. Portal section notes with pencil icons
-
-The portal report preview now adds pencil icons beside editable report sections. Each section note saves through the backend action `saveReportSectionNote` and is stored inside the existing `Reports.notes` JSON under:
-
-```json
-{
-  "section_notes": {
-    "capital_contributions": {
-      "text": "Example note",
-      "updated_at": "2026-05-22T02:19:59.000Z",
-      "updated_by": "admin@example.com"
-    }
-  }
-}
-```
-
-No new Google Sheet tabs are required.
-
-## Files in this package
-
-- `CSC_PORTAL_BACKEND_v7.1.0_Alpha.gs` — full corrected Apps Script backend
-- `index_v7.1.0_Alpha.html` — corrected portal frontend
-- `README_CSC_PORTAL_v7.1.0_Alpha.md` — this README
-- `appsscript_v7.1.0_Alpha.json` — manifest copy with Drive/Sheets/Mail scopes and Advanced Drive API v2
-
-## Required Apps Script setup
-
-1. Open the Apps Script project.
-2. Replace the backend `.gs` file with `CSC_PORTAL_BACKEND_v7.1.0_Alpha.gs`.
-3. Confirm `appsscript.json` is visible in Project Settings.
-4. Confirm Advanced Google Services includes **Drive API v2**.
-5. Confirm the Google Cloud project has Drive API enabled.
-6. Deploy a new Web App version as:
-   - Execute as: **Me**
-   - Who has access: **Anyone** or the same public setting currently used by the portal
-
-## Portal setup
-
-Replace the existing portal `index.html` with `index_v7.1.0_Alpha.html`.
-
-The portal web app URL is unchanged:
+v1.8.0 Alpha uses this rule:
 
 ```text
-https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
+Manual verified numbers first.
+Tiingo market prefill second, only for brokerage market-price assistance.
+PDF links as proof.
+Parser / AI / Plaid disabled by default.
+No fake zeros.
 ```
 
-## Acceptance test
+Reports must never silently use missing values as real zeros. A blank number remains blank/null unless an admin intentionally enters `0`.
 
-1. Log into the portal as admin.
-2. Upload or sync the March U.S. Bank statement.
-3. Upload or sync the April U.S. Bank statement.
-4. Click **Parse Statements**.
-5. Open the Documents tab and confirm statement rows show parser diagnostics:
-   - parser
-   - text length
-   - extraction method
-   - period dates
-   - beginning and ending balances
-6. Click **Generate Report**.
-7. Open **Preview / Edit**.
-8. Confirm cash numbers are not all zero when statements parsed successfully.
-9. Click the pencil icon beside **Capital Contribution Summary**.
-10. Add a note and save.
-11. Refresh reports and preview again.
-12. Confirm the note remains visible under that section.
-13. Approve only after statement values and notes are reviewed.
+---
 
-## Notes
+## What changed from v7.1.0 / v7.1.1
 
-- No new tabs were added.
-- Canonical sheet headers were preserved.
-- The backend uses one `doGet` and one `doPost`.
-- The section-note workflow stores data in existing `Reports.notes` JSON.
-- Accounting corrections should still be made in source records, not hidden report HTML.
+### 1. Manual statement mode is now the source of truth
 
+The portal now treats manually entered and verified statement summaries as the primary report source.
 
-# CSC Portal Backend v1.7.0 Alpha
+Manual entries are saved into the existing `Statements.parsed_summary` JSON field. No new tabs are required.
 
-Last Updated: 21 May 2026 @ 23:46:42Z UTC  
-Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+### 2. OCR, AI parsing, and Plaid are disabled by default
 
-## Purpose
-This build cleans the report/parser backend so bank statements produce real numbers instead of zero-filled reports.
+The parser tools are no longer part of the normal report workflow.
 
-## Major changes
-- Cleaned duplicate function declarations from the prior hotfix stack.
-- Preserved one `doGet` and one `doPost`.
-- Added U.S. Bank Business Essentials Checking parser.
-- Added Fidelity GPS Guided Portfolio Summary parser for portfolio-reference values.
-- Added Drive OCR / Google Docs text extraction path for PDFs.
-- Reports now use the latest complete bank-statement-backed 15th-to-15th period.
-- Report numbers pull from `Statements.parsed_summary`.
-- No new Google Sheet tabs.
-- No canonical header changes.
+Default switches:
 
-## Required setup
-1. Apps Script Project Settings: show `appsscript.json`.
-2. Services: enable Advanced Drive API v2.
-3. Use the included manifest.
-4. Run `CSC_manualParseStatements()`.
-5. Run `CSC_manualGenerateReportForLatestCompletePeriod()`.
-
-## Statement parsing target
-For uploaded U.S. Bank statements, the parser extracts account summary fields, daily balance summary, and transactions where possible. For the March/April statement pair, reports can derive the 15 March–15 April period using the daily balances and parsed transaction activity.
-
-
-This README documents the CSC private portal reports/documents update. It is built on top of the locked CSC Website Google Sheet and the existing corporate GitHub Pages site.
-
-## What changed in v1.6.0 Beta
-
-This build adds the Reports/Documents foundation that was missing from the v1.5.0 Beta portal:
-
-- Drive Vault Sync for files manually uploaded to Google Drive.
-- Document classification/edit controls inside `/portal/`.
-- Statement parsing workflow using the existing `Statements` tab only.
-- 15th-to-15th monthly report period logic.
-- Branded report emails with CSC Investments logo, portal button, and footer.
-- Corrected all CSC contact email references to `cookservicescompany@gmail.com`.
-- Added `appsscript.json` using Drive API v2 Advanced Service only.
-
-## Returned files
-
-```txt
-CSC_PORTAL_BACKEND_v1.6.0_Beta.gs
-portal/index.html
-appsscript.json
-CSC_PORTAL_REPORTS_DOCUMENTS_README.md
-CSC_Portal_Reports_Documents_Manual_v1.0.pdf
+```text
+CSC_MANUAL_STATEMENT_MODE_ENABLED = true
+CSC_LEGACY_STATEMENT_PARSER_ENABLED = false
+CSC_OPENAI_STATEMENT_READER_ENABLED = false
+CSC_PLAID_ENABLED = false
 ```
 
-## Locked Google Sheet
+Config-tab soft switches should also default to:
 
-Workbook:
-
-```txt
-CSC Website
+```text
+manual_statement_mode_enabled = TRUE
+legacy_statement_parser_enabled = FALSE
+openai_statement_reader_enabled = FALSE
+plaid_enabled = FALSE
 ```
 
-Spreadsheet ID:
+### 3. Brokerage values can be prefilled with Tiingo
 
-```txt
-1mt6mEqqPajvsXzUb6DKuxoIhVEkiMXx8SP2rqyEMI_Q
-```
+Brokerage/Fidelity values may use Tiingo for market data assistance.
 
-Use only these existing tabs:
+Tiingo can safely prefill:
 
-```txt
+- latest price
+- latest price date/time
+- estimated market value if quantity is entered
+- unrealized gain/loss if quantity and manual cost basis are entered
+- market-data source note
+
+Tiingo must **not** be treated as the official accounting source for:
+
+- cost basis
+- contributions
+- withdrawals
+- tax lots
+- ownership status
+- official brokerage statement balances
+
+Those remain editable/manual.
+
+### 4. Manual overrides always win
+
+For both bank and brokerage reporting:
+
+1. Manual verified entry
+2. Manual draft entry, with report marked pending review
+3. Tiingo prefill for brokerage market values only, with review flag if not verified
+4. Parser / AI / Plaid only if explicitly re-enabled later
+5. Needs Review
+
+### 5. Source PDF links are attached to reports
+
+Every report should include a **Source Documents Used** section with Drive links to the bank statements, Fidelity reports, brokerage statements, signed documents, and other supporting records used.
+
+---
+
+## Existing tabs used
+
+Do **not** add new tabs.
+
+Use existing tabs only:
+
+```text
 Config
 PortalUsers
 Sessions
@@ -328,13 +142,13 @@ Budget
 Logs
 ```
 
-Do not add new tabs.
+---
 
-## Required Config rows
+## Required Config keys
 
-Confirm these rows exist in `Config`:
+Confirm these keys exist or add them to the existing `Config` tab:
 
-```txt
+```text
 WEB_APP_URL = https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
 DRIVE_DOCUMENTS_FOLDER_ID = 1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
 MARKET_DATA_PROVIDER = TIINGO
@@ -343,259 +157,487 @@ MONTHLY_REPORT_DAY = 15
 MONTHLY_REPORT_HOUR_ET = 9
 MONTHLY_REPORT_AUTO_SEND = FALSE
 PORTAL_DOMAIN = https://corporate.cook-international.com/portal/
+
+manual_statement_mode_enabled = TRUE
+legacy_statement_parser_enabled = FALSE
+openai_statement_reader_enabled = FALSE
+plaid_enabled = FALSE
+brokerage_prefill_enabled = TRUE
+brokerage_prefill_provider = TIINGO
+manual_override_enabled = TRUE
 ```
 
-## Apps Script Properties
+If the Tiingo key is currently stored in Config, preserve that pattern. If it is stored in Apps Script Properties, that is also acceptable. Do not expose the Tiingo key in the portal HTML.
 
-Do not put private keys in the sheet or website.
-
-Set:
-
-```txt
-TIINGO_API_KEY = your Tiingo token
-```
+---
 
 ## appsscript.json
 
-Use the included `appsscript.json`. It uses:
+The v1.8.0 Alpha manifest does not need extra OCR/DocumentApp permissions if OCR parsing is disabled.
 
-- `America/New_York`
-- V8 runtime
-- Sheets scope
-- Drive scope
-- external request scope
-- send mail scope
-- script trigger scope
-- Drive Advanced Service v2 only
+Minimum expected scopes remain:
 
-Do not include both Drive v2 and Drive v3 under the same `Drive` userSymbol.
-
-## Advanced Drive Service
-
-In Apps Script:
-
-```txt
-Services -> + -> Drive API
+```json
+"https://www.googleapis.com/auth/spreadsheets",
+"https://www.googleapis.com/auth/drive",
+"https://www.googleapis.com/auth/script.external_request",
+"https://www.googleapis.com/auth/script.send_mail",
+"https://www.googleapis.com/auth/script.scriptapp"
 ```
 
-Enable Drive API. The manifest in this build is configured for Drive API v2.
+Advanced Drive API v2 can remain enabled for Drive vault sync and file operations. It is no longer the required statement-reading path.
 
-## Drive Vault Sync
+---
 
-The portal can now sync manually uploaded files from the configured Drive folder.
+## Manual bank statement entry
 
-Backend action:
+Each bank statement card in Documents should include a **Manual Numbers** button.
 
-```txt
-syncDriveVaultDocuments
+The Manual Numbers editor should support:
+
+```text
+institution
+account_name
+account_number_last4
+statement_type
+statement_period_start
+statement_period_end
+statement_date
+beginning_balance
+ending_balance
+cash_balance
+total_credits
+deposits
+total_other_deposits
+total_debits
+withdrawals
+card_withdrawals
+other_withdrawals
+checks_paid
+fees
+net_change
+balance_on_report_start
+balance_on_report_end
+balance_on_15th
+daily_balance_notes
+transaction_count_manual
+source_pdf_url
+source_drive_file_id
+manual_notes
+manual_entry_status
+verified_by
+verified_at
 ```
 
-Manual Apps Script function:
+Allowed manual entry statuses:
 
-```js
-CSC_manualSyncDriveVaultDocuments()
-```
-
-Portal button:
-
-```txt
-Settings -> Sync Drive Vault
-Documents -> Sync Drive Vault
-```
-
-The sync function:
-
-- opens the Drive folder from `DRIVE_DOCUMENTS_FOLDER_ID`
-- scans each file
-- checks whether `drive_file_id` already exists in `Documents`
-- creates missing `Documents` rows
-- marks synced files as `status = synced_from_drive`
-- marks synced files as `uploaded_by = drive_sync`
-- auto-classifies obvious file types
-- creates `Statements` rows for statement/report files
-- logs sync activity to `Logs.raw_payload_json`
-
-## Document classification
-
-Admins can classify/update:
-
-```txt
-title
-category
-document_type
-status
-related_account_id
-related_report_id
-notes
-```
-
-Allowed document types:
-
-```txt
-company_document
-operating_agreement
-investor_packet
-budget
-bank_statement
-fidelity_statement
-brokerage_statement
-report_pdf
-tax_cpa
-signed_document
-esign_document
-other
-```
-
-Allowed statuses:
-
-```txt
-uploaded
-synced_from_drive
-classified
-parsed
+```text
+draft
+verified
 needs_review
-approved
-archived
 ```
 
-## Statement parsing
+---
 
-Statement parsing is conservative. It attempts Drive/Google Docs OCR/text extraction when available, stores summary results in `Statements.parsed_summary`, and stores detailed debug information in `Logs.raw_payload_json`.
+## Manual parsed_summary shape
 
-No extra parsing tabs are created.
+Manual bank entries should save into `Statements.parsed_summary` like this:
 
-If parsing fails, is low-confidence, or totals cannot be validated, the statement remains:
-
-```txt
-parsed_status = needs_review
+```json
+{
+  "parser": "manual_statement_entry_v180",
+  "source": "manual_entry",
+  "institution": "U.S. Bank",
+  "statement_type": "bank_statement",
+  "account_name": "CSC Checking",
+  "account_number_last4": "5923",
+  "statement_period_start": "2026-04-01",
+  "statement_period_end": "2026-04-30",
+  "statement_date": "2026-04-30",
+  "beginning_balance": 90.10,
+  "ending_balance": 22.29,
+  "cash_balance": 22.29,
+  "total_credits": 524.65,
+  "deposits": 524.65,
+  "total_debits": 592.46,
+  "withdrawals": 592.46,
+  "card_withdrawals": 542.46,
+  "other_withdrawals": 50.00,
+  "fees": 0,
+  "net_change": -67.81,
+  "balance_on_report_start": null,
+  "balance_on_report_end": null,
+  "balance_on_15th": 465.41,
+  "daily_balance_notes": "Manual entry from U.S. Bank statement daily balance summary.",
+  "transaction_count_manual": 50,
+  "source_pdf_url": "https://drive.google.com/...",
+  "source_drive_file_id": "...",
+  "manual_notes": "Entered from April U.S. Bank statement.",
+  "manual_entry_status": "verified",
+  "verified_by": "Michael Cook",
+  "verified_at": "2026-05-22T03:40:53Z",
+  "updated_at": "2026-05-22T03:40:53Z"
+}
 ```
 
-The report then remains:
+Blank numeric fields should be `null`, not `0`.
 
-```txt
-status = pending_review
+---
+
+## Brokerage / Fidelity manual entry with Tiingo prefill
+
+Brokerage statements and Fidelity reports should also use manual verified entries.
+
+The portal should include a **Brokerage Numbers / Holdings** editor for brokerage-type documents and portfolio-reference documents.
+
+The editor should support rows for holdings:
+
+```text
+ticker
+security_name
+quantity
+manual_cost_basis
+manual_average_cost
+tiingo_last_price
+tiingo_price_date
+tiingo_market_value
+manual_market_value_override
+final_market_value
+unrealized_gain_loss
+unrealized_gain_loss_pct
+holding_notes
+include_in_portfolio_totals
+position_status
 ```
 
-## 15th-to-15th reports
+Tiingo prefill behavior:
 
-Reports now use a 15th-to-15th period.
+- Admin enters ticker and quantity.
+- Admin clicks **Prefill Brokerage Values**.
+- Backend fetches latest/cached Tiingo price.
+- Backend calculates estimated market value.
+- Admin can override market value or cost basis.
+- Manual override wins.
+- Cost basis remains manual.
+- Final values must be reviewed and saved.
 
-Example:
+Brokerage parsed_summary example:
 
-```txt
-Report generated: 15 June 2026
-Period start: 15 May 2026
-Period end: 15 June 2026
+```json
+{
+  "parser": "manual_brokerage_entry_v180",
+  "source": "manual_entry_with_tiingo_prefill",
+  "institution": "Fidelity",
+  "statement_type": "brokerage_statement",
+  "account_name": "CSC Investments Brokerage",
+  "account_number_last4": "1234",
+  "statement_period_start": "2026-04-01",
+  "statement_period_end": "2026-04-30",
+  "statement_date": "2026-04-30",
+  "brokerage_total_value": 8268.91,
+  "brokerage_cash": null,
+  "brokerage_manual_notes": "Fidelity GPS / statement values manually reviewed.",
+  "tiingo_prefill_used": true,
+  "tiingo_prefill_provider": "TIINGO",
+  "holdings": [
+    {
+      "ticker": "VOO",
+      "security_name": "Vanguard S&P 500 ETF",
+      "quantity": 1.25,
+      "manual_cost_basis": 600.00,
+      "manual_average_cost": 480.00,
+      "tiingo_last_price": 505.00,
+      "tiingo_price_date": "2026-05-22",
+      "tiingo_market_value": 631.25,
+      "manual_market_value_override": null,
+      "final_market_value": 631.25,
+      "unrealized_gain_loss": 31.25,
+      "unrealized_gain_loss_pct": 5.21,
+      "include_in_portfolio_totals": true,
+      "position_status": "owned",
+      "holding_notes": "Price prefilled from Tiingo; cost basis manually entered."
+    }
+  ],
+  "manual_entry_status": "verified",
+  "verified_by": "Michael Cook",
+  "verified_at": "2026-05-22T03:40:53Z",
+  "updated_at": "2026-05-22T03:40:53Z"
+}
 ```
 
-Report title format:
+---
 
-```txt
-Cook Services Company Monthly Investor Report - [period start] to [period end]
+## Backend actions for v1.8.0 Alpha
+
+Required manual bank actions:
+
+```text
+getManualStatementEntry
+saveManualStatementEntry
+verifyManualStatementEntry
+clearManualStatementEntry
+getStatementDiagnostics
 ```
 
-## Report inputs
+Required brokerage/Tiingo actions:
 
-Reports read existing tabs only:
-
-```txt
-Accounts
-Positions
-Transactions
-MarketPrices
-MarketHistory
-Statements
-Documents
-BusinessUpdates
-Budget
-CapitalContributions
-MemberLedger
+```text
+getManualBrokerageEntry
+saveManualBrokerageEntry
+verifyManualBrokerageEntry
+prefillBrokerageFromTiingo
+refreshMarketData
 ```
 
-Reports include:
+Report actions that must continue working:
 
-- executive summary
-- 15th-to-15th period
-- portfolio snapshot
-- cash/bank summary
-- Fidelity/brokerage summary
-- owned holdings
-- research-only watchlist
-- cost basis review
-- unrealized gain/loss summary
-- budget summary
-- capital contribution summary
-- documents/statements used
-- statement parsing status
-- exceptions / needs review
-- business updates
-- risk and compliance notes
+```text
+getReports
+generateMonthlyReport
+testReport
+saveReportEdits
+saveReportSectionNote
+approveReport
+sendApprovedReport
+```
 
-## Approval rule
+Document actions that must continue working:
 
-Generated reports default to:
+```text
+getDocuments
+uploadDocument
+syncDriveVaultDocuments
+classifyDocument
+```
 
-```txt
+---
+
+## Report source priority
+
+Reports must use this priority order:
+
+```text
+1. Manual verified bank statement entry
+2. Manual verified brokerage/Fidelity entry
+3. Manual draft entry, but report remains pending_review
+4. Tiingo prefilled brokerage market value, only when manually reviewed
+5. Parser/AI/Plaid only if re-enabled later
+6. Needs Review
+```
+
+Manual verified values must not be overwritten by Tiingo, OCR, AI, or Plaid.
+
+---
+
+## 15th-to-15th report handling
+
+CSC reports use a 15th-to-15th reporting window.
+
+If manual entries include exact 15th-to-15th balances:
+
+```text
+balance_on_report_start
+balance_on_report_end
+```
+
+the report should use those values.
+
+If only monthly beginning/ending balances are entered, the report may generate but must remain:
+
+```text
 pending_review
 ```
 
-Final investor emails send only when the report is:
+and include this exception:
 
-```txt
-approved
-approved_with_exceptions
+```text
+Manual monthly statement values were entered, but exact 15th-to-15th balances were not provided.
 ```
 
-If pending review, the final investor email does not send.
+If `balance_on_15th` is entered, the report should use it where applicable and explain the basis in report notes.
 
-## Branded emails
+---
 
-Monthly report emails now use:
+## Source Documents Used section
 
-```txt
-replyTo: cookservicescompany@gmail.com
+Every generated report should include a section called:
+
+```text
+Source Documents Used
 ```
 
-The email shell includes:
+This section should include links to:
 
-- CSC Investments logo
-- dark CSC header
-- gold portal button
-- footer contact block
-- corporate.cook-international.com link
+- U.S. Bank statement PDFs
+- Huntington statement PDFs, when added
+- Fidelity brokerage statements / GPS reports
+- signed documents
+- budgets or supporting documents
+- manually attached Drive links
 
-## Portal testing checklist
+PDFs are evidence/source documents only. They are not required to be parsed.
 
-1. Replace `/portal/index.html`.
-2. Paste `CSC_PORTAL_BACKEND_v1.6.0_Beta.gs` into Apps Script.
-3. Replace `appsscript.json`.
-4. Enable Drive API service.
-5. Redeploy Apps Script as:
-   - Execute as: Me
-   - Who has access: Anyone
-6. Run `CSC_manualSyncDriveVaultDocuments()`.
-7. Open `/portal/`.
-8. Login as Michael.
-9. Go to Documents.
-10. Click Sync Drive Vault.
-11. Confirm manually uploaded files appear.
-12. Classify a file.
-13. Parse a statement.
-14. Generate a report.
-15. Confirm report period is 15th-to-15th.
-16. Approve a report.
-17. Send approved report.
-18. Confirm EmailLog records the send.
+---
 
-## Important safety notes
+## Portal UI requirements
 
-- This portal creates management reports, not audited financial statements.
-- Never rely on OCR/extracted statement data without review.
-- Never allow TradingView widget values to become accounting source-of-truth.
+### Documents tab
+
+Each statement/brokerage document card should show:
+
+```text
+Manual status
+Source type
+Institution
+Account last four
+Statement period
+Beginning balance
+Ending balance
+Deposits / credits
+Withdrawals / debits
+Fees
+Brokerage total value, if brokerage
+Tiingo prefill status, if brokerage
+Source PDF link
+Verified by
+Verified at
+```
+
+Buttons:
+
+```text
+Manual Numbers
+Brokerage Numbers / Holdings
+Prefill Brokerage Values
+Save Draft
+Mark Verified
+Clear Manual Entry
+Open PDF
+```
+
+### Reports tab
+
+Reports should show:
+
+```text
+Statement-backed: Yes/No
+Manual verified source: Yes/No
+Brokerage prefill used: Yes/No
+Source statement IDs
+Source PDF links
+Exceptions
+Pending review / approved status
+```
+
+### Settings tab
+
+Settings should show:
+
+```text
+Manual Statement Mode: Enabled
+Legacy Parser: Disabled
+OpenAI Statement Reader: Disabled
+Plaid: Disabled
+Brokerage Tiingo Prefill: Enabled
+Report Source Priority: Manual Verified Entries First
+```
+
+---
+
+## Safety rules
+
+- Never store blank numeric fields as `0`.
+- Never let Tiingo overwrite manual verified values.
+- Never use TradingView widget values as accounting values.
 - Research-only positions never count toward portfolio totals.
-- Cost basis, quantity, and ownership status remain CSC record fields only.
+- Owned positions count only when explicitly marked owned and included in totals.
+- Cost basis remains manual unless separately verified.
+- PDF parser / AI parser / Plaid cannot override manual verified numbers.
+- Reports must remain `pending_review` until approved.
+- Investor emails only send approved or approved-with-exceptions reports.
 
-Last Updated: 22 May 2026 @ 02:50:49Z UTC  
-Developed by Cook Technology Services
+---
+
+## Setup steps
+
+1. Replace the Apps Script backend with the v1.8.0 Alpha backend.
+2. Replace portal `/portal/index.html` with the v1.8.0 Alpha portal frontend.
+3. Confirm Config keys are present.
+4. Confirm Tiingo key is available through Config or Apps Script Properties.
+5. Deploy Apps Script as a new Web App version:
+   - Execute as: Me
+   - Who has access: Anyone, or the current portal setting.
+6. Upload or sync statement PDFs into the Drive vault.
+7. Open the portal.
+8. Go to Documents.
+9. Use Manual Numbers / Brokerage Numbers to enter verified values.
+10. Mark each entry verified.
+11. Generate the report.
+12. Review source links and exceptions.
+13. Approve the report.
+14. Send only after approval.
+
+---
+
+## Acceptance tests
+
+### Bank manual entry
+
+1. Open portal.
+2. Go to Documents.
+3. Open a U.S. Bank statement card.
+4. Click **Manual Numbers**.
+5. Enter January statement values.
+6. Save Draft.
+7. Refresh portal.
+8. Confirm values persist.
+9. Mark Verified.
+10. Confirm status shows Verified.
+11. Repeat for February, March, and April.
+
+### Brokerage / Tiingo prefill
+
+1. Open a Fidelity or brokerage document card.
+2. Click **Brokerage Numbers / Holdings**.
+3. Enter a ticker and quantity.
+4. Click **Prefill Brokerage Values**.
+5. Confirm Tiingo price and market value appear.
+6. Enter or edit cost basis manually.
+7. Save Draft.
+8. Mark Verified.
+9. Confirm verified brokerage value appears in report inputs.
+
+### Report generation
+
+1. Generate report.
+2. Confirm report uses manual bank values, not parser zeros.
+3. Confirm report uses verified brokerage values.
+4. Confirm Tiingo-assisted numbers are labeled as market-data prefills, not official brokerage accounting.
+5. Confirm source PDF Drive links appear.
+6. Confirm report remains pending review until approved.
+7. Confirm section pencil notes still save.
+8. Confirm Send Approved Report only sends approved reports.
+
+---
+
+## Known design decision
+
+v1.8.0 Alpha intentionally stops trying to solve PDF OCR inside Apps Script as the critical reporting path.
+
+The portal is now designed to function reliably by combining:
+
+```text
+Manual verified statement numbers
++ Tiingo brokerage market-price prefills
++ source PDF links
++ report approval controls
+```
+
+This is the stable foundation. OCR, AI, Plaid, or other aggregators can be reintroduced later as optional helpers, but not as the required path for investor reports.
+
+---
+
+Last Updated: 22 May 2026 @ 03:40:53Z UTC  
+Developed by Cook Technology Services  
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
