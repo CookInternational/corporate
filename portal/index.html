@@ -288,6 +288,15 @@
     function esc(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
     function showAlert(id,msg,type='ok'){ const el=document.getElementById(id); if(!el) return; el.className='portal-alert show '+type; el.textContent=msg; }
     function clearAlert(id){ const el=document.getElementById(id); if(el){el.className='portal-alert';el.textContent='';} }
+    function isSessionErrorMessage(msg){
+      const m=String(msg||'').toLowerCase();
+      return (m.includes('session') || m.includes('token') || m.includes('login')) && (m.includes('expired') || m.includes('invalid') || m.includes('required') || m.includes('not found') || m.includes('inactive'));
+    }
+    function handleSessionFailure(err){
+      clearSession();
+      showLogin();
+      showAlert('login-alert', (err && err.message) ? 'Session reset. Please log in again. ('+err.message+')' : 'Session reset. Please log in again.', 'warn');
+    }
     function isAdmin(){ return CSC_SESSION && ['super_admin','admin'].includes(CSC_SESSION.role); }
 
     function cscJsonp(action, params={}){
@@ -344,7 +353,7 @@
 
     async function loadDashboard(){
       try{ const res=await cscJsonp('getDashboard',{chart_symbol:CURRENT_CHART_SYMBOL}); CSC_DATA.dashboard=res.data; renderDashboard(res.data); }
-      catch(err){ showAlert('portal-global-alert',err.message,'error'); }
+      catch(err){ if(isSessionErrorMessage(err.message)){ handleSessionFailure(err); } else { showAlert('portal-global-alert',err.message,'error'); } }
     }
     async function loadPositions(){ try{ const res=await cscJsonp('getPositions',{}); CSC_DATA.positions=res.data; renderPositions(res.data,'positions-content'); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
     async function loadReports(){ try{ const res=await cscJsonp('getReports',{}); CSC_DATA.reports=res.data; renderReports(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
