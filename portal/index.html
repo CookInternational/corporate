@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v2.3.0 Alpha | Last Updated on 22 May 2026 @ 18:55:28Z UTC -->
+<!-- CSC Portal Frontend v2.4.0 Alpha | Last Updated on 22 May 2026 @ 19:11:58Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -126,8 +126,22 @@
           <div class="portal-field"><label for="login-email">Email</label><input class="portal-input" id="login-email" name="email" type="email" autocomplete="username" required></div>
           <div class="portal-field"><label for="login-password">Password</label><input class="portal-input" id="login-password" name="password" type="password" autocomplete="current-password" required></div>
           <button class="portal-button portal-button-primary" type="submit">Login</button>
+          <button class="portal-button portal-button-secondary" id="forgot-password-link" type="button" style="margin-left:8px;">Forgot Password?</button>
           <p class="portal-small">No public signup. Users are created by CSC administration only.</p>
           <div id="login-alert" class="portal-alert"></div>
+          <div id="forgot-password-panel" class="portal-hidden" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--portal-line);">
+            <p class="portal-kicker">Password Help</p><h2>Reset Password</h2>
+            <div class="portal-field"><label for="forgot-email">Account Email</label><input class="portal-input" id="forgot-email" type="email" autocomplete="email"></div>
+            <div class="portal-actions"><button class="portal-button portal-button-primary" id="send-reset-link" type="button">Send Reset Link</button><button class="portal-button portal-button-secondary" id="back-to-login" type="button">Back to Login</button></div>
+          </div>
+          <div id="reset-password-panel" class="portal-hidden" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--portal-line);">
+            <p class="portal-kicker">Password Reset</p><h2>Choose New Password</h2>
+            <div class="portal-field"><label for="reset-email">Account Email</label><input class="portal-input" id="reset-email" type="email" autocomplete="email"></div>
+            <div class="portal-field"><label for="reset-new-password">New Password</label><input class="portal-input" id="reset-new-password" type="password" autocomplete="new-password"></div>
+            <div class="portal-field"><label for="reset-confirm-password">Confirm New Password</label><input class="portal-input" id="reset-confirm-password" type="password" autocomplete="new-password"></div>
+            <div class="portal-actions"><button class="portal-button portal-button-primary" id="reset-password-button" type="button">Reset Password</button><button class="portal-button portal-button-secondary" id="reset-back-to-login" type="button">Back to Login</button></div>
+            <p class="portal-small">Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.</p>
+          </div>
         </form>
       </section>
 
@@ -151,7 +165,7 @@
         <section id="tab-dashboard" class="portal-panel active">
           <div class="portal-market-ticker" aria-label="CSC market ticker">
             <div class="portal-market-ticker-label">CSC Market Watch</div>
-            <div class="portal-market-ticker-window portal-tv-wrap">
+            <div class="portal-market-ticker-window portal-tv-wrap" id="portal-tv-ticker">
               <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
@@ -282,7 +296,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.3.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.4.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -348,6 +362,41 @@
     });
     document.getElementById('logout-button').addEventListener('click', async ()=>{ try{await cscJsonp('logout',{});}catch(e){} clearSession(); showLogin(); });
 
+
+    function portalQueryParam(name){ return new URLSearchParams(window.location.search).get(name) || ''; }
+    function showForgotPanel(){ document.getElementById('forgot-password-panel')?.classList.remove('portal-hidden'); document.getElementById('reset-password-panel')?.classList.add('portal-hidden'); document.getElementById('forgot-email').value=document.getElementById('login-email').value||''; }
+    function showLoginPanels(){ document.getElementById('forgot-password-panel')?.classList.add('portal-hidden'); document.getElementById('reset-password-panel')?.classList.add('portal-hidden'); }
+    function showResetPanelFromUrl(){
+      const token=portalQueryParam('reset_token'); const email=portalQueryParam('email');
+      if(!token) return false;
+      clearSession(); showLogin();
+      document.getElementById('forgot-password-panel')?.classList.add('portal-hidden');
+      document.getElementById('reset-password-panel')?.classList.remove('portal-hidden');
+      document.getElementById('reset-email').value=email||'';
+      return true;
+    }
+    document.getElementById('forgot-password-link')?.addEventListener('click', showForgotPanel);
+    document.getElementById('back-to-login')?.addEventListener('click', showLoginPanels);
+    document.getElementById('reset-back-to-login')?.addEventListener('click', ()=>{ history.replaceState({},'',location.pathname); showLoginPanels(); });
+    document.getElementById('send-reset-link')?.addEventListener('click', async()=>{
+      try{
+        clearAlert('login-alert');
+        const email=document.getElementById('forgot-email').value.trim();
+        const res=await cscPost('requestPasswordReset',{email},{timeoutMs:90000});
+        showAlert('login-alert',res.message||'If an account exists, a reset link has been sent.','ok');
+      }catch(err){ showAlert('login-alert',err.message,'error'); }
+    });
+    document.getElementById('reset-password-button')?.addEventListener('click', async()=>{
+      try{
+        clearAlert('login-alert');
+        const payload={email:document.getElementById('reset-email').value.trim(),reset_token:portalQueryParam('reset_token'),new_password:document.getElementById('reset-new-password').value,confirm_password:document.getElementById('reset-confirm-password').value};
+        const res=await cscPost('resetPasswordWithToken',payload,{timeoutMs:90000});
+        history.replaceState({},'',location.pathname);
+        showLoginPanels();
+        showAlert('login-alert',res.message||'Password reset. Please log in.','ok');
+      }catch(err){ showAlert('login-alert',err.message,'error'); }
+    });
+
     document.querySelectorAll('.portal-tab').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('.portal-tab').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.portal-panel').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active'); if(btn.dataset.tab==='positions') loadPositions(); if(btn.dataset.tab==='reports') loadReports(); if(btn.dataset.tab==='documents') loadDocuments(); if(btn.dataset.tab==='esign') loadESign(); if(btn.dataset.tab==='settings') renderSettings(); }));
 
     async function loadDashboard(){
@@ -360,7 +409,7 @@
     async function loadESign(){ try{ const res=await cscJsonp('getESignRequests',{}); CSC_DATA.esign=res.data; renderESign(res.data); }catch(err){ showAlert('portal-global-alert',err.message,'error'); } }
 
     function renderDashboard(data){
-      clearAlert('portal-global-alert'); renderSummary(data.summary||{}); renderStatus(data); renderPositions(data.positions||{},'dashboard-positions'); renderTradingViewChart(CURRENT_TV_SYMBOL);
+      clearAlert('portal-global-alert'); renderSummary(data.summary||{}); renderStatus(data); renderPositions(data.positions||{},'dashboard-positions'); renderTradingViewTicker(); renderTradingViewChart(CURRENT_TV_SYMBOL);
     }
     function renderTicker(prices){
       const track=document.getElementById('portal-ticker-track');
@@ -378,7 +427,7 @@
     function renderPositions(data, mountId){
       const mount=document.getElementById(mountId); const owned=data.owned||[]; const research=data.research||[]; const all=[...owned,...research];
       if(!all.length){ mount.innerHTML='<p class="portal-small">No positions found. Confirm the Positions tab has the approved headers and rows.</p>'; return; }
-      const table=(rows,title)=>`<h3>${title}</h3><div class="portal-table-wrap"><table class="portal-table"><thead><tr><th>Status</th><th>Ticker</th><th>Name</th><th>Sleeve</th><th>Qty</th><th class="num">Avg Cost</th><th class="num">Cost Basis</th><th class="num">Last Price</th><th class="num">Market Value</th><th class="num">Gain/Loss</th><th>Notes</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="portal-badge ${r.position_status==='owned'?'green':'gold'}">${esc(r.position_status||'')}</span></td><td><strong>${esc(r.ticker)}</strong></td><td>${esc(r.security_name)}</td><td>${esc(r.sleeve)}</td><td>${esc(r.quantity||0)}</td><td class="num">${money(r.average_cost)}</td><td class="num">${money(r.cost_basis)}</td><td class="num">${money(r.last_price||r.research_price_snapshot)}</td><td class="num">${money(r.market_value)}</td><td class="num">${money(r.total_gain_loss)}</td><td>${esc(r.notes)}</td></tr>`).join('')}</tbody></table></div>`;
+      const table=(rows,title)=>`<h3>${title}</h3><div class="portal-table-wrap"><table class="portal-table"><thead><tr><th>Status</th><th>Ticker</th><th>Name</th><th>Sleeve</th><th>Qty</th><th class="num">Avg Cost</th><th class="num">Cost Basis</th><th class="num">Last Price</th><th class="num">Day %</th><th>Quote Source</th><th>Quote Time</th><th class="num">Market Value</th><th class="num">Gain/Loss</th><th>Notes</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="portal-badge ${r.position_status==='owned'?'green':'gold'}">${esc(r.position_status||'')}</span></td><td><strong>${esc(r.ticker)}</strong></td><td>${esc(r.security_name)}</td><td>${esc(r.sleeve)}</td><td>${esc(r.quantity||0)}</td><td class="num">${money(r.average_cost)}</td><td class="num">${money(r.cost_basis)}</td><td class="num">${money(r.last_price||r.research_price_snapshot)}</td><td class="num ${Number(r.day_change_pct||0)>=0?'portal-up':'portal-down'}">${pct(Number(r.day_change_pct||0))}</td><td>${esc(r.quote_provider||r.data_source||'')}</td><td>${esc(r.quote_time_utc||r.research_price_date||'')}</td><td class="num">${money(r.market_value)}</td><td class="num">${money(r.total_gain_loss)}</td><td>${esc(r.notes)}</td></tr>`).join('')}</tbody></table></div>`;
       mount.innerHTML=(owned.length?table(owned,'Owned Holdings'):'<h3>Owned Holdings</h3><p class="portal-small">No owned holdings currently counted in totals.</p>')+(research.length?table(research,'Research-Only Watchlist'):'');
     }
     function renderReports(data){
@@ -909,6 +958,42 @@
     }
 
 
+
+    const CSC_TV_TICKER_SYMBOLS = [
+      {description:"SPYI", proName:"AMEX:SPYI"},
+      {description:"VOO", proName:"AMEX:VOO"},
+      {description:"IJH", proName:"AMEX:IJH"},
+      {description:"KMX", proName:"NYSE:KMX"},
+      {description:"GEHC", proName:"NASDAQ:GEHC"},
+      {description:"CNH", proName:"NYSE:CNH"},
+      {description:"MAS", proName:"NYSE:MAS"},
+      {description:"MKTX", proName:"NASDAQ:MKTX"},
+      {description:"DINO", proName:"NYSE:DINO"},
+      {description:"CMCSA", proName:"NASDAQ:CMCSA"},
+      {description:"DIS", proName:"NYSE:DIS"},
+      {description:"PFE", proName:"NYSE:PFE"},
+      {description:"NXPI", proName:"NASDAQ:NXPI"},
+      {description:"AVGO", proName:"NASDAQ:AVGO"},
+      {description:"CRSP", proName:"NASDAQ:CRSP"},
+      {description:"NTLA", proName:"NASDAQ:NTLA"},
+      {description:"TERN", proName:"NASDAQ:TERN"},
+      {description:"ADMA", proName:"NASDAQ:ADMA"},
+      {description:"ANIP", proName:"NASDAQ:ANIP"},
+      {description:"LQDA", proName:"NASDAQ:LQDA"}
+    ];
+
+    function renderTradingViewTicker(){
+      const mount=document.getElementById('portal-tv-ticker') || document.querySelector('.portal-market-ticker-window.portal-tv-wrap');
+      if(!mount) return;
+      mount.innerHTML='<div class="tradingview-widget-container" style="height:100%;width:100%;"><div class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div></div>';
+      const script=document.createElement('script');
+      script.type='text/javascript';
+      script.async=true;
+      script.src='https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+      script.innerHTML=JSON.stringify({symbols:CSC_TV_TICKER_SYMBOLS,showSymbolLogo:true,isTransparent:true,displayMode:"regular",colorTheme:"dark",locale:"en"});
+      mount.querySelector('.tradingview-widget-container').appendChild(script);
+    }
+
     const CSC_TV_SYMBOLS = [
       ["SPYI","AMEX:SPYI|1D"],
       ["VOO","AMEX:VOO|1D"],
@@ -992,7 +1077,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.3.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.4.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
@@ -1001,6 +1086,22 @@
         showAlert('portal-global-alert','Statement parse attempted. Review status updated.','ok');
         loadDocuments();
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+
+
+    function renderSettings(){
+      const mount=document.getElementById('settings-content');
+      if(!mount) return;
+      mount.innerHTML=`<div class="portal-grid portal-grid-2"><div class="portal-list-item"><h3>Account</h3><p><strong>${esc(CSC_SESSION?.full_name||'User')}</strong><br>${esc(CSC_SESSION?.email||'')}<br>${esc(CSC_SESSION?.role||'')}</p></div><form id="change-password-form" class="portal-list-item"><h3>Change Password</h3><p class="portal-small">Available to admins and investors. After changing your password, you will be logged out and must log back in.</p><div class="portal-field"><label>Current Password</label><input class="portal-input" id="current-password" type="password" autocomplete="current-password" required></div><div class="portal-field"><label>New Password</label><input class="portal-input" id="new-password" type="password" autocomplete="new-password" required></div><div class="portal-field"><label>Confirm New Password</label><input class="portal-input" id="confirm-password" type="password" autocomplete="new-password" required></div><button class="portal-button portal-button-primary" type="submit">Change Password</button><p class="portal-small">Minimum 10 characters with uppercase, lowercase, number, and symbol.</p><div id="change-password-alert" class="portal-alert"></div></form></div>`;
+      document.getElementById('change-password-form')?.addEventListener('submit',async e=>{
+        e.preventDefault();
+        try{
+          clearAlert('change-password-alert');
+          const res=await cscPost('changePassword',{current_password:document.getElementById('current-password').value,new_password:document.getElementById('new-password').value,confirm_password:document.getElementById('confirm-password').value},{timeoutMs:90000});
+          showAlert('change-password-alert',res.message||'Password changed. Please log in again.','ok');
+          setTimeout(()=>{clearSession(); showLogin();},1200);
+        }catch(err){ showAlert('change-password-alert',err.message,'error'); }
+      });
     }
 
     document.getElementById('refresh-dashboard').addEventListener('click', loadDashboard);
@@ -1040,7 +1141,7 @@
     document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; const btn=e.target.querySelector('button[type=submit]'); if(!file){showAlert('upload-alert','Choose a file.','error');return;} if(btn){btn.disabled=true;btn.textContent='Uploading…';} showAlert('upload-alert','Uploading to the CSC Website Drive folder. Please wait.','warn'); const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64},{timeoutMs:240000}); showAlert('upload-alert','Document uploaded and logged.','ok'); e.target.reset(); await loadDocuments(); }catch(err){ showAlert('upload-alert',err.message,'error'); try{await loadDocuments();}catch(x){} } finally { if(btn){btn.disabled=false;btn.textContent='Upload Document';} } }; reader.onerror=()=>{ if(btn){btn.disabled=false;btn.textContent='Upload Document';} showAlert('upload-alert','Could not read file.','error'); }; reader.readAsDataURL(file); });
     document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
 
-    loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
+    if(!showResetPanelFromUrl()) { loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); } }
   </script>
   <script src="/assets/csc-shell.js"></script>
 </body>
