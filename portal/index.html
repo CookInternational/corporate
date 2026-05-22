@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v2.2.0 Alpha | Last Updated on 22 May 2026 @ 18:01:05Z UTC -->
+<!-- CSC Portal Frontend v2.3.0 Alpha | Last Updated on 22 May 2026 @ 18:55:28Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -282,7 +282,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.2.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.3.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -530,6 +530,16 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
 
+
+    function documentKindLabel(d){
+      const type=String(d.document_type||'').toLowerCase();
+      if(type.includes('bank') || type.includes('fidelity') || type.includes('brokerage')) return 'statement';
+      if(type.includes('report')) return 'report';
+      if(type.includes('agreement') || type.includes('company') || type.includes('investor') || type.includes('budget')) return 'document';
+      return 'document';
+    }
+    function documentRequiresSignature(d){ return String(d.requires_signature||'').toUpperCase()==='TRUE' || String(d.signature_status||'').toLowerCase()==='pending'; }
+
     function renderDocuments(data){
       const mount=document.getElementById('documents-content');
       const docs=(data.documents||[]).filter(d=>{
@@ -539,7 +549,7 @@
         if(CURRENT_DOC_FILTER==='legal') return type.includes('agreement') || cat.includes('legal') || type.includes('company_document');
         if(CURRENT_DOC_FILTER==='reports') return type.includes('report') || cat.includes('report');
         if(CURRENT_DOC_FILTER==='signed') return type.includes('signed') || String(d.signature_status||'').toLowerCase().includes('signed');
-        if(CURRENT_DOC_FILTER==='needs_review') return status.includes('review') || d.parsed_needs_review===true || !String(d.manual_entry_status||'').includes('verified');
+        if(CURRENT_DOC_FILTER==='needs_review') return status.includes('review') || d.parsed_needs_review===true || String(d.signature_status||'').toLowerCase()==='pending';
         return true;
       });
       if(!docs.length){mount.innerHTML='<p class="portal-small">No documents found for this filter.</p>';return;}
@@ -547,11 +557,48 @@
         const type=String(d.document_type||'').toLowerCase();
         const isStatement=type.includes('statement') || type.includes('brokerage') || type.includes('fidelity');
         const manualStatus=String(d.manual_entry_status||'not_entered').toLowerCase();
-        const source=String(d.source||d.parser_name||'unknown');
-        const pillClass=manualStatus==='verified'?'':manualStatus==='draft'?'draft':manualStatus.includes('review')?'review':'empty';
+        const source=String(d.source||d.parser_name||'document_record');
+        const sigStatus=String(d.signature_status||'not_required').toLowerCase();
+        const sigRequired=documentRequiresSignature(d);
+        const pillClass=isStatement?(manualStatus==='verified'?'':manualStatus==='draft'?'draft':manualStatus.includes('review')?'review':'empty'):(sigRequired?'draft':'empty');
         const summary=d.parsed_summary?(()=>{try{return JSON.stringify(JSON.parse(d.parsed_summary),null,2)}catch(e){return String(d.parsed_summary)}})():'';
-        return `<div class="portal-list-item" id="doc-card-${esc(d.document_id||d.statement_id||'')}"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-source-pill ${pillClass}">${esc(manualStatus==='not_entered'?'manual not entered':manualStatus)}</span> <span class="portal-badge ${manualStatus==='verified'?'green':manualStatus==='draft'?'gold':''}">${esc(source)}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Account</b>${esc(d.account_number_last4||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Cash / Ending</b>${money(d.ending_balance||d.cash_balance)}</span><span><b>Deposits</b>${money(d.deposits)}</span><span><b>Withdrawals</b>${money(d.withdrawals)}</span><span><b>Market Value</b>${money(d.total_market_value)}</span><span><b>Cost Basis</b>${money(d.total_cost_basis)}</span><span><b>Verified</b>${esc(d.manual_verified_at||'—')}</span><span><b>Verified By</b>${esc(d.manual_verified_by||'—')}</span></div>${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open Source PDF</a>`:''}${isStatement?`<button class="portal-button portal-button-primary" type="button" onclick="openManualStatementEditor('${esc(d.document_id||'')}','${esc(d.statement_id||'')}')">Manual Numbers</button>`:''}</div><div class="manual-editor-mount" data-doc-id="${esc(d.document_id||'')}" data-statement-id="${esc(d.statement_id||'')}"></div>${summary?`<details class="portal-json-details"><summary>Saved Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
+        const statementMeta=`<div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Account</b>${esc(d.account_number_last4||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Cash / Ending</b>${money(d.ending_balance||d.cash_balance)}</span><span><b>Deposits</b>${money(d.deposits)}</span><span><b>Withdrawals</b>${money(d.withdrawals)}</span><span><b>Market Value</b>${money(d.total_market_value)}</span><span><b>Cost Basis</b>${money(d.total_cost_basis)}</span><span><b>Verified</b>${esc(d.manual_verified_at||'—')}</span><span><b>Verified By</b>${esc(d.manual_verified_by||'—')}</span></div>`;
+        const documentMeta=`<div class="portal-document-meta"><span><b>Document ID</b>${esc(d.document_id||'—')}</span><span><b>Category</b>${esc(d.category||'—')}</span><span><b>Document Type</b>${esc(d.document_type||'—')}</span><span><b>Status</b>${esc(d.status||'—')}</span><span><b>Requires Signature</b>${esc(d.requires_signature||'FALSE')}</span><span><b>Signature Status</b>${esc(d.signature_status||'not_required')}</span><span><b>Uploaded By</b>${esc(d.uploaded_by||'—')}</span><span><b>Uploaded At</b>${esc(d.uploaded_at||'—')}</span><span><b>Related Account</b>${esc(d.related_account_id||'—')}</span><span><b>Related Report</b>${esc(d.related_report_id||'—')}</span></div>`;
+        return `<div class="portal-list-item" id="doc-card-${esc(d.document_id||d.statement_id||'')}"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-source-pill ${pillClass}">${isStatement?esc(manualStatus==='not_entered'?'manual not entered':manualStatus):esc(sigRequired?'signature required':'document')}</span> <span class="portal-badge ${sigStatus==='signed'?'green':sigStatus==='pending'?'gold':''}">${esc(isStatement?source:sigStatus)}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p>${isStatement?statementMeta:documentMeta}${d.notes?`<p class="portal-small"><strong>Notes:</strong> ${esc(d.notes)}</p>`:''}${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">View Document</a>`:''}<button class="portal-button portal-button-secondary" type="button" onclick="openDocumentLineEditor('${esc(d.document_id||'')}')">Edit Document Line</button>${isStatement?`<button class="portal-button portal-button-primary" type="button" onclick="openManualStatementEditor('${esc(d.document_id||'')}','${esc(d.statement_id||'')}')">Manual Numbers</button>`:''}</div><div class="document-editor-mount" data-doc-id="${esc(d.document_id||'')}"></div><div class="manual-editor-mount" data-doc-id="${esc(d.document_id||'')}" data-statement-id="${esc(d.statement_id||'')}"></div>${summary && isStatement?`<details class="portal-json-details"><summary>Saved Statement Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
       }).join('')+'</div>';
+    }
+
+    function documentById(documentId){
+      const docs=(CSC_DATA.documents&&CSC_DATA.documents.documents)||[];
+      return docs.find(d=>String(d.document_id||'')===String(documentId||'')) || {};
+    }
+    window.openDocumentLineEditor=function(documentId){
+      const d=documentById(documentId);
+      const mount=document.querySelector(`.document-editor-mount[data-doc-id="${CSS.escape(documentId||'')}"]`);
+      if(!mount) return;
+      if(mount.innerHTML.trim()){ mount.innerHTML=''; return; }
+      const type=String(d.document_type||'company_document');
+      const status=String(d.status||'uploaded');
+      const requires=String(d.requires_signature||'FALSE').toUpperCase()==='TRUE';
+      const sig=String(d.signature_status||'not_required');
+      mount.innerHTML=`<form class="portal-manual-editor" data-classify-document="${esc(documentId)}"><h4>Edit Document Line</h4><p class="portal-small">This edits the Documents sheet row. Statement balance fields are only shown for bank/Fidelity/brokerage statement records.</p><div class="portal-manual-grid">
+        <div class="portal-field"><label>Title</label><input class="portal-input" name="title" value="${inputValue(d.title||'')}"></div>
+        <div class="portal-field"><label>Category</label><input class="portal-input" name="category" value="${inputValue(d.category||'')}"></div>
+        <div class="portal-field"><label>Document Type</label><select class="portal-select" name="document_type">
+          ${['company_document','operating_agreement','investor_packet','budget','bank_statement','fidelity_statement','brokerage_statement','report_pdf','tax_cpa','signed_document','esign_document','other'].map(v=>`<option value="${v}" ${type===v?'selected':''}>${v}</option>`).join('')}
+        </select></div>
+        <div class="portal-field"><label>Status</label><select class="portal-select" name="status">
+          ${['uploaded','synced_from_drive','classified','parsed','needs_review','approved','archived'].map(v=>`<option value="${v}" ${status===v?'selected':''}>${v}</option>`).join('')}
+        </select></div>
+        <div class="portal-field"><label>Requires Signature</label><select class="portal-select" name="requires_signature"><option value="TRUE" ${requires?'selected':''}>TRUE</option><option value="FALSE" ${!requires?'selected':''}>FALSE</option></select></div>
+        <div class="portal-field"><label>Signature Status</label><select class="portal-select" name="signature_status">
+          ${['not_required','pending','signed','declined','void'].map(v=>`<option value="${v}" ${sig===v?'selected':''}>${v}</option>`).join('')}
+        </select></div>
+        <div class="portal-field"><label>Related Account ID</label><input class="portal-input" name="related_account_id" value="${inputValue(d.related_account_id||'')}"></div>
+        <div class="portal-field"><label>Related Report ID</label><input class="portal-input" name="related_report_id" value="${inputValue(d.related_report_id||'')}"></div>
+        <div class="portal-field"><label>Effective Date</label><input class="portal-input" type="date" name="effective_date" value="${inputValue(d.effective_date||'')}"></div>
+        <div class="portal-field"><label>Expiration Date</label><input class="portal-input" type="date" name="expiration_date" value="${inputValue(d.expiration_date||'')}"></div>
+      </div><div class="portal-field"><label>Notes</label><textarea class="portal-textarea" name="notes">${esc(d.notes||'')}</textarea></div><div class="portal-actions"><button class="portal-button portal-button-primary" type="submit">Save Document Line</button><button class="portal-button portal-button-secondary" type="button" onclick="this.closest('.document-editor-mount').innerHTML=''">Cancel</button></div></form>`;
     }
 
     function manualDocByIds(documentId, statementId){
@@ -861,6 +908,71 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
 
+
+    const CSC_TV_SYMBOLS = [
+      ["SPYI","AMEX:SPYI|1D"],
+      ["VOO","AMEX:VOO|1D"],
+      ["IJH","AMEX:IJH|1D"],
+      ["CarMax","NYSE:KMX|1D"],
+      ["GE HealthCare","NASDAQ:GEHC|1D"],
+      ["CNH Industrial","NYSE:CNH|1D"],
+      ["Masco","NYSE:MAS|1D"],
+      ["MarketAxess","NASDAQ:MKTX|1D"],
+      ["HF Sinclair","NYSE:DINO|1D"],
+      ["Comcast","NASDAQ:CMCSA|1D"],
+      ["Disney","NYSE:DIS|1D"],
+      ["Pfizer","NYSE:PFE|1D"],
+      ["NXP","NASDAQ:NXPI|1D"],
+      ["Broadcom","NASDAQ:AVGO|1D"],
+      ["CRISPR Therapeutics","NASDAQ:CRSP|1D"],
+      ["Intellia","NASDAQ:NTLA|1D"],
+      ["Terns","NASDAQ:TERN|1D"],
+      ["ADMA","NASDAQ:ADMA|1D"],
+      ["ANI Pharma","NASDAQ:ANIP|1D"],
+      ["Liquidia","NASDAQ:LQDA|1D"]
+    ];
+
+    function renderTradingViewChart(symbol){
+      const mount=document.getElementById('portal-tv-chart');
+      if(!mount) return;
+      const selected=String(symbol||'AMEX:VOO');
+      const label=(selected.split(':').pop()||'VOO').replace('|1D','');
+      const meta=document.getElementById('chart-meta');
+      if(meta) meta.textContent=`${label} TradingView symbol overview — same embedded widget pattern as the Investors page.`;
+      const selectedPipe=selected.includes('|') ? selected : `${selected}|1D`;
+      const selectedTicker=label.toUpperCase();
+      const selectedRows=CSC_TV_SYMBOLS.filter(row => String(row[1]).toUpperCase()===selectedPipe.toUpperCase() || String(row[0]).toUpperCase()===selectedTicker);
+      const otherRows=CSC_TV_SYMBOLS.filter(row => !(String(row[1]).toUpperCase()===selectedPipe.toUpperCase() || String(row[0]).toUpperCase()===selectedTicker));
+      const symbols=(selectedRows.length?selectedRows:[[label, selectedPipe]]).concat(otherRows);
+      mount.innerHTML='<div class="tradingview-widget-container" style="height:100%;width:100%;"><div class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div></div>';
+      const script=document.createElement('script');
+      script.type='text/javascript';
+      script.async=true;
+      script.src='https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+      script.innerHTML=JSON.stringify({
+        symbols:symbols,
+        chartOnly:false,
+        width:"100%",
+        height:"100%",
+        locale:"en",
+        colorTheme:"dark",
+        autosize:true,
+        showVolume:false,
+        showMA:false,
+        hideDateRanges:false,
+        hideMarketStatus:false,
+        hideSymbolLogo:false,
+        scalePosition:"right",
+        scaleMode:"Normal",
+        fontFamily:"Arial, sans-serif",
+        fontSize:"12",
+        noTimeScale:false,
+        valuesTracking:"1",
+        changeMode:"price-and-percent"
+      });
+      mount.querySelector('.tradingview-widget-container').appendChild(script);
+    }
+
     function renderChart(rows,symbol){
       const mount=document.getElementById('portal-chart'); const tooltip=document.getElementById('chart-tooltip'); document.getElementById('chart-meta').textContent=`${symbol} cached market history`;
       const data=(rows||[]).filter(r=>Number(r.close_price||r.last_price||0)>0).map(r=>({date:r.price_date||r.price_time_utc||'', close:Number(r.close_price||r.last_price)}));
@@ -880,7 +992,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.2.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.3.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
@@ -917,11 +1029,11 @@
       e.preventDefault();
       const fd=new FormData(form);
       const payload={document_id:form.dataset.classifyDocument};
-      ['title','category','document_type','status','related_account_id','related_report_id','notes'].forEach(k=>payload[k]=fd.get(k)||'');
+      ['title','category','document_type','status','requires_signature','signature_status','effective_date','expiration_date','related_account_id','related_report_id','notes'].forEach(k=>payload[k]=fd.get(k)||'');
       try{
-        await cscJsonp('classifyDocument',payload);
-        showAlert('portal-global-alert','Document classification saved.','ok');
-        loadDocuments();
+        await cscPost('classifyDocument',payload);
+        showAlert('portal-global-alert','Document line saved.','ok');
+        await loadDocuments();
       }catch(err){showAlert('portal-global-alert',err.message,'error');}
     });
 
