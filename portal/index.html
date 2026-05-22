@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v1.9.0 Alpha | Last Updated on 22 May 2026 @ 16:56:30Z UTC -->
+<!-- CSC Portal Frontend v2.0.0 Alpha | Last Updated on 22 May 2026 @ 17:27:35Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -218,7 +218,7 @@
 
         <section id="tab-positions" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Positions</p><h2 class="portal-section-title">Holdings & Research Watchlist</h2><p>Owned positions count only when <strong>position_status = owned</strong> and <strong>include_in_portfolio_totals = TRUE</strong>.</p></div><button class="portal-button portal-button-dark" id="refresh-market" type="button">Refresh Market Data</button></div><div id="positions-content"></div></article></section>
 
-        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>v1.9.0 Alpha uses CustomReport as the report source of truth. One CustomReport row equals one full report, and every section/number can be edited manually from this screen before approval.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-dark" id="generate-report" type="button">Generate Custom Report</button><button class="portal-button portal-button-primary" id="send-report" type="button">Send Approved Report</button></div></div><div class="portal-data-note"><strong>CustomReport Manual Mode is active.</strong> Manual section text and manual numbers are the source of truth. Tiingo may help with brokerage market values only. Parser, AI statement reading, Plaid, and sensitive Drive statement uploads are disabled by default.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
+        <section id="tab-reports" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Reports</p><h2 class="portal-section-title">Custom Reports</h2><p>v2.0.0 Alpha makes CustomReport operational: save, pending review, approve, and send are all tied to the exact same report_id.</p></div><div class="portal-actions"><button class="portal-button portal-button-secondary" id="open-custom-report" type="button">Open Custom Report Builder</button><button class="portal-button portal-button-dark" id="run-custom-setup-check" type="button">Run Setup Check</button></div></div><div class="portal-data-note"><strong>CustomReport Workflow Mode is active.</strong> Save Draft creates/updates the matching Reports row as draft. Mark Pending Review creates/updates it as pending_review. Approve This Report syncs CustomReport and Reports as approved. Send This Approved Report sends only that exact approved report.</div><div id="custom-report-builder" class="portal-card portal-section-card" style="display:none;margin-bottom:16px;"></div><div id="reports-content"></div></article></section>
 
         <section id="tab-documents" class="portal-panel">
           <div class="portal-grid portal-grid-2">
@@ -282,7 +282,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v1.9.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.0.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -625,12 +625,13 @@
       const status=inputValue(row.report_status||'draft');
       const numberHtml=CUSTOM_REPORT_NUMBER_FIELDS.map(([k,label])=>`<div class="portal-field"><label>${esc(label)}</label><input class="portal-input" data-custom-field="${esc(k)}" value="${inputValue(row[k])}"></div>`).join('');
       const sectionHtml=CUSTOM_REPORT_SECTION_FIELDS.map(([k,label])=>`<div class="portal-field"><label>${esc(label)}</label><textarea class="portal-textarea" data-custom-field="${esc(k)}">${esc(row[k]||'')}</textarea></div>`).join('');
-      mount.innerHTML=`<div class="portal-custom-builder"><div class="portal-section-head"><div><p class="portal-kicker">CustomReport Builder</p><h2 class="portal-section-title">Manual Report Editor</h2><p>Everything here saves to the CustomReport row. You can edit sections and numbers manually before generating, approving, or sending.</p></div><span class="portal-badge gold">${esc(status)}</span></div>
+      mount.innerHTML=`<div class="portal-custom-builder"><div class="portal-section-head"><div><p class="portal-kicker">CustomReport Builder</p><h2 class="portal-section-title">Manual Report Editor</h2><p>Edit anything here. Every workflow button saves or acts on this exact CustomReport/report_id pair.</p></div><span class="portal-badge gold" id="custom-report-status-badge">${esc(status)}</span></div>
+        <div id="custom-report-workflow-status" class="portal-data-note">Workflow status loading…</div>
         <input type="hidden" data-custom-field="custom_report_id" value="${inputValue(row.custom_report_id||'')}">
         <input type="hidden" data-custom-field="report_id" value="${inputValue(row.report_id||'')}">
         <div class="portal-form-grid">
           <div class="portal-field"><label>Report Title</label><input class="portal-input" data-custom-field="report_title" value="${title}"></div>
-          <div class="portal-field"><label>Report Status</label><select class="portal-select" data-custom-field="report_status"><option value="draft" ${status==='draft'?'selected':''}>draft</option><option value="pending_review" ${status==='pending_review'?'selected':''}>pending_review</option><option value="approved" ${status==='approved'?'selected':''}>approved</option><option value="sent" ${status==='sent'?'selected':''}>sent</option></select></div>
+          <div class="portal-field"><label>Report Status</label><select class="portal-select" data-custom-field="report_status"><option value="draft" ${status==='draft'?'selected':''}>draft</option><option value="pending_review" ${status==='pending_review'?'selected':''}>pending_review</option><option value="approved" ${status==='approved'?'selected':''}>approved</option><option value="approved_with_exceptions" ${status==='approved_with_exceptions'?'selected':''}>approved_with_exceptions</option><option value="sent" ${status==='sent'?'selected':''}>sent</option></select></div>
           <div class="portal-field"><label>Period Start</label><input class="portal-input" type="date" data-custom-field="report_period_start" value="${periodStart}"></div>
           <div class="portal-field"><label>Period End</label><input class="portal-input" type="date" data-custom-field="report_period_end" value="${periodEnd}"></div>
         </div>
@@ -642,13 +643,17 @@
         <input type="hidden" data-custom-field="manual_override" value="TRUE">
         <input type="hidden" data-custom-field="status" value="active">
         <div class="portal-actions">
-          <button class="portal-button portal-button-primary" type="button" onclick="saveCustomReport()">Save CustomReport</button>
-          <button class="portal-button portal-button-dark" type="button" onclick="generateCustomReport()">Generate Custom Report</button>
+          <button class="portal-button portal-button-primary" type="button" onclick="customReportWorkflow('saveCustomReportDraft')">Save Draft</button>
+          <button class="portal-button portal-button-secondary" type="button" onclick="customReportWorkflow('markCustomReportPendingReview')">Mark Pending Review</button>
+          <button class="portal-button portal-button-dark" type="button" onclick="customReportWorkflow('approveCustomReport')">Approve This Report</button>
+          <button class="portal-button portal-button-primary" type="button" onclick="customReportWorkflow('sendCustomReport')">Send This Approved Report</button>
+          <button class="portal-button portal-button-secondary" type="button" onclick="runCustomReportSetupCheck()">Run Setup Check</button>
           <button class="portal-button portal-button-secondary" type="button" onclick="document.getElementById('custom-report-builder').style.display='none'">Close</button>
         </div>
-        <p class="portal-small">Sensitive bank statements, SSNs, full account numbers, tax IDs, and raw sensitive brokerage PDFs should not be uploaded to Drive. Paste sanitized/manual report content here.</p>
+        <p class="portal-small">Send only works after this exact report_id is approved and active recipients exist. Sensitive bank/brokerage PDFs should not be uploaded to Drive.</p>
       </div>`;
       mount.scrollIntoView({behavior:'smooth',block:'start'});
+      refreshCustomReportWorkflowStatus();
     }
 
     function collectCustomReportPayload(){
@@ -658,29 +663,70 @@
       return payload;
     }
 
-    async function saveCustomReport(){
+    async function refreshCustomReportWorkflowStatus(){
+      const box=document.getElementById('custom-report-workflow-status');
+      if(!box) return;
       try{
         const payload=collectCustomReportPayload();
-        const res=await cscPost('saveCustomReport',payload);
-        CSC_DATA.custom_report=res.custom_report||payload;
-        showAlert('portal-global-alert','CustomReport saved.','ok');
-        await loadReports();
-        if(res.custom_report) renderCustomReportBuilder(res.custom_report);
-      }catch(err){showAlert('portal-global-alert',err.message,'error');}
+        const res=await cscJsonp('getCustomReportWorkflowStatus',{custom_report_id:payload.custom_report_id||'',report_id:payload.report_id||''});
+        const s=res.workflow_status||res.data?.workflow_status||{};
+        box.innerHTML=`<strong>Workflow Status</strong><br>
+          CustomReport saved: <strong>${s.custom_report_saved?'YES':'NO'}</strong> &nbsp; | &nbsp;
+          Matching Reports row exists: <strong>${s.matching_reports_row_exists?'YES':'NO'}</strong> &nbsp; | &nbsp;
+          Reports status: <strong>${esc(s.reports_status||'none')}</strong><br>
+          Active recipients found: <strong>${s.active_recipients_found?'YES':'NO'}</strong> (${esc(s.active_recipient_count||0)}) &nbsp; | &nbsp;
+          Mail permission available: <strong>${s.mail_permission_available?'YES':'NO'}</strong> &nbsp; | &nbsp;
+          Last send result: <strong>${esc(s.last_send_result||'not attempted')}</strong><br>
+          Report ID: <strong>${esc(s.report_id||payload.report_id||'not set')}</strong>`;
+      }catch(err){
+        box.innerHTML=`<strong>Workflow Status Error:</strong> ${esc(err.message)}`;
+      }
     }
 
-    async function generateCustomReport(){
+    async function customReportWorkflow(action){
       try{
-        const mount=document.getElementById('custom-report-builder');
-        if(mount && mount.style.display!=='none' && mount.querySelector('[data-custom-field]')){
-          await cscPost('saveCustomReport',collectCustomReportPayload());
+        const payload=collectCustomReportPayload();
+        let label='CustomReport updated.';
+        if(action==='saveCustomReportDraft'){ payload.report_status='draft'; label='Draft saved and matching Reports row updated as draft.'; }
+        if(action==='markCustomReportPendingReview'){ payload.report_status='pending_review'; label='Report marked pending review and matching Reports row updated.'; }
+        if(action==='approveCustomReport'){ payload.report_status='approved'; payload.status='approved'; label='This report was approved in CustomReport and Reports.'; }
+        if(action==='sendCustomReport'){ label='This approved report was sent.'; }
+        const res=await cscPost(action,payload);
+        if(res.custom_report){
+          CSC_DATA.custom_report=res.custom_report;
+          renderCustomReportBuilder(res.custom_report);
+        }else{
+          await refreshCustomReportWorkflowStatus();
         }
-        const customId=(CSC_DATA.custom_report&&CSC_DATA.custom_report.custom_report_id)||'';
-        await cscPost('generateCustomReport',{custom_report_id:customId});
-        showAlert('portal-global-alert','Custom report generated into Reports as pending_review.','ok');
+        showAlert('portal-global-alert',label,'ok');
         await loadReports();
-      }catch(err){showAlert('portal-global-alert',err.message,'error');}
+      }catch(err){
+        showAlert('portal-global-alert',err.message,'error');
+        await refreshCustomReportWorkflowStatus();
+      }
     }
+
+    async function runCustomReportSetupCheck(){
+      const out=document.getElementById('settings-output');
+      try{
+        const payload=(document.getElementById('custom-report-builder')?.querySelector('[data-custom-field]')) ? collectCustomReportPayload() : {};
+        const res=await cscPost('validateCustomReportSetup',payload);
+        const message=res.setup_ok?'Setup check passed.':'Setup check found issues.';
+        showAlert('portal-global-alert',message,res.setup_ok?'ok':'warn');
+        if(out){out.style.display='block';out.textContent=JSON.stringify(res,null,2);}
+        await refreshCustomReportWorkflowStatus();
+      }catch(err){
+        showAlert('portal-global-alert',err.message,'error');
+        if(out){out.style.display='block';out.textContent=err.message;}
+      }
+    }
+
+    async function saveCustomReport(){ return customReportWorkflow('saveCustomReportDraft'); }
+    async function generateCustomReport(){ return customReportWorkflow('markCustomReportPendingReview'); }
+
+    async 
+    // generateCustomReport is an alias in the v2.0.0 workflow block above.
+
 
 
     window.previewReport=function(reportId){
@@ -750,7 +796,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v1.9.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.0.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
@@ -768,8 +814,9 @@
     document.getElementById('test-report')?.addEventListener('click',async()=>{ try{const res=await cscJsonp('testReport',{}); showAlert('portal-global-alert','Test report generated and saved to Reports.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
     document.getElementById('settings-test-report')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('testReport',{}); out.textContent=JSON.stringify(res,null,2); loadReports();}catch(e){out.textContent=e.message;} });
     document.getElementById('open-custom-report')?.addEventListener('click', openCustomReportBuilder);
-    document.getElementById('generate-report').addEventListener('click', generateCustomReport);
-    document.getElementById('send-report').addEventListener('click',async()=>{ try{const res=await cscJsonp('sendApprovedReport',{}); showAlert('portal-global-alert','Approved report email workflow complete.','ok'); loadReports();}catch(e){showAlert('portal-global-alert',e.message,'error');} });
+    document.getElementById('run-custom-setup-check')?.addEventListener('click', runCustomReportSetupCheck);
+    document.getElementById('generate-report')?.addEventListener('click', generateCustomReport);
+    document.getElementById('send-report')?.addEventListener('click',async()=>{ try{ await customReportWorkflow('sendCustomReport'); }catch(e){showAlert('portal-global-alert',e.message,'error');} });
     document.getElementById('refresh-documents').addEventListener('click', loadDocuments);
     document.getElementById('sync-drive-vault')?.addEventListener('click', syncDriveVault);
     document.getElementById('parse-statements')?.addEventListener('click', parseStatements);
@@ -794,7 +841,7 @@
       }catch(err){showAlert('portal-global-alert',err.message,'error');}
     });
 
-    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Sensitive bank/brokerage statement uploads are blocked in v1.9.0 Alpha; use CustomReport for report values.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
+    document.getElementById('document-upload-form').addEventListener('submit',async e=>{ e.preventDefault(); clearAlert('upload-alert'); const file=document.getElementById('doc-file').files[0]; if(!file){showAlert('upload-alert','Choose a file.','error');return;} const reader=new FileReader(); reader.onload=async()=>{ try{ const base64=String(reader.result).split(',')[1]; await cscPost('uploadDocument',{title:document.getElementById('doc-title').value,document_type:document.getElementById('doc-type').value,category:document.getElementById('doc-category').value,file_name:file.name,mime_type:file.type||'application/octet-stream',base64}); showAlert('upload-alert','Document uploaded. Sensitive bank/brokerage statement uploads are blocked in v2.0.0 Alpha; use CustomReport for report values.','ok'); e.target.reset(); loadDocuments(); }catch(err){showAlert('upload-alert',err.message,'error');} }; reader.onerror=()=>showAlert('upload-alert','Could not read file.','error'); reader.readAsDataURL(file); });
     document.getElementById('esign-create-form').addEventListener('submit',async e=>{ e.preventDefault(); try{ await cscPost('createESignRequest',{document_id:document.getElementById('esign-document-id').value,title:document.getElementById('esign-title').value,signer_email:document.getElementById('esign-email').value,message:document.getElementById('esign-message').value}); showAlert('esign-create-alert','E-sign request created.','ok'); e.target.reset(); loadESign(); }catch(err){showAlert('esign-create-alert',err.message,'error');} });
 
     loadSession(); if(CSC_SESSION && CSC_SESSION.token){ showApp(); } else { showLogin(); }
