@@ -4,10 +4,100 @@
 
 **Cook Services Company, LLC**  
 **Build:** CSC Portal v1.7.1 Alpha  
-**Updated:** 22 May 2026 @ 02:19:59Z UTC  
+**Updated:** 22 May 2026 @ 02:50:49Z UTC   
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
 **Contact:** cookservicescompany@gmail.com
+
+# CSC Portal Backend + Frontend v7.1.1 Alpha
+
+Last Updated: 22 May 2026 @ 02:50:49Z UTC  
+Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+
+## Purpose
+This build adds Plan C: an OpenAI-powered statement document reader for CSC Portal. v7.1.0 proved that the backend could find the U.S. Bank statement rows, but Drive/OCR extraction returned `text_length: 0` and `parser: none`, so the U.S. Bank parser never received readable text.
+
+The v7.1.1 fix bypasses that failure path by sending the Drive PDF bytes from the backend to OpenAI as a file input, asking for strict statement JSON, validating the result, and saving it into `Statements.parsed_summary`.
+
+## Critical security note
+The OpenAI API key must not be hardcoded into the `.gs` file or portal HTML. This build reads it from the existing `Config` tab key:
+
+- `openai_api_key`
+
+Optional Config keys:
+
+- `openai_model` — defaults to `gpt-4.1` if blank.
+- `openai_statement_reader_enabled` — optional TRUE/FALSE soft switch.
+
+Because the API key was pasted into chat during troubleshooting, rotate that key after deployment/testing.
+
+## Manual enable / disable
+The backend has a hard kill switch near the top of the `.gs` file:
+
+- `CSC_AI_STATEMENT_READER_ENABLED = true` enables AI parsing.
+- `CSC_AI_STATEMENT_READER_ENABLED = false` disables all OpenAI statement reader actions immediately.
+
+The Config tab can also disable the feature with `openai_statement_reader_enabled = FALSE`, but the `.gs` flag is the hard override.
+
+## New backend actions
+- `aiParseStatement`
+- `aiParseStatements`
+- `aiTestStatementReader`
+- `getStatementParseDiagnostics`
+
+## Portal changes
+- Documents tab now has **AI Parse Statements** beside the legacy Drive OCR parse button.
+- Each statement card now has **AI Re-parse**.
+- Statement cards show parser source, model, confidence, review reasons, deposits, withdrawals, daily balance count, transaction count, and parsed summary preview.
+- Existing section-level report pencil notes from v7.1.0 are preserved.
+
+## Data flow
+1. Portal calls `aiParseStatements` or `aiParseStatement`.
+2. Backend verifies admin permissions.
+3. Backend checks `CSC_AI_STATEMENT_READER_ENABLED`.
+4. Backend reads `openai_api_key` from Config.
+5. Backend reads the Drive PDF blob.
+6. Backend sends the PDF file to OpenAI using file input.
+7. OpenAI returns JSON only.
+8. Backend validates/normalizes the JSON.
+9. Backend writes it to `Statements.parsed_summary`.
+10. Reports use `Statements.parsed_summary` as the source of truth.
+
+## No new tabs
+This build uses existing tabs only:
+
+- Config
+- Statements
+- Documents
+- Reports
+- Logs
+- Accounts
+- Positions
+- Transactions
+- Budget
+- CapitalContributions
+- MemberLedger
+- BusinessUpdates
+
+## Acceptance test
+1. Deploy the new backend.
+2. Deploy the new portal HTML.
+3. Confirm Config tab has `openai_api_key`.
+4. Set `CSC_AI_STATEMENT_READER_ENABLED = true` in the `.gs` file.
+5. Open the portal.
+6. Go to Documents.
+7. Click **AI Parse Statements**.
+8. Confirm U.S. Bank statements no longer show `parser: none`.
+9. Confirm `Statements.parsed_summary` contains `parser: openai_document_reader_v711`.
+10. Confirm parsed JSON has period dates, balances, deposits/withdrawals if visible, and review reasons if needed.
+11. Generate report.
+12. Confirm report is not silently all zeros.
+
+## Build files
+- `CSC_PORTAL_BACKEND_v7.1.1_Alpha.gs`
+- `index_v7.1.1_Alpha.html`
+- `README_CSC_PORTAL_v7.1.1_Alpha.md`
+- `appsscript_v7.1.1_Alpha.json`
 
 # CSC Portal v7.1.0 Alpha
 
