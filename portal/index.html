@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v7.1.1 Alpha | Last Updated on 22 May 2026 @ 02:19:59Z -->
+<!-- CSC Portal Frontend v1.8.0 Alpha | Last Updated on 22 May 2026 @ 03:46:14Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -88,6 +88,16 @@
     .portal-json-details{margin-top:10px;}
     .portal-json-details summary{cursor:pointer;font-weight:900;color:var(--portal-navy);font-size:12px;}
     .portal-json-details pre{margin-top:8px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border-radius:14px;padding:12px;max-height:260px;overflow:auto;font-size:11px;}
+
+
+    .portal-manual-banner{margin:12px 0;padding:12px 14px;border-radius:16px;background:#ecfdf3;border:1px solid #abefc6;color:#05603a;font-size:13px;line-height:1.55;}
+    .portal-manual-editor{margin-top:12px;padding:14px;border-radius:18px;background:#fff7e6;border:1px solid rgba(201,151,43,.34);display:grid;gap:12px;}
+    .portal-manual-editor h4{margin:0;color:var(--portal-navy);font-size:17px;}
+    .portal-manual-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+    .portal-manual-grid .portal-field{margin-bottom:0;}
+    .portal-source-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;background:#ecfdf3;color:#05603a;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;}
+    .portal-source-pill.draft{background:#fffaeb;color:#93370d;}.portal-source-pill.empty{background:#f1f5f9;color:#475569;}.portal-source-pill.review{background:#fff1f3;color:#c01048;}
+    @media(max-width:900px){.portal-manual-grid{grid-template-columns:1fr;}}
 
     @media(max-width:900px){.portal-login-wrap,.portal-grid-2,.portal-grid-3,.portal-grid-4,.portal-form-grid{grid-template-columns:1fr}.portal-topbar{flex-direction:column}.portal-userline{text-align:left;white-space:normal}.portal-chart{height:300px}.portal-table{min-width:760px}.portal-market-ticker{align-items:center}.portal-market-ticker-label{margin-left:10px}.portal-shell{width:min(100% - 22px,1180px)}}
   </style>
@@ -238,7 +248,7 @@
                 <div><p class="portal-kicker">View Documents</p><h2 class="portal-section-title">Document Vault</h2><p>Sync, classify, review, and open uploaded Drive vault files.</p></div>
                 <div class="portal-actions">
                   <button class="portal-button portal-button-secondary" id="sync-drive-vault" type="button">Sync Drive Vault</button>
-                  <button class="portal-button portal-button-secondary" id="parse-statements" type="button">Drive OCR Parse</button><button class="portal-button portal-button-primary" id="ai-parse-statements" type="button">AI Parse Statements</button>
+                  <button class="portal-button portal-button-secondary" id="parse-statements" type="button">Legacy Parse Disabled</button>
                   <button class="portal-button portal-button-dark" id="refresh-documents" type="button">Refresh Documents</button>
                 </div>
               </div>
@@ -250,14 +260,14 @@
                 <button class="portal-doc-filter" data-doc-filter="signed" type="button">Signed Documents</button>
                 <button class="portal-doc-filter" data-doc-filter="needs_review" type="button">Needs Review</button>
               </div>
-              <div id="documents-content"></div>
+              <div class="portal-manual-banner"><strong>Manual Statement Entry is active.</strong> Enter verified bank and brokerage numbers manually. Tiingo may prefill brokerage price/market value only; cost basis and final report values remain editable/manual. PDFs are stored as proof links.</div><div id="documents-content"></div>
             </article>
           </div>
         </section>
 
         <section id="tab-esign" class="portal-panel"><div class="portal-grid portal-grid-2"><article class="portal-section-card portal-card"><p class="portal-kicker">Internal E-Sign</p><h2 class="portal-section-title">Create Request</h2><form id="esign-create-form"><div class="portal-field"><label for="esign-document-id">Document ID</label><input class="portal-input" id="esign-document-id" name="document_id" required></div><div class="portal-field"><label for="esign-title">Title</label><input class="portal-input" id="esign-title" name="title" required></div><div class="portal-field"><label for="esign-email">Signer Email</label><input class="portal-input" id="esign-email" name="signer_email" type="email" required></div><div class="portal-field"><label for="esign-message">Message</label><textarea class="portal-textarea" id="esign-message" name="message"></textarea></div><button class="portal-button portal-button-primary" type="submit">Create E-Sign Request</button></form><div id="esign-create-alert" class="portal-alert"></div></article><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Requests</p><h2 class="portal-section-title">Pending & Completed</h2></div><button class="portal-button portal-button-dark" id="refresh-esign" type="button">Refresh</button></div><div id="esign-content"></div></article></div></section>
 
-        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Drive OCR Parse</button><button class="portal-button portal-button-primary" id="settings-ai-parse-statements" type="button">AI Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
+        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
       </section>
     </div>
   </main>
@@ -265,7 +275,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v7.1.1 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v1.8.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -484,26 +494,78 @@
         setTimeout(()=>previewReport(reportId),150);
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
+
     function renderDocuments(data){
       const mount=document.getElementById('documents-content');
       const docs=(data.documents||[]).filter(d=>{
-        const type=String(d.document_type||'').toLowerCase(); const status=String(d.status||d.parser_status||'').toLowerCase(); const cat=String(d.category||'').toLowerCase();
+        const type=String(d.document_type||'').toLowerCase(); const status=String(d.status||d.parser_status||d.manual_entry_status||'').toLowerCase(); const cat=String(d.category||'').toLowerCase();
         if(CURRENT_DOC_FILTER==='all') return true;
         if(CURRENT_DOC_FILTER==='statements') return type.includes('statement') || ['bank_statement','fidelity_statement','brokerage_statement'].includes(type);
         if(CURRENT_DOC_FILTER==='legal') return type.includes('agreement') || cat.includes('legal') || type.includes('company_document');
         if(CURRENT_DOC_FILTER==='reports') return type.includes('report') || cat.includes('report');
         if(CURRENT_DOC_FILTER==='signed') return type.includes('signed') || String(d.signature_status||'').toLowerCase().includes('signed');
-        if(CURRENT_DOC_FILTER==='needs_review') return status.includes('review') || d.parsed_needs_review===true;
+        if(CURRENT_DOC_FILTER==='needs_review') return status.includes('review') || d.parsed_needs_review===true || !String(d.manual_entry_status||'').includes('verified');
         return true;
       });
       if(!docs.length){mount.innerHTML='<p class="portal-small">No documents found for this filter.</p>';return;}
       mount.innerHTML='<div class="portal-split-list">'+docs.map(d=>{
-        const isStatement=String(d.document_type||'').toLowerCase().includes('statement');
-        const badgeClass=String(d.status||d.parser_status||'').toLowerCase().includes('parsed')?'green':String(d.status||d.parser_status||'').toLowerCase().includes('review')?'gold':'';
+        const type=String(d.document_type||'').toLowerCase();
+        const isStatement=type.includes('statement') || type.includes('brokerage') || type.includes('fidelity');
+        const manualStatus=String(d.manual_entry_status||'not_entered').toLowerCase();
+        const source=String(d.source||d.parser_name||'unknown');
+        const pillClass=manualStatus==='verified'?'':manualStatus==='draft'?'draft':manualStatus.includes('review')?'review':'empty';
         const summary=d.parsed_summary?(()=>{try{return JSON.stringify(JSON.parse(d.parsed_summary),null,2)}catch(e){return String(d.parsed_summary)}})():'';
-        return `<div class="portal-list-item"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-badge ${badgeClass}">${esc(d.status||d.parser_status||'uploaded')}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Parser</b>${esc(d.parser_name||'—')}</span><span><b>Source</b>${esc(d.parse_source||'—')}</span><span><b>Model</b>${esc(d.openai_model||'—')}</span><span><b>Confidence</b>${esc(d.ai_confidence||'—')}</span><span><b>Text Length</b>${esc(d.text_length||'—')}</span><span><b>Extraction</b>${esc(d.extraction_method||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Balances</b>${money(d.beginning_balance)} → ${money(d.ending_balance)}</span><span><b>Deposits</b>${money(d.deposits)}</span><span><b>Withdrawals</b>${money(d.withdrawals)}</span><span><b>Daily Balances</b>${esc(d.daily_balance_count||0)}</span><span><b>Transactions</b>${esc(d.transaction_count||0)}</span></div>${d.review_reasons?`<p class="portal-small" style="color:#93370d"><strong>Review:</strong> ${esc(d.review_reasons)}</p>`:''}${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}${isStatement&&d.document_id?`<button class="portal-button portal-button-dark" type="button" onclick="parseStatementDocument('${esc(d.document_id)}')">Drive OCR Re-parse</button><button class="portal-button portal-button-primary" type="button" onclick="aiParseStatementDocument('${esc(d.document_id)}')">AI Re-parse</button>`:''}</div>${summary?`<details class="portal-json-details"><summary>Parsed Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
+        return `<div class="portal-list-item" id="doc-card-${esc(d.document_id||d.statement_id||'')}"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-source-pill ${pillClass}">${esc(manualStatus==='not_entered'?'manual not entered':manualStatus)}</span> <span class="portal-badge ${manualStatus==='verified'?'green':manualStatus==='draft'?'gold':''}">${esc(source)}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Account</b>${esc(d.account_number_last4||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Cash / Ending</b>${money(d.ending_balance||d.cash_balance)}</span><span><b>Deposits</b>${money(d.deposits)}</span><span><b>Withdrawals</b>${money(d.withdrawals)}</span><span><b>Market Value</b>${money(d.total_market_value)}</span><span><b>Cost Basis</b>${money(d.total_cost_basis)}</span><span><b>Verified</b>${esc(d.manual_verified_at||'—')}</span><span><b>Verified By</b>${esc(d.manual_verified_by||'—')}</span></div>${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open Source PDF</a>`:''}${isStatement?`<button class="portal-button portal-button-primary" type="button" onclick="openManualStatementEditor('${esc(d.document_id||'')}','${esc(d.statement_id||'')}')">Manual Numbers</button>`:''}</div><div class="manual-editor-mount" data-doc-id="${esc(d.document_id||'')}" data-statement-id="${esc(d.statement_id||'')}"></div>${summary?`<details class="portal-json-details"><summary>Saved Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
       }).join('')+'</div>';
     }
+
+    function manualDocByIds(documentId, statementId){
+      const docs=(CSC_DATA.documents&&CSC_DATA.documents.documents)||[];
+      return docs.find(d=>String(d.document_id||'')===String(documentId||'') || String(d.statement_id||'')===String(statementId||'')) || {};
+    }
+    function parsedSummaryObj(raw){ try{return raw?JSON.parse(raw):{};}catch(e){return {};}}
+    function inputValue(v){ return v===null||v===undefined?'':String(v).replace(/"/g,'&quot;'); }
+    function isBrokerageDoc(d, ps){ const s=String((d.document_type||'')+' '+(d.title||'')+' '+(d.file_name||'')+' '+(ps.statement_type||'')+' '+(ps.institution||'')).toLowerCase(); return s.includes('brokerage')||s.includes('fidelity')||s.includes('portfolio'); }
+    window.openManualStatementEditor=function(documentId,statementId){
+      const d=manualDocByIds(documentId,statementId); const ps=parsedSummaryObj(d.parsed_summary); const broker=isBrokerageDoc(d,ps);
+      const mount=document.querySelector(`.manual-editor-mount[data-doc-id="${CSS.escape(documentId||'')}"]`) || document.querySelector(`.manual-editor-mount[data-statement-id="${CSS.escape(statementId||'')}"]`);
+      if(!mount) return;
+      if(mount.innerHTML.trim()){ mount.innerHTML=''; return; }
+      mount.innerHTML=`<div class="portal-manual-editor"><h4>Manual ${broker?'Brokerage / Fidelity':'Bank'} Numbers</h4><p class="portal-small">Manual verified entries are the report source of truth. Blank numeric fields stay blank; zero means you intentionally entered 0.</p><div class="portal-manual-grid">
+        <div class="portal-field"><label>Institution</label><input class="portal-input" data-manual-field="institution" value="${inputValue(ps.institution||d.parser_institution||'')}"></div>
+        <div class="portal-field"><label>Account Name</label><input class="portal-input" data-manual-field="account_name" value="${inputValue(ps.account_name||d.account_name||'')}"></div>
+        <div class="portal-field"><label>Account Last 4</label><input class="portal-input" data-manual-field="account_number_last4" value="${inputValue(ps.account_number_last4||d.account_number_last4||'')}"></div>
+        <div class="portal-field"><label>Statement Type</label><select class="portal-select" data-manual-field="statement_type"><option value="bank_statement" ${!broker?'selected':''}>Bank Statement</option><option value="brokerage_statement" ${broker?'selected':''}>Brokerage / Fidelity</option><option value="portfolio_reference">Portfolio Reference</option></select></div>
+        <div class="portal-field"><label>Period Start</label><input class="portal-input" type="date" data-manual-field="statement_period_start" value="${inputValue(ps.statement_period_start||d.statement_period_start||'')}"></div>
+        <div class="portal-field"><label>Period End</label><input class="portal-input" type="date" data-manual-field="statement_period_end" value="${inputValue(ps.statement_period_end||d.statement_period_end||'')}"></div>
+        <div class="portal-field"><label>Statement Date</label><input class="portal-input" type="date" data-manual-field="statement_date" value="${inputValue(ps.statement_date||d.statement_date||'')}"></div>
+        <div class="portal-field"><label>Beginning Balance</label><input class="portal-input" data-manual-field="beginning_balance" value="${inputValue(ps.beginning_balance)}"></div>
+        <div class="portal-field"><label>Ending / Cash Balance</label><input class="portal-input" data-manual-field="ending_balance" value="${inputValue(ps.ending_balance||ps.cash_balance)}"></div>
+        <div class="portal-field"><label>Deposits / Credits</label><input class="portal-input" data-manual-field="deposits" value="${inputValue(ps.deposits||ps.total_credits)}"></div>
+        <div class="portal-field"><label>Withdrawals / Debits</label><input class="portal-input" data-manual-field="withdrawals" value="${inputValue(ps.withdrawals||ps.total_debits)}"></div>
+        <div class="portal-field"><label>Fees</label><input class="portal-input" data-manual-field="fees" value="${inputValue(ps.fees)}"></div>
+        <div class="portal-field"><label>15th Start Balance</label><input class="portal-input" data-manual-field="balance_on_report_start" value="${inputValue(ps.balance_on_report_start)}"></div>
+        <div class="portal-field"><label>15th End Balance</label><input class="portal-input" data-manual-field="balance_on_report_end" value="${inputValue(ps.balance_on_report_end||ps.balance_on_15th)}"></div>
+        <div class="portal-field"><label>Brokerage Market Value</label><input class="portal-input" data-manual-field="total_market_value" value="${inputValue(ps.total_market_value||ps.brokerage_market_value)}"></div>
+        <div class="portal-field"><label>Brokerage Cost Basis</label><input class="portal-input" data-manual-field="total_cost_basis" value="${inputValue(ps.total_cost_basis||ps.brokerage_cost_basis)}"></div>
+        <div class="portal-field"><label>Source PDF URL</label><input class="portal-input" data-manual-field="source_pdf_url" value="${inputValue(ps.source_pdf_url||d.file_url||'')}"></div>
+      </div><div class="portal-field"><label>Manual Notes</label><textarea class="portal-textarea" data-manual-field="manual_notes">${esc(ps.manual_notes||d.manual_notes||'')}</textarea></div><div class="portal-actions"><button class="portal-button portal-button-secondary" type="button" onclick="prefillBrokerageFromTiingo(this)">Prefill Brokerage from Tiingo</button><button class="portal-button portal-button-primary" type="button" onclick="saveManualStatementEntry(this,'draft')">Save Draft</button><button class="portal-button portal-button-dark" type="button" onclick="saveManualStatementEntry(this,'verified')">Mark Verified</button><button class="portal-button portal-button-danger" type="button" onclick="clearManualStatementEntry(this)">Clear Manual Entry</button><button class="portal-button portal-button-secondary" type="button" onclick="this.closest('.manual-editor-mount').innerHTML=''">Cancel</button></div><p class="portal-small">Tiingo prefill is only for latest price / estimated market value. You can still update cost basis manually.</p></div>`;
+    }
+    function manualPayloadFromButton(btn){
+      const card=btn.closest('.portal-list-item'); const mount=btn.closest('.manual-editor-mount'); const payload={document_id:mount?.dataset.docId||'',statement_id:mount?.dataset.statementId||''};
+      card.querySelectorAll('[data-manual-field]').forEach(el=>payload[el.dataset.manualField]=el.value);
+      const d=manualDocByIds(payload.document_id,payload.statement_id); payload.source_drive_file_id=d.drive_file_id||''; return payload;
+    }
+    window.saveManualStatementEntry=async function(btn,status){
+      try{ const payload=manualPayloadFromButton(btn); payload.manual_entry_status=status; const action=status==='verified'?'verifyManualStatementEntry':'saveManualStatementEntry'; await cscPost(action,payload); showAlert('portal-global-alert',status==='verified'?'Manual entry verified.':'Manual entry saved.','ok'); await loadDocuments(); await loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    window.clearManualStatementEntry=async function(btn){
+      try{ const payload=manualPayloadFromButton(btn); await cscPost('clearManualStatementEntry',payload); showAlert('portal-global-alert','Manual entry cleared.','ok'); await loadDocuments(); }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    window.prefillBrokerageFromTiingo=async function(btn){
+      try{ const res=await cscJsonp('getBrokeragePrefill',{}); const data=res.data||{}; const card=btn.closest('.portal-list-item'); const mv=card.querySelector('[data-manual-field="total_market_value"]'); const cb=card.querySelector('[data-manual-field="total_cost_basis"]'); if(mv) mv.value=data.total_market_value||''; if(cb && !cb.value) cb.value=data.total_cost_basis||''; showAlert('portal-global-alert','Brokerage market value prefilled from Tiingo/Positions. Review and save manually.','ok'); }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+
 
     window.previewReport=function(reportId){
       const r=(CSC_DATA.reports?.reports||[]).find(x=>x.report_id===reportId); const el=document.getElementById('report-preview'); if(!r||!el)return;
@@ -572,31 +634,8 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      try{
-        showAlert('portal-global-alert','Parsing statements…','warn');
-        const res=await cscJsonp('parseStatements',{reparse_all:'true'});
-        showAlert('portal-global-alert',`Statement parse complete. Parsed ${res.parsed_count||res.parsed||0}; needs review ${res.needs_review_count||res.needs_review||0}; errors ${res.error_count||0}.`,'ok');
-        loadDocuments(); loadReports();
-      }catch(e){showAlert('portal-global-alert',e.message,'error');}
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v1.8.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
-
-    async function aiParseStatements(){
-      try{
-        showAlert('portal-global-alert','AI parsing statements with OpenAI document reader…','warn');
-        const res=await cscJsonp('aiParseStatements',{ai_reparse_all:'true'});
-        showAlert('portal-global-alert',`AI statement parse complete. Parsed ${res.parsed_count||0}; needs review ${res.needs_review_count||0}; errors ${res.error_count||0}.`,'ok');
-        loadDocuments(); loadReports();
-      }catch(e){showAlert('portal-global-alert',e.message,'error');}
-    }
-    window.aiParseStatementDocument=async function(documentId){
-      try{
-        showAlert('portal-global-alert','AI parsing selected statement…','warn');
-        await cscJsonp('aiParseStatement',{document_id:documentId});
-        showAlert('portal-global-alert','AI statement parse completed. Review parsed summary and report numbers.','ok');
-        loadDocuments(); loadReports();
-      }catch(e){showAlert('portal-global-alert',e.message,'error');}
-    }
-
     window.parseStatementDocument=async function(documentId){
       try{
         showAlert('portal-global-alert','Parsing selected statement…','warn');
@@ -617,13 +656,11 @@
     document.getElementById('refresh-documents').addEventListener('click', loadDocuments);
     document.getElementById('sync-drive-vault')?.addEventListener('click', syncDriveVault);
     document.getElementById('parse-statements')?.addEventListener('click', parseStatements);
-    document.getElementById('ai-parse-statements')?.addEventListener('click', aiParseStatements);
     document.querySelectorAll('[data-doc-filter]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-doc-filter]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');CURRENT_DOC_FILTER=btn.dataset.docFilter;renderDocuments(CSC_DATA.documents||{documents:[]});}));
     document.getElementById('refresh-esign').addEventListener('click', loadESign);
     document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-sync-drive')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('syncDriveVaultDocuments',{}); out.textContent=JSON.stringify(res,null,2); loadDocuments();}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('parseStatements',{reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
-    document.getElementById('settings-ai-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('aiParseStatements',{ai_reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
     document.getElementById('manual-trigger-setup').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('createMonthlyTrigger',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
 
     document.addEventListener('submit',async e=>{
