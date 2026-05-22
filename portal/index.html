@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v1.6.2 Beta | Last Updated on 21 May 2026 @ 23:12:29Z -->
+<!-- CSC Portal Frontend v7.1.0 Alpha | Last Updated on 22 May 2026 @ 02:19:59Z -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -67,11 +67,27 @@
     .portal-document-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
     .portal-classify-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #e8edf4;}
     .portal-classify-form .portal-field{margin-bottom:0;}
-    @media(max-width:760px){.portal-classify-form{grid-template-columns:1fr;}}
+    @media(max-width:760px){.portal-classify-form,.portal-document-meta{grid-template-columns:1fr;}}
 
     .portal-report-editor{display:grid;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #e8edf4;}
     .portal-report-editor textarea{min-height:170px;font-family:Arial,sans-serif;}
     .portal-statement-json{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;min-height:190px;}
+
+
+    .portal-report-section{border:1px solid rgba(15,23,42,.10);border-radius:18px;padding:14px;margin:14px 0;background:#fff;}
+    .portal-report-section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;}
+    .portal-report-section-title h2{margin:0;color:var(--portal-navy);font-size:22px;letter-spacing:-.03em;}
+    .portal-pencil-button{border:1px solid var(--portal-line);background:#fff;color:var(--portal-navy);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;}
+    .portal-pencil-button:hover{background:#fffaeb;border-color:rgba(201,151,43,.45);}
+    .portal-section-note-box{margin:10px 0 12px;padding:11px 13px;border-radius:14px;background:#f8fafc;border:1px solid #e8edf4;color:#334155;font-size:13px;line-height:1.55;}
+    .portal-section-note-editor{margin:10px 0 12px;padding:12px;border-radius:16px;background:#fff7e6;border:1px solid rgba(201,151,43,.34);display:grid;gap:10px;}
+    .portal-section-note-editor textarea{width:100%;min-height:110px;border:1px solid var(--portal-line);border-radius:12px;padding:10px;font:inherit;resize:vertical;background:#fff;}
+    .portal-document-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px;}
+    .portal-document-meta span{display:block;background:#f8fafc;border:1px solid #e8edf4;border-radius:12px;padding:8px;font-size:12px;color:#334155;}
+    .portal-document-meta b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:10px;color:#64748b;margin-bottom:3px;}
+    .portal-json-details{margin-top:10px;}
+    .portal-json-details summary{cursor:pointer;font-weight:900;color:var(--portal-navy);font-size:12px;}
+    .portal-json-details pre{margin-top:8px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border-radius:14px;padding:12px;max-height:260px;overflow:auto;font-size:11px;}
 
     @media(max-width:900px){.portal-login-wrap,.portal-grid-2,.portal-grid-3,.portal-grid-4,.portal-form-grid{grid-template-columns:1fr}.portal-topbar{flex-direction:column}.portal-userline{text-align:left;white-space:normal}.portal-chart{height:300px}.portal-table{min-width:760px}.portal-market-ticker{align-items:center}.portal-market-ticker-label{margin-left:10px}.portal-shell{width:min(100% - 22px,1180px)}}
   </style>
@@ -249,7 +265,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v1.6.2 Beta';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v7.1.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -351,11 +367,150 @@
       const reports=data.reports||[]; if(!reports.length){document.getElementById('reports-content').innerHTML='<p class="portal-small">No reports found yet.</p>';return;}
       document.getElementById('reports-content').innerHTML='<div class="portal-split-list">'+reports.map(r=>`<div class="portal-list-item"><h3>${esc(r.report_title||r.report_id)}</h3><p><span class="portal-badge ${String(r.status).includes('approved')?'green':String(r.status).includes('pending')||String(r.status).includes('draft')?'gold':String(r.status).includes('sent')?'green':''}">${esc(r.status)}</span> ${esc(r.report_period_start||'')} – ${esc(r.report_period_end||'')}</p><p>${esc(r.summary||'')}</p><p class="portal-small">${esc(r.notes||'')}</p><div class="portal-actions"><button class="portal-button portal-button-secondary" onclick="previewReport('${esc(r.report_id)}')">Preview / Edit</button>${isAdmin()?`<button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve</button>`:''}</div></div>`).join('')+'</div><div id="report-preview" class="portal-card portal-section-card" style="margin-top:16px;display:none;"></div>';
     }
+
+
+    const REPORT_SECTION_LABELS = {
+      executive_summary:'Executive Summary',
+      statement_numbers:'Statement Numbers Used',
+      portfolio_snapshot:'Portfolio Snapshot',
+      cash_bank_summary:'Cash / Bank Summary',
+      fidelity_brokerage_summary:'Fidelity / Brokerage Summary',
+      owned_holdings:'Owned Holdings',
+      research_watchlist:'Research-Only Watchlist',
+      transactions_cost_basis:'Transactions / Cost Basis Review',
+      budget_summary:'Budget Summary',
+      capital_contributions:'Capital Contribution Summary',
+      documents_statements_used:'Documents / Statements Used',
+      business_updates:'Business Updates',
+      exceptions:'Exceptions / Needs Review',
+      risk_compliance_notes:'Risk and Compliance Notes',
+      notes_to_investor:'Notes to Investor'
+    };
+    function reportSectionKeyFromHeading(text){
+      const clean=String(text||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+      const map={
+        'executive summary':'executive_summary',
+        'statement numbers used':'statement_numbers',
+        'portfolio snapshot':'portfolio_snapshot',
+        'cash bank summary':'cash_bank_summary',
+        'fidelity brokerage summary':'fidelity_brokerage_summary',
+        'owned holdings':'owned_holdings',
+        'research only watchlist':'research_watchlist',
+        'transactions cost basis review':'transactions_cost_basis',
+        'budget summary':'budget_summary',
+        'capital contribution summary':'capital_contributions',
+        'documents statements used':'documents_statements_used',
+        'business updates':'business_updates',
+        'exceptions needs review':'exceptions',
+        'risk and compliance notes':'risk_compliance_notes',
+        'notes to investor':'notes_to_investor'
+      };
+      return map[clean]||'';
+    }
+    function parseNotesObject(raw){
+      if(!raw) return {};
+      if(typeof raw==='object') return raw;
+      try{return JSON.parse(raw);}catch(e){return {legacy_notes:String(raw)};}
+    }
+    function noteTextForSection(report, key){
+      const notes=parseNotesObject(report.notes||'{}');
+      return notes.section_notes && notes.section_notes[key] ? String(notes.section_notes[key].text||'') : '';
+    }
+    function enhanceReportSections(reportId, report){
+      const body=document.getElementById('report-preview-body');
+      if(!body) return;
+      const sections=[...body.querySelectorAll('section[data-editable-section]')];
+      if(!sections.length){
+        [...body.querySelectorAll('h2')].forEach(h=>{
+          const key=reportSectionKeyFromHeading(h.textContent);
+          if(!key) return;
+          const section=document.createElement('section');
+          section.className='portal-report-section';
+          section.dataset.editableSection=key;
+          h.parentNode.insertBefore(section,h);
+          section.appendChild(h);
+          let node=section.nextSibling;
+          while(node && !(node.nodeType===1 && node.tagName==='H2') && !(node.nodeType===1 && node.matches('section[data-editable-section]'))){
+            const next=node.nextSibling; section.appendChild(node); node=next;
+          }
+        });
+      }
+      [...body.querySelectorAll('section[data-editable-section]')].forEach(section=>{
+        const key=section.dataset.editableSection;
+        if(!REPORT_SECTION_LABELS[key]) return;
+        section.classList.add('portal-report-section');
+        let h=section.querySelector('h2');
+        if(!h){ h=document.createElement('h2'); h.textContent=REPORT_SECTION_LABELS[key]; section.prepend(h); }
+        const existingTitle=section.querySelector(':scope > .portal-report-section-title');
+        if(!existingTitle){
+          const titleWrap=document.createElement('div');
+          titleWrap.className='portal-report-section-title';
+          h.parentNode.insertBefore(titleWrap,h);
+          titleWrap.appendChild(h);
+          if(isAdmin()){
+            const btn=document.createElement('button');
+            btn.type='button'; btn.className='portal-pencil-button'; btn.title='Edit section note'; btn.setAttribute('aria-label','Edit section note'); btn.textContent='✎';
+            btn.addEventListener('click',()=>openSectionNoteEditor(reportId,key,report));
+            titleWrap.appendChild(btn);
+          }
+        }
+        const saved=noteTextForSection(report,key);
+        if(saved){
+          const old=section.querySelector(':scope > .portal-section-note-box'); if(old) old.remove();
+          const box=document.createElement('div'); box.className='portal-section-note-box';
+          box.innerHTML='<strong>Management Note:</strong><br>'+esc(saved).replace(/\n/g,'<br>');
+          const anchor=section.querySelector(':scope > .portal-report-section-title') || section.firstElementChild;
+          anchor.insertAdjacentElement('afterend',box);
+        }
+      });
+    }
+    window.openSectionNoteEditor=function(reportId,key,report){
+      const body=document.getElementById('report-preview-body');
+      const section=body?.querySelector(`section[data-editable-section="${key}"]`);
+      if(!section) return;
+      const old=section.querySelector(':scope > .portal-section-note-editor'); if(old){old.remove();return;}
+      const editor=document.createElement('div'); editor.className='portal-section-note-editor';
+      editor.innerHTML=`<label><strong>${esc(REPORT_SECTION_LABELS[key]||key)} Note</strong></label><textarea id="section-note-${esc(key)}">${esc(noteTextForSection(report,key))}</textarea><div class="portal-actions"><button class="portal-button portal-button-primary" type="button" onclick="saveReportSectionNote('${esc(reportId)}','${esc(key)}')">Save Section Note</button><button class="portal-button portal-button-secondary" type="button" onclick="this.closest('.portal-section-note-editor').remove()">Cancel</button></div>`;
+      const anchor=section.querySelector(':scope > .portal-report-section-title') || section.firstElementChild;
+      anchor.insertAdjacentElement('afterend',editor);
+      editor.querySelector('textarea').focus();
+    }
+    window.saveReportSectionNote=async function(reportId,key){
+      try{
+        const ta=document.getElementById('section-note-'+key);
+        await cscPost('saveReportSectionNote',{report_id:reportId,section_key:key,note_text:ta?ta.value:''});
+        showAlert('portal-global-alert','Section note saved.','ok');
+        await loadReports();
+        setTimeout(()=>previewReport(reportId),150);
+      }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    function renderDocuments(data){
+      const mount=document.getElementById('documents-content');
+      const docs=(data.documents||[]).filter(d=>{
+        const type=String(d.document_type||'').toLowerCase(); const status=String(d.status||d.parser_status||'').toLowerCase(); const cat=String(d.category||'').toLowerCase();
+        if(CURRENT_DOC_FILTER==='all') return true;
+        if(CURRENT_DOC_FILTER==='statements') return type.includes('statement') || ['bank_statement','fidelity_statement','brokerage_statement'].includes(type);
+        if(CURRENT_DOC_FILTER==='legal') return type.includes('agreement') || cat.includes('legal') || type.includes('company_document');
+        if(CURRENT_DOC_FILTER==='reports') return type.includes('report') || cat.includes('report');
+        if(CURRENT_DOC_FILTER==='signed') return type.includes('signed') || String(d.signature_status||'').toLowerCase().includes('signed');
+        if(CURRENT_DOC_FILTER==='needs_review') return status.includes('review') || d.parsed_needs_review===true;
+        return true;
+      });
+      if(!docs.length){mount.innerHTML='<p class="portal-small">No documents found for this filter.</p>';return;}
+      mount.innerHTML='<div class="portal-split-list">'+docs.map(d=>{
+        const isStatement=String(d.document_type||'').toLowerCase().includes('statement');
+        const badgeClass=String(d.status||d.parser_status||'').toLowerCase().includes('parsed')?'green':String(d.status||d.parser_status||'').toLowerCase().includes('review')?'gold':'';
+        const summary=d.parsed_summary?(()=>{try{return JSON.stringify(JSON.parse(d.parsed_summary),null,2)}catch(e){return String(d.parsed_summary)}})():'';
+        return `<div class="portal-list-item"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-badge ${badgeClass}">${esc(d.status||d.parser_status||'uploaded')}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Parser</b>${esc(d.parser_name||'—')}</span><span><b>Text Length</b>${esc(d.text_length||'—')}</span><span><b>Extraction</b>${esc(d.extraction_method||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Balances</b>${money(d.beginning_balance)} → ${money(d.ending_balance)}</span></div>${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}${isStatement&&d.document_id?`<button class="portal-button portal-button-dark" type="button" onclick="parseStatementDocument('${esc(d.document_id)}')">Re-parse</button>`:''}</div>${summary?`<details class="portal-json-details"><summary>Parsed Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
+      }).join('')+'</div>';
+    }
+
     window.previewReport=function(reportId){
       const r=(CSC_DATA.reports?.reports||[]).find(x=>x.report_id===reportId); const el=document.getElementById('report-preview'); if(!r||!el)return;
       el.style.display='block';
       const body=r.html_body||'<p>No HTML body saved.</p>';
-      el.innerHTML=`<div class="portal-section-head"><div><p class="portal-kicker">Report Review</p><h2 class="portal-section-title">${esc(r.report_title||r.report_id)}</h2><p>Text can be edited here. Correct accounting numbers in source records, not hidden report HTML.</p></div><span class="portal-badge gold">${esc(r.status||'pending_review')}</span></div><div id="report-preview-body">${body}</div>${isAdmin()?`<div class="portal-report-editor"><div class="portal-field"><label>Executive Summary / Report Summary</label><textarea class="portal-textarea" id="edit-report-summary">${esc(r.summary||'')}</textarea></div><div class="portal-field"><label>Report HTML Body</label><textarea class="portal-textarea" id="edit-report-html">${esc(r.html_body||'')}</textarea></div><div class="portal-field"><label>Notes / Exceptions / Investor Notes</label><textarea class="portal-textarea" id="edit-report-notes">${esc(r.notes||'')}</textarea></div><div class="portal-field"><label>Business Update to Save</label><textarea class="portal-textarea" id="edit-business-update" placeholder="Write a manual Business Updates paragraph here if needed."></textarea></div><div class="portal-actions"><button class="portal-button portal-button-primary" onclick="saveReportDraft('${esc(r.report_id)}','draft')">Save Draft</button><button class="portal-button portal-button-secondary" onclick="saveReportDraft('${esc(r.report_id)}','pending_review')">Mark Pending Review</button><button class="portal-button portal-button-secondary" onclick="saveBusinessUpdateForReport('${esc(r.report_id)}')">Save Business Update</button><button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve Report</button></div></div>`:''}`;
+      el.innerHTML=`<div class="portal-section-head"><div><p class="portal-kicker">Report Review</p><h2 class="portal-section-title">${esc(r.report_title||r.report_id)}</h2><p>Use the pencil icon beside each section to save notes/summaries for that exact section. Correct accounting numbers in source records, not hidden report HTML.</p></div><span class="portal-badge gold">${esc(r.status||'pending_review')}</span></div><div id="report-preview-body">${body}</div>${isAdmin()?`<div class="portal-report-editor"><div class="portal-field"><label>Executive Summary / Report Summary</label><textarea class="portal-textarea" id="edit-report-summary">${esc(r.summary||'')}</textarea></div><div class="portal-field"><label>Report HTML Body</label><textarea class="portal-textarea" id="edit-report-html">${esc(r.html_body||'')}</textarea></div><div class="portal-field"><label>Notes JSON / Exceptions / Investor Notes</label><textarea class="portal-textarea" id="edit-report-notes">${esc(r.notes||'')}</textarea></div><div class="portal-field"><label>Business Update to Save</label><textarea class="portal-textarea" id="edit-business-update" placeholder="Write a manual Business Updates paragraph here if needed."></textarea></div><div class="portal-actions"><button class="portal-button portal-button-primary" onclick="saveReportDraft('${esc(r.report_id)}','draft')">Save Draft</button><button class="portal-button portal-button-secondary" onclick="saveReportDraft('${esc(r.report_id)}','pending_review')">Mark Pending Review</button><button class="portal-button portal-button-secondary" onclick="saveBusinessUpdateForReport('${esc(r.report_id)}')">Save Business Update</button><button class="portal-button portal-button-primary" onclick="approveReport('${esc(r.report_id)}')">Approve Report</button></div></div>`:''}`;
+      enhanceReportSections(reportId,r);
       el.scrollIntoView({behavior:'smooth',block:'start'});
     }
     window.saveReportDraft=async function(reportId,status){ try{ await cscPost('saveReportEdits',{report_id:reportId,status,summary:document.getElementById('edit-report-summary').value,html_body:document.getElementById('edit-report-html').value,notes:document.getElementById('edit-report-notes').value}); showAlert('portal-global-alert','Report edits saved.','ok'); loadReports(); }catch(e){showAlert('portal-global-alert',e.message,'error');} }
@@ -419,8 +574,8 @@
     async function parseStatements(){
       try{
         showAlert('portal-global-alert','Parsing statements…','warn');
-        const res=await cscJsonp('parseStatements',{});
-        showAlert('portal-global-alert',`Statement parse complete. Parsed ${res.parsed_count||0}.`,'ok');
+        const res=await cscJsonp('parseStatements',{reparse_all:'true'});
+        showAlert('portal-global-alert',`Statement parse complete. Parsed ${res.parsed_count||res.parsed||0}; needs review ${res.needs_review_count||res.needs_review||0}; errors ${res.error_count||0}.`,'ok');
         loadDocuments(); loadReports();
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
@@ -448,7 +603,7 @@
     document.getElementById('refresh-esign').addEventListener('click', loadESign);
     document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-sync-drive')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('syncDriveVaultDocuments',{}); out.textContent=JSON.stringify(res,null,2); loadDocuments();}catch(e){out.textContent=e.message;} });
-    document.getElementById('settings-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('parseStatements',{}); out.textContent=JSON.stringify(res,null,2); loadDocuments();}catch(e){out.textContent=e.message;} });
+    document.getElementById('settings-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('parseStatements',{reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
     document.getElementById('manual-trigger-setup').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('createMonthlyTrigger',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
 
     document.addEventListener('submit',async e=>{
