@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v7.1.0 Alpha | Last Updated on 22 May 2026 @ 02:19:59Z -->
+<!-- CSC Portal Frontend v7.1.1 Alpha | Last Updated on 22 May 2026 @ 02:19:59Z -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -238,7 +238,7 @@
                 <div><p class="portal-kicker">View Documents</p><h2 class="portal-section-title">Document Vault</h2><p>Sync, classify, review, and open uploaded Drive vault files.</p></div>
                 <div class="portal-actions">
                   <button class="portal-button portal-button-secondary" id="sync-drive-vault" type="button">Sync Drive Vault</button>
-                  <button class="portal-button portal-button-secondary" id="parse-statements" type="button">Parse Statements</button>
+                  <button class="portal-button portal-button-secondary" id="parse-statements" type="button">Drive OCR Parse</button><button class="portal-button portal-button-primary" id="ai-parse-statements" type="button">AI Parse Statements</button>
                   <button class="portal-button portal-button-dark" id="refresh-documents" type="button">Refresh Documents</button>
                 </div>
               </div>
@@ -257,7 +257,7 @@
 
         <section id="tab-esign" class="portal-panel"><div class="portal-grid portal-grid-2"><article class="portal-section-card portal-card"><p class="portal-kicker">Internal E-Sign</p><h2 class="portal-section-title">Create Request</h2><form id="esign-create-form"><div class="portal-field"><label for="esign-document-id">Document ID</label><input class="portal-input" id="esign-document-id" name="document_id" required></div><div class="portal-field"><label for="esign-title">Title</label><input class="portal-input" id="esign-title" name="title" required></div><div class="portal-field"><label for="esign-email">Signer Email</label><input class="portal-input" id="esign-email" name="signer_email" type="email" required></div><div class="portal-field"><label for="esign-message">Message</label><textarea class="portal-textarea" id="esign-message" name="message"></textarea></div><button class="portal-button portal-button-primary" type="submit">Create E-Sign Request</button></form><div id="esign-create-alert" class="portal-alert"></div></article><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Requests</p><h2 class="portal-section-title">Pending & Completed</h2></div><button class="portal-button portal-button-dark" id="refresh-esign" type="button">Refresh</button></div><div id="esign-content"></div></article></div></section>
 
-        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
+        <section id="tab-settings" class="portal-panel"><article class="portal-section-card portal-card"><div class="portal-section-head"><div><p class="portal-kicker">Settings</p><h2 class="portal-section-title">Portal Configuration</h2><p>Admin controls and backend test actions.</p></div></div><div id="settings-content"></div><div class="portal-actions" style="margin-top:16px;"><button class="portal-button portal-button-dark" id="health-check" type="button">Health Check</button><button class="portal-button portal-button-secondary" id="settings-sync-drive" type="button">Sync Drive Vault</button><button class="portal-button portal-button-secondary" id="settings-parse-statements" type="button">Drive OCR Parse</button><button class="portal-button portal-button-primary" id="settings-ai-parse-statements" type="button">AI Parse Statements</button><button class="portal-button portal-button-secondary" id="settings-test-report" type="button">Test Report</button><button class="portal-button portal-button-secondary" id="manual-trigger-setup" type="button">Create Monthly Trigger</button></div><pre id="settings-output" class="portal-pre" style="margin-top:16px;display:none;"></pre></article></section>
       </section>
     </div>
   </main>
@@ -265,7 +265,7 @@
 
   <script>
     const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v7.1.0 Alpha';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v7.1.1 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -501,7 +501,7 @@
         const isStatement=String(d.document_type||'').toLowerCase().includes('statement');
         const badgeClass=String(d.status||d.parser_status||'').toLowerCase().includes('parsed')?'green':String(d.status||d.parser_status||'').toLowerCase().includes('review')?'gold':'';
         const summary=d.parsed_summary?(()=>{try{return JSON.stringify(JSON.parse(d.parsed_summary),null,2)}catch(e){return String(d.parsed_summary)}})():'';
-        return `<div class="portal-list-item"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-badge ${badgeClass}">${esc(d.status||d.parser_status||'uploaded')}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Parser</b>${esc(d.parser_name||'—')}</span><span><b>Text Length</b>${esc(d.text_length||'—')}</span><span><b>Extraction</b>${esc(d.extraction_method||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Balances</b>${money(d.beginning_balance)} → ${money(d.ending_balance)}</span></div>${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}${isStatement&&d.document_id?`<button class="portal-button portal-button-dark" type="button" onclick="parseStatementDocument('${esc(d.document_id)}')">Re-parse</button>`:''}</div>${summary?`<details class="portal-json-details"><summary>Parsed Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
+        return `<div class="portal-list-item"><h3>${esc(d.title||d.file_name||d.document_id)}</h3><p><span class="portal-badge ${badgeClass}">${esc(d.status||d.parser_status||'uploaded')}</span> ${esc(d.document_type||'')}</p><p>${esc(d.file_name||'')}</p><div class="portal-document-meta"><span><b>Institution</b>${esc(d.parser_institution||'—')}</span><span><b>Parser</b>${esc(d.parser_name||'—')}</span><span><b>Source</b>${esc(d.parse_source||'—')}</span><span><b>Model</b>${esc(d.openai_model||'—')}</span><span><b>Confidence</b>${esc(d.ai_confidence||'—')}</span><span><b>Text Length</b>${esc(d.text_length||'—')}</span><span><b>Extraction</b>${esc(d.extraction_method||'—')}</span><span><b>Period</b>${esc((d.statement_period_start||'')+' – '+(d.statement_period_end||''))}</span><span><b>Balances</b>${money(d.beginning_balance)} → ${money(d.ending_balance)}</span><span><b>Deposits</b>${money(d.deposits)}</span><span><b>Withdrawals</b>${money(d.withdrawals)}</span><span><b>Daily Balances</b>${esc(d.daily_balance_count||0)}</span><span><b>Transactions</b>${esc(d.transaction_count||0)}</span></div>${d.review_reasons?`<p class="portal-small" style="color:#93370d"><strong>Review:</strong> ${esc(d.review_reasons)}</p>`:''}${d.parsed_error?`<p class="portal-small" style="color:#912018">${esc(d.parsed_error)}</p>`:''}<div class="portal-document-actions">${d.file_url?`<a class="portal-button portal-button-secondary" href="${esc(d.file_url)}" target="_blank" rel="noopener">Open</a>`:''}${isStatement&&d.document_id?`<button class="portal-button portal-button-dark" type="button" onclick="parseStatementDocument('${esc(d.document_id)}')">Drive OCR Re-parse</button><button class="portal-button portal-button-primary" type="button" onclick="aiParseStatementDocument('${esc(d.document_id)}')">AI Re-parse</button>`:''}</div>${summary?`<details class="portal-json-details"><summary>Parsed Summary Preview</summary><pre>${esc(summary)}</pre></details>`:''}</div>`;
       }).join('')+'</div>';
     }
 
@@ -579,6 +579,24 @@
         loadDocuments(); loadReports();
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
+
+    async function aiParseStatements(){
+      try{
+        showAlert('portal-global-alert','AI parsing statements with OpenAI document reader…','warn');
+        const res=await cscJsonp('aiParseStatements',{ai_reparse_all:'true'});
+        showAlert('portal-global-alert',`AI statement parse complete. Parsed ${res.parsed_count||0}; needs review ${res.needs_review_count||0}; errors ${res.error_count||0}.`,'ok');
+        loadDocuments(); loadReports();
+      }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+    window.aiParseStatementDocument=async function(documentId){
+      try{
+        showAlert('portal-global-alert','AI parsing selected statement…','warn');
+        await cscJsonp('aiParseStatement',{document_id:documentId});
+        showAlert('portal-global-alert','AI statement parse completed. Review parsed summary and report numbers.','ok');
+        loadDocuments(); loadReports();
+      }catch(e){showAlert('portal-global-alert',e.message,'error');}
+    }
+
     window.parseStatementDocument=async function(documentId){
       try{
         showAlert('portal-global-alert','Parsing selected statement…','warn');
@@ -599,11 +617,13 @@
     document.getElementById('refresh-documents').addEventListener('click', loadDocuments);
     document.getElementById('sync-drive-vault')?.addEventListener('click', syncDriveVault);
     document.getElementById('parse-statements')?.addEventListener('click', parseStatements);
+    document.getElementById('ai-parse-statements')?.addEventListener('click', aiParseStatements);
     document.querySelectorAll('[data-doc-filter]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-doc-filter]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');CURRENT_DOC_FILTER=btn.dataset.docFilter;renderDocuments(CSC_DATA.documents||{documents:[]});}));
     document.getElementById('refresh-esign').addEventListener('click', loadESign);
     document.getElementById('health-check').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('health',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-sync-drive')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('syncDriveVaultDocuments',{}); out.textContent=JSON.stringify(res,null,2); loadDocuments();}catch(e){out.textContent=e.message;} });
     document.getElementById('settings-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('parseStatements',{reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
+    document.getElementById('settings-ai-parse-statements')?.addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('aiParseStatements',{ai_reparse_all:'true'}); out.textContent=JSON.stringify(res,null,2); loadDocuments(); loadReports();}catch(e){out.textContent=e.message;} });
     document.getElementById('manual-trigger-setup').addEventListener('click',async()=>{ const out=document.getElementById('settings-output'); out.style.display='block'; try{const res=await cscJsonp('createMonthlyTrigger',{}); out.textContent=JSON.stringify(res,null,2);}catch(e){out.textContent=e.message;} });
 
     document.addEventListener('submit',async e=>{
