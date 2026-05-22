@@ -595,7 +595,7 @@ The email shell includes:
 - Research-only positions never count toward portfolio totals.
 - Cost basis, quantity, and ownership status remain CSC record fields only.
 
-Last Updated: 22 May 2026 @ 02:19:59Z UTC  
+Last Updated: 22 May 2026 @ 02:50:49Z UTC  
 Developed by Cook Technology Services
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
