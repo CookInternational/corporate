@@ -1,13 +1,147 @@
 [Uploading CSC_PORTAL_REPORTS_DOCUMENTS_README.md…]()
-# CSC Portal v1.7.0 Alpha - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+# CSC Portal v1.7.1 Alpha - Reports, Documents & Drive Vault | Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 
 **Cook Services Company, LLC**  
-**Build:** CSC Portal v1.7.0 Alpha  
-**Updated:** 21 May 2026 @ 23:46:42Z UTC  
+**Build:** CSC Portal v1.7.1 Alpha  
+**Updated:** 22 May 2026 @ 02:19:59Z UTC  
 **Website:** https://corporate.cook-international.com  
 **Portal:** https://corporate.cook-international.com/portal/  
 **Contact:** cookservicescompany@gmail.com
+
+# CSC Portal v7.1.0 Alpha
+
+**Last Updated:** 22 May 2026 @ 02:19:59Z UTC  
+**Backend Build Stamp:** 22 May 2026 @ 02:19:59Z UTC  
+**Backend Version:** `CSC PORTAL BACKEND v7.1.0 Alpha`  
+**Frontend Version:** `CSC Portal Frontend v7.1.0 Alpha`  
+**Copyright:** Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+
+## Purpose
+
+This build fixes the CSC Portal report pipeline so uploaded U.S. Bank statements and Fidelity GPS/reference reports are actually read, parsed, saved into `Statements.parsed_summary`, and used by the monthly investor report builder. It also updates the portal report preview so each report section has its own pencil-icon note editor.
+
+## What changed from v1.7.0 Alpha
+
+### 1. Verification-first PDF extraction
+
+The backend now treats statement parsing as a visible chain:
+
+`Drive PDF → text extraction/OCR → parser detection → parsed_summary JSON → report builder → portal preview`
+
+For every parsed statement, the backend records diagnostic values such as:
+
+- `text_length`
+- `extraction_method`
+- `parser`
+- `institution`
+- `statement_period_start`
+- `statement_period_end`
+- `beginning_balance`
+- `ending_balance`
+- `balance_by_date`
+- `parsed_at`
+- `needs_review`
+
+If text extraction fails or returns too little text, the statement is marked `needs_review` instead of silently producing zero-filled reports.
+
+### 2. U.S. Bank parser hardening
+
+The U.S. Bank parser was hardened for Business Essentials Checking statement formats, including:
+
+- optional dollar signs
+- spaces after dollar signs
+- trailing minus signs such as `542.46-`
+- item counts before amounts such as `Other Deposits 3 524.65`
+- beginning and ending balance fallback period detection
+- daily balance summaries for 15th-to-15th reporting
+- parsed transactions where possible
+
+### 3. Fidelity GPS/reference parser
+
+Fidelity GPS / Guided Portfolio Summary documents are treated as portfolio-reference material, not the official cash accounting source. The parser stores values such as total selected account value and account-level reference values, while marking the document as educational/reference-only.
+
+### 4. 15th-to-15th report logic
+
+Monthly reports still use the 15th-to-15th reporting window. If the requested period is incomplete, the report builder falls back to the latest complete two-month bank-statement-backed period and records the reason in report notes.
+
+Reports now use `Statements.parsed_summary` for statement-backed cash numbers and do not silently treat missing values as correct zero values.
+
+### 5. Portal section notes with pencil icons
+
+The portal report preview now adds pencil icons beside editable report sections. Each section note saves through the backend action `saveReportSectionNote` and is stored inside the existing `Reports.notes` JSON under:
+
+```json
+{
+  "section_notes": {
+    "capital_contributions": {
+      "text": "Example note",
+      "updated_at": "2026-05-22T02:19:59.000Z",
+      "updated_by": "admin@example.com"
+    }
+  }
+}
+```
+
+No new Google Sheet tabs are required.
+
+## Files in this package
+
+- `CSC_PORTAL_BACKEND_v7.1.0_Alpha.gs` — full corrected Apps Script backend
+- `index_v7.1.0_Alpha.html` — corrected portal frontend
+- `README_CSC_PORTAL_v7.1.0_Alpha.md` — this README
+- `appsscript_v7.1.0_Alpha.json` — manifest copy with Drive/Sheets/Mail scopes and Advanced Drive API v2
+
+## Required Apps Script setup
+
+1. Open the Apps Script project.
+2. Replace the backend `.gs` file with `CSC_PORTAL_BACKEND_v7.1.0_Alpha.gs`.
+3. Confirm `appsscript.json` is visible in Project Settings.
+4. Confirm Advanced Google Services includes **Drive API v2**.
+5. Confirm the Google Cloud project has Drive API enabled.
+6. Deploy a new Web App version as:
+   - Execute as: **Me**
+   - Who has access: **Anyone** or the same public setting currently used by the portal
+
+## Portal setup
+
+Replace the existing portal `index.html` with `index_v7.1.0_Alpha.html`.
+
+The portal web app URL is unchanged:
+
+```text
+https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
+```
+
+## Acceptance test
+
+1. Log into the portal as admin.
+2. Upload or sync the March U.S. Bank statement.
+3. Upload or sync the April U.S. Bank statement.
+4. Click **Parse Statements**.
+5. Open the Documents tab and confirm statement rows show parser diagnostics:
+   - parser
+   - text length
+   - extraction method
+   - period dates
+   - beginning and ending balances
+6. Click **Generate Report**.
+7. Open **Preview / Edit**.
+8. Confirm cash numbers are not all zero when statements parsed successfully.
+9. Click the pencil icon beside **Capital Contribution Summary**.
+10. Add a note and save.
+11. Refresh reports and preview again.
+12. Confirm the note remains visible under that section.
+13. Approve only after statement values and notes are reviewed.
+
+## Notes
+
+- No new tabs were added.
+- Canonical sheet headers were preserved.
+- The backend uses one `doGet` and one `doPost`.
+- The section-note workflow stores data in existing `Reports.notes` JSON.
+- Accounting corrections should still be made in source records, not hidden report HTML.
+
 
 # CSC Portal Backend v1.7.0 Alpha
 
@@ -371,7 +505,7 @@ The email shell includes:
 - Research-only positions never count toward portfolio totals.
 - Cost basis, quantity, and ownership status remain CSC record fields only.
 
-Last Updated: 21 May 2026 @ 23:12:29Z
+Last Updated: 22 May 2026 @ 02:19:59Z UTC  
 Developed by Cook Technology Services
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
