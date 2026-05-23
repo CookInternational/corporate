@@ -1,6 +1,6 @@
 /*
   CSC Corporate Shared Shell
-  Last Updated: 22 May 2026 @ 20:19:35Z UTC
+  Last Updated: 23 May 2026 @ 19:08:09Z UTC
   Copyright © 2026 Cook Services Company, LLC | All Rights Reserved.
 */
 (function () {
@@ -11,8 +11,23 @@
   const path = window.location.pathname.replace(/\/index\.html$/, '/');
 
   function pageLink(href, label, extraAttrs = '') {
-    const normalizedHref = href === '/' ? '/' : href.replace(/\/index\.html$/, '/');
-    const isCurrent = path === normalizedHref || (href.startsWith('#') && window.location.hash === href);
+    let isCurrent = false;
+
+    try {
+      if (href.startsWith('#')) {
+        isCurrent = window.location.hash === href;
+      } else {
+        const url = new URL(href, window.location.origin);
+        const currentUrl = new URL(window.location.href);
+        const normalizedPath = url.pathname.replace(/\/index\.html$/, '/') || '/';
+        const normalizedCurrentPath = currentUrl.pathname.replace(/\/index\.html$/, '/') || '/';
+        const samePage = url.origin === currentUrl.origin && normalizedPath === normalizedCurrentPath;
+        isCurrent = samePage && (!url.hash || url.hash === currentUrl.hash);
+      }
+    } catch (error) {
+      isCurrent = path === href.replace(/\/index\.html$/, '/');
+    }
+
     return `<a href="${href}" ${isCurrent ? 'aria-current="page"' : ''} ${extraAttrs}>${label}</a>`;
   }
 
@@ -31,7 +46,8 @@
           </a>
           <button class="csc-nav-toggle" type="button" aria-expanded="false" aria-controls="csc-primary-nav">Menu</button>
           <nav class="csc-nav" id="csc-primary-nav" aria-label="Primary navigation">
-            ${pageLink('/', 'Home')}
+            ${pageLink('https://www.cook-international.com/', 'Home')}
+            ${pageLink('https://corporate.cook-international.com/', 'Corporate')}
             ${pageLink('/#portfolio', 'Portfolio')}
             ${pageLink('/investors/', 'Investors')}
             ${pageLink('/#contact', 'Contact')}
