@@ -1,6 +1,6 @@
 /*
   CSC Corporate Shared Styles
-  Last Updated: 22 May 2026 @ 20:19:35Z UTC
+  Last Updated: 23 May 2026 @ 19:08:09Z UTC
   Copyright © 2026 Cook Services Company, LLC | All Rights Reserved.
 */
 :root {
@@ -1404,5 +1404,127 @@ img {
 
   .csc-custom-ticker {
     display: flex;
+  }
+}
+
+/* Corporate portfolio brand-logo cards — 23 May 2026 @ 19:08:09Z UTC */
+.csc-brand-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.csc-brand-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.csc-brand-card {
+  position: relative;
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  border-radius: var(--csc-radius);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--csc-line);
+  box-shadow: 0 16px 46px rgba(7, 23, 47, 0.10);
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.csc-brand-card:hover,
+.csc-brand-card:focus {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 72px rgba(7, 23, 47, 0.16);
+  border-color: rgba(201, 151, 43, 0.52);
+  text-decoration: none;
+}
+
+.csc-brand-card::after {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -85px;
+  top: -85px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(201, 151, 43, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.csc-brand-logo-box {
+  position: relative;
+  z-index: 1;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 22px;
+  border: 1px solid rgba(7, 23, 47, 0.10);
+  padding: 18px;
+}
+
+.csc-brand-logo-box img {
+  max-height: 198px;
+  max-width: 98%;
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.csc-brand-card h3 {
+  margin: 24px 0 0;
+  color: var(--csc-navy);
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.csc-brand-card p {
+  margin: 12px 0 0;
+  color: #526074;
+  line-height: 1.62;
+  font-size: 14.5px;
+}
+
+.csc-brand-card .csc-card-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  color: var(--csc-blue);
+  font-weight: 950;
+  font-size: 14px;
+}
+
+.csc-brand-card sup {
+  font-size: 0.55em;
+  line-height: 0;
+  position: relative;
+  top: -0.3em;
+}
+
+@media (max-width: 980px) {
+  .csc-brand-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .csc-brand-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .csc-brand-card {
+    min-height: 390px;
+  }
+
+  .csc-brand-logo-box {
+    height: 200px;
+  }
+
+  .csc-brand-logo-box img {
+    max-height: 170px;
   }
 }
