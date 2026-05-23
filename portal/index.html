@@ -1,4 +1,4 @@
-<!-- CSC Portal Frontend v2.4.0 Alpha | Last Updated on 22 May 2026 @ 19:11:58Z UTC -->
+<!-- CSC Portal Frontend v2.5.0 Alpha | Last Updated on 23 May 2026 @ 12:46:37Z UTC -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -295,8 +295,8 @@
   <div id="csc-site-footer"></div>
 
   <script>
-    const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZn7soezxSkOd7FeydEvP6M_3LiZmrQvcx6bWtULz8-ZXaEKJSNo2vElJ_DkS5D_eN2g/exec';
-    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.4.0 Alpha';
+    const CSC_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec';
+    const CSC_PORTAL_VERSION = 'CSC Portal Frontend v2.5.0 Alpha';
     const SESSION_KEY = 'csc_portal_session_v1';
     let CSC_SESSION = null;
     let CSC_DATA = { dashboard:null, positions:null, reports:null, documents:null, esign:null };
@@ -1077,7 +1077,7 @@
       }catch(e){showAlert('portal-global-alert',e.message,'error');}
     }
     async function parseStatements(){
-      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.4.0 Alpha. Use Manual Numbers on each statement card.','warn');
+      showAlert('portal-global-alert','Manual Statement Entry is active. Legacy parser is disabled by default in v2.5.0 Alpha. Use Manual Numbers on each statement card.','warn');
     }
     window.parseStatementDocument=async function(documentId){
       try{
