@@ -1,8 +1,8 @@
-[README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md](https://github.com/user-attachments/files/28160644/README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md)
-# CSC Portal v2.4.0 Alpha — Tiingo Grid, TradingView Ticker & Password Access Hardfix
+[README_CSC_PORTAL_v2.5.0_Alpha_FULL_UPDATED.md](https://github.com/user-attachments/files/28160644/README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md)
+# CSC Portal v2.5.0 Alpha — Tiingo Grid, TradingView Ticker & Password Access Hardfix
 
-**Last Updated:** 22 May 2026 @ 19:21:15Z UTC  
-**Backend Build Stamp:** 22 May 2026 @ 19:21:15Z UTC  
+**Last Updated:** 23 May 2026 @ 12:52:08Z UTC  
+**Backend Build Stamp:** 23 May 2026 @ 12:46:37Z UTC
 **Backend Version:** `CSC PORTAL BACKEND v2.4.0 Alpha`  
 **Frontend Version:** `CSC Portal Frontend v2.4.0 Alpha`  
 **Sheet Name:** `CSC Website`  
@@ -17,6 +17,35 @@
 **Copyright:** Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 
 ---
+
+CSC Portal v2.5.0 Alpha — CSC Account Cutover
+Last Updated on 23 May 2026 @ 12:46:37Z UTC
+
+Files in this package:
+1. CSC_PORTAL_BACKEND_v2.5.0_Alpha.gs
+2. index.html
+3. appsscript.json
+
+What changed from v2.4.0 Alpha:
+- Backend version changed to CSC PORTAL BACKEND v2.5.0 Alpha.
+- Frontend version changed to CSC Portal Frontend v2.5.0 Alpha.
+- Google Apps Script Web App URL changed to:
+  https://script.google.com/macros/s/AKfycbyzg1NZxxv0VQUEtK9H7yhoq2tPcTbhBsh9SiYnJDUbXXz6pnfMVndYCgIESN7eLWHG/exec
+- Portal sender/reply/admin identity moved to:
+  cookservicescompany@gmail.com
+- Drive uploads/sync folder changed to Website Uploads:
+  1tkny64DDcoIXYuuVhOIeWxN2KS6U89EL
+- appsscript.json includes Drive, Sheets, external request, send mail, and scriptapp scopes.
+- appsscript.json enables Advanced Drive service as Drive API v2.
+- Web app manifest remains executeAs USER_DEPLOYING and access ANYONE_ANONYMOUS.
+- Same spreadsheet ID preserved:
+  1AiSta8CqjbBAu5dZeiQoFmQ0Xdn054-v6soEa_hQ_RE
+
+Deploy note:
+Paste/replace the .gs code and appsscript.json while logged into cookservicescompany@gmail.com, save, authorize, and deploy a new web app version. Because webapp.executeAs is USER_DEPLOYING, the deployed app should run as the CSC account when deployed from that CSC Gmail account.
+
+Important:
+This build intentionally locks WEB_APP_URL, DRIVE_DOCUMENTS_FOLDER_ID, COMPANY_EMAIL, and REPLY_TO to the approved v2.5.0 Alpha constants so stale Config tab rows do not send uploads or mail identity back to the prior account/folder.
 
 ## 1. Purpose
 
@@ -949,7 +978,7 @@ Tiingo-backed research-only Portfolio Grid pricing, dynamic TradingView ticker, 
 
 ---
 
-Last Updated: 22 May 2026 @ 19:21:15Z UTC  
+Last Updated: 23 May 2026 @ 12:52:08Z UTC  
 Developed by Cook Technology Services  
 Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
 End of README
