@@ -18,6 +18,8 @@
 
 ---
 
+Copyright © 2026 Cook Services Company, LLC | All Rights Reserved | Developed by Cook Technology Services | https://cts.cook-international.com | Last Updated on 23 June 2026 at 05:17:00Z
+
 CSC Portal v2.5.0 Alpha — CSC Account Cutover
 Last Updated on 23 May 2026 @ 12:46:37Z UTC
 
@@ -978,7 +980,7 @@ Tiingo-backed research-only Portfolio Grid pricing, dynamic TradingView ticker, 
 
 ---
 
-Last Updated: 23 May 2026 @ 12:52:08Z UTC  
+Last Updated: 23 June 2026 @ 05:17:08Z UTC  
 Developed by Cook Technology Services  
-Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+Copyright © 2026 Cook Services Company, LLC | All Rights Reserved.
 End of README
