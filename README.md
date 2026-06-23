@@ -1,7 +1,7 @@
 [README_CSC_PORTAL_v2.5.0_Alpha_FULL_UPDATED.md](https://github.com/user-attachments/files/28160644/README_CSC_PORTAL_v2.4.0_Alpha_FULL_UPDATED.md)
 # CSC Portal v2.5.0 Alpha — Tiingo Grid, TradingView Ticker & Password Access Hardfix
 
-**Last Updated:** 23 May 2026 @ 12:52:08Z UTC  
+**Last Updated:** 23 June 2026 @ 05:17:08Z UTC  
 **Backend Build Stamp:** 23 May 2026 @ 12:46:37Z UTC
 **Backend Version:** `CSC PORTAL BACKEND v2.4.0 Alpha`  
 **Frontend Version:** `CSC Portal Frontend v2.4.0 Alpha`  
@@ -14,11 +14,9 @@
 **Executing Account:** `tips@cgnnews.net`  
 **Visible Sender Name:** `Cook Services Company`  
 **Company:** Cook Services Company, LLC  
-**Copyright:** Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+**Copyright:** Copyright © 2026 Cook Services Company, LLC | All Rights Reserved | Developed by Cook Technology Services
 
 ---
-
-Copyright © 2026 Cook Services Company, LLC | All Rights Reserved | Developed by Cook Technology Services | https://cts.cook-international.com | Last Updated on 23 June 2026 at 05:17:00Z
 
 CSC Portal v2.5.0 Alpha — CSC Account Cutover
 Last Updated on 23 May 2026 @ 12:46:37Z UTC
