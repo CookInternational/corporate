@@ -14,7 +14,7 @@
 **Executing Account:** `tips@cgnnews.net`  
 **Visible Sender Name:** `Cook Services Company`  
 **Company:** Cook Services Company, LLC  
-**Copyright:** Copyright © 2026 Cook Services Company, LLC | All Rights Reserved | Developed by Cook Technology Services
+**Copyright:** Copyright © 2026 Cook Services Company, LLC | All Rights Reserved
 
 ---
 
